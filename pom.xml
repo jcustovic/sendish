@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.sendish</groupId>
+    <artifactId>sendish-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <description>Sendish parent project</description>
+
+    <modules>
+        <module>repository</module>
+        <module>location-importer</module>
+        <module>sendish-api</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+
+        <version.spring-boot>1.1.9.RELEASE</version.spring-boot>
+        <version.joda-time>2.5</version.joda-time>
+        <version.joda-time-hibernate>1.3</version.joda-time-hibernate>
+        <version.org.jadira.usertype>3.2.0.GA</version.org.jadira.usertype>
+        <version.hibernate-spatial>4.3</version.hibernate-spatial>
+        <version.vividsolutions.jts>1.13</version.vividsolutions.jts>
+        <version.swagger-springmvc>0.8.8</version.swagger-springmvc>
+        <version.ehcache>2.9.0</version.ehcache>
+        <version.hibernate>4.3.7.Final</version.hibernate>
+        <version.prettytime>3.2.5.Final</version.prettytime>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <!-- Import dependency management from Spring Boot -->
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${version.spring-boot}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${version.joda-time}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jadira.usertype</groupId>
+                <artifactId>usertype.core</artifactId>
+                <version>${version.org.jadira.usertype}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-spatial</artifactId>
+                <version>${version.hibernate-spatial}</version>
+            </dependency>
+            
+            <dependency>
+				<groupId>com.vividsolutions</groupId>
+				<artifactId>jts</artifactId>
+				<version>${version.vividsolutions.jts}</version>
+			</dependency>
+            
+			<dependency>
+				<groupId>com.mangofactory</groupId>
+				<artifactId>swagger-springmvc</artifactId>
+				<version>${version.swagger-springmvc}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-ehcache</artifactId>
+				<version>${version.hibernate}</version>
+			</dependency>
+
+            <dependency>
+                <groupId>org.ocpsoft.prettytime</groupId>
+                <artifactId>prettytime</artifactId>
+                <version>${version.prettytime}</version>
+            </dependency>
+						
+        </dependencies>
+    </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                </dependency>
+
+                <!-- This is needed for Spatial support in H2 -->
+                <dependency>
+                    <groupId>geodb</groupId>
+                    <artifactId>geodb</artifactId>
+                    <version>0.8</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>net.sourceforge</groupId>
+                    <artifactId>hatbox</artifactId>
+                    <version>1.0.b7</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+        	<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+            <layout>default</layout>
+            <url>http://repo1.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>Hibernate Spatial repo</id>
+            <url>http://www.hibernatespatial.org/repository</url>
+        </repository>
+
+        <repository>
+            <id>Local file repo</id>
+            <name>Local file repo</name>
+            <url>file:${project.basedir}/repo</url>
+        </repository>
+    </repositories>
+
+</project>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    
+    <logger name="org.hibernate.SQL" level="trace" />
+    <logger name="org.hibernate.stat.Statistics" level="trace" />
+    <!--
+    <logger name="org.hibernate.cache" level="trace" />
+    <logger name="net.sf.ehcache" level="trace" />
+    -->
+    
+
+</configuration>
