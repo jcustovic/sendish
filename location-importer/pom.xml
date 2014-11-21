@@ -12,6 +12,10 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
+    <properties>
+        <top.basedir>${project.parent.basedir}</top.basedir>
+    </properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.sendish</groupId>

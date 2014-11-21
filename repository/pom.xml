@@ -13,6 +13,10 @@
 
     <artifactId>repository</artifactId>
 
+    <properties>
+        <top.basedir>${project.parent.basedir}</top.basedir>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

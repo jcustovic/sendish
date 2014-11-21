@@ -9,6 +9,10 @@
 	</parent>
 	
 	<artifactId>sendish-api</artifactId>
+
+    <properties>
+        <top.basedir>${project.parent.basedir}</top.basedir>
+    </properties>
 	
 	<dependencies>
 		<dependency>
