@@ -14,7 +14,7 @@
     <artifactId>repository</artifactId>
 
     <properties>
-        <top.basedir>${project.parent.basedir}</top.basedir>
+        <top.basedir>${project.basedir}/..</top.basedir>
     </properties>
 
     <dependencies>
