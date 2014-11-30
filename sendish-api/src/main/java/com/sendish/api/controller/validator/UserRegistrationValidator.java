@@ -1,7 +1,10 @@
 package com.sendish.api.controller.validator;
 
 import com.sendish.api.dto.UserRegistration;
+import com.sendish.repository.UserRepository;
+import com.sendish.repository.model.jpa.User;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
@@ -9,6 +12,9 @@ import org.springframework.validation.Validator;
 
 @Component
 public class UserRegistrationValidator implements Validator {
+	
+	@Autowired
+	private UserRepository userRepository;
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -22,6 +28,11 @@ public class UserRegistrationValidator implements Validator {
     		if (!userReg.getPassword().equals(userReg.getRepeatPassword())) {
     			errors.rejectValue("repeatPassword", null, "Passwords don't match");
     		}
+    	}
+    	
+    	User user = userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(userReg.getEmail(), userReg.getEmail());
+    	if (user != null) {
+    		errors.rejectValue("email", null, "Email already exists");
     	}
     }
 

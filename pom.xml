@@ -20,7 +20,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
-        <top.basedir>${project.basedir}</top.basedir>
 
         <version.spring-boot>1.1.9.RELEASE</version.spring-boot>
         <version.joda-time>2.5</version.joda-time>
@@ -32,6 +31,7 @@
         <version.ehcache>2.9.0</version.ehcache>
         <version.hibernate>4.3.7.Final</version.hibernate>
         <version.prettytime>3.2.5.Final</version.prettytime>
+        <version.javax.mail>1.4.7</version.javax.mail>
     </properties>
 
     <dependencies>
@@ -99,7 +99,12 @@
                 <artifactId>prettytime</artifactId>
                 <version>${version.prettytime}</version>
             </dependency>
-						
+            
+            <dependency>
+				<groupId>javax.mail</groupId>
+				<artifactId>mail</artifactId>
+				<version>${version.javax.mail}</version>
+			</dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -132,23 +137,6 @@
     </profiles>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${version.spring-boot}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>repackage</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
         	<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -158,6 +146,10 @@
 					<target>${java.version}</target>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 
@@ -180,7 +172,7 @@
         <repository>
             <id>Local file repo</id>
             <name>Local file repo</name>
-            <url>file:${top.basedir}/repo</url>
+            <url>file:${project.basedir}/repo</url>
         </repository>
     </repositories>
 

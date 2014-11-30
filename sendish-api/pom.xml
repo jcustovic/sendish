@@ -9,10 +9,6 @@
 	</parent>
 	
 	<artifactId>sendish-api</artifactId>
-
-    <properties>
-        <top.basedir>${project.basedir}/..</top.basedir>
-    </properties>
 	
 	<dependencies>
 		<dependency>
@@ -72,6 +68,11 @@
             <groupId>org.ocpsoft.prettytime</groupId>
             <artifactId>prettytime</artifactId>
         </dependency>
+        
+        <dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+		</dependency>
 
         <!-- Enable JSP -->
         <dependency>
@@ -85,14 +86,5 @@
             <artifactId>jstl</artifactId>
         </dependency>
 	</dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

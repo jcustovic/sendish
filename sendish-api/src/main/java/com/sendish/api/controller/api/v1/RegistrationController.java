@@ -3,6 +3,7 @@ package com.sendish.api.controller.api.v1;
 import com.sendish.api.controller.model.ValidationError;
 import com.sendish.api.controller.validator.UserRegistrationValidator;
 import com.sendish.api.dto.UserRegistration;
+import com.sendish.api.service.impl.RegistrationServiceImpl;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
@@ -23,6 +24,9 @@ public class RegistrationController {
 
     @Autowired
     private UserRegistrationValidator userRegistrationValidator;
+    
+    @Autowired
+    private RegistrationServiceImpl registrationService;
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
@@ -36,7 +40,7 @@ public class RegistrationController {
     	@ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
     })
     public void register(@Valid @RequestBody UserRegistration userRegistration) {
-        return;
+    	registrationService.registerNewUser(userRegistration);
     }
 
 }

@@ -27,7 +27,21 @@ security:
 
 flyway:
   locations = classpath:db/migrations,classpath:db/migrations/h2
+  
+email:
+  host: mail.sendish.com
+  port: 587
+  username: app.sender@sendish.com
+  password: 4fLlmz2qtlDF
+#  smtp:
+#    auth: 
+#    starttls:
+#      enabled: true
 
+app:
+  registration:
+    mail:
+      from: noreply@sendish.com
 
 
 ---
