@@ -1,6 +1,7 @@
 package com.sendish.api.controller.api.v1;
 
 import com.sendish.api.dto.InboxItemDto;
+import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
@@ -13,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1.0/inbox")
+@RequestMapping("/api/v1.0/inbox")
+@Api(value = "inbox", description = "User inbox")
 public class InboxController {
 
     @RequestMapping(method = RequestMethod.GET)

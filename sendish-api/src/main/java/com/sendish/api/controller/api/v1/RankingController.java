@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1.0/ranking")
-@Api(value = "ranking", description = "Ranking API - get leaderboard")
+@RequestMapping("/api/v1.0/ranking")
+@Api(value = "ranking", description = "Ranking - get leaderboard")
 public class RankingController {
 
     @RequestMapping(method = RequestMethod.GET)

@@ -11,8 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1.0/photo-comments")
-@Api(value = "photo-comments", description = "Photos Comments API - get comments, write comments, like comments etc.")
+@RequestMapping("/api/v1.0/photo-comments")
+@Api(value = "photo-comments", description = "Comments on photo")
 public class PhotoCommentsController {
 
     @RequestMapping(value = "/{photoId}/comments", method = RequestMethod.GET)

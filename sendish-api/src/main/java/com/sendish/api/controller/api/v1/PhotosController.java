@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1.0/photos")
+@RequestMapping("/api/v1.0/photos")
 @Api(value = "photos", description = "Photos API - get details, send photos and delete photos")
 public class PhotosController {
 

@@ -1,6 +1,7 @@
 package com.sendish.api.controller.api.v1;
 
 import com.sendish.api.dto.FeedItemDto;
+import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
@@ -13,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1.0/feeds")
+@RequestMapping("/api/v1.0/feeds")
+@Api(value = "feeds", description = "Feed")
 public class FeedsController {
 
     @RequestMapping(method = RequestMethod.GET)

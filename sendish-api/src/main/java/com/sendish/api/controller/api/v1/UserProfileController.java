@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wordnik.swagger.annotations.Api;
 
 @RestController
-@RequestMapping("/v1.0/user-profile")
+@RequestMapping("/api/v1.0/user-profile")
 @Api(value = "user-profile", description = "Get user profile information")
 public class UserProfileController {
 

@@ -18,8 +18,8 @@ import scala.None;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/v1.0/registration")
-@Api(value = "registration", description = "Registration API")
+@RequestMapping("/api/v1.0/registration")
+@Api(value = "registration", description = "Email registration, forgotten password")
 public class RegistrationController {
 
     @Autowired
