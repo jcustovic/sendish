@@ -69,7 +69,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 	            .antMatchers("/h2/**").permitAll()
 	            .antMatchers("/").permitAll()
 	            .antMatchers("/api/v1.0/registration/**").permitAll()
-                .antMatchers("/api/registration/**").permitAll()
+                .antMatchers("/api/d/registration/**").permitAll()
 	            .anyRequest().fullyAuthenticated();
         //.and().formLogin().loginPage("/login").failureUrl("/login?error").permitAll();
     }

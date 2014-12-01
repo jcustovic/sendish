@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.HandlerMapping;
 
 @Controller
-@RequestMapping("/api/**")
+@RequestMapping("/api/d/**")
 public class DefaultAPIVersionController {
 
     @RequestMapping
     public String forward(HttpServletRequest request) {
     	String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        return "forward:/api/v1.0/" + path.substring(5);
+        return "forward:/api/v1.0/" + path.substring(7);
     }
 
 }
