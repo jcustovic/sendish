@@ -18,7 +18,7 @@ public class UserProfileController {
     @RequestMapping(method = RequestMethod.GET)
     @ApiOperation(value = "Get the current user profile")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK")
     })
     public UserProfileDto getProfile() {
         return new UserProfileDto();

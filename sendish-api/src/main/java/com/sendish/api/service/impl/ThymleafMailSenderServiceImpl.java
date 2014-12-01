@@ -1,18 +1,22 @@
 package com.sendish.api.service.impl;
 
-import java.util.Map;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import com.sendish.api.service.MailSenderService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamSource;
+import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import com.sendish.api.service.MailSenderService;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import java.util.Map;
 
 @Service
 public class ThymleafMailSenderServiceImpl implements MailSenderService {
@@ -22,11 +26,15 @@ public class ThymleafMailSenderServiceImpl implements MailSenderService {
 	
 	@Autowired
 	private TemplateEngine templateEngine;
+	
+	@Value("${app.baseUrl}")
+	private String baseUrl;
 
 	@Override
-	public void sendEmail(String toEmail, String fromEmail, Map<String, Object> variables, String tplName) throws MessagingException {
+	public void sendEmail(String toEmail, String fromEmail, Map<String, Object> variables, String tplName, Map<String, byte[]> pngImages) throws MessagingException {
 		final Context ctx = new Context();
 		ctx.setVariables(variables);
+		ctx.setVariable("baseUrl", baseUrl);
 
 		// Prepare message using a Spring helper
 		final MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -39,10 +47,14 @@ public class ThymleafMailSenderServiceImpl implements MailSenderService {
 		final String htmlContent = templateEngine.process(tplName, ctx);
 		message.setText(htmlContent, true); // true = isHtml
 
-		// Add the inline image, referenced from the HTML code as
-		// "cid:${imageResourceName}"
-		// final InputStreamSource imageSource = new ByteArrayResource(imageBytes);
-		// message.addInline(imageResourceName, imageSource, imageContentType);
+        if (pngImages != null) {
+            for (Map.Entry<String, byte[]> imageEntry : pngImages.entrySet()) {
+                // Add the inline image, referenced from the HTML code as
+                // "cid:${imageResourceName}"
+                final InputStreamSource imageSource = new ByteArrayResource(imageEntry.getValue());
+                message.addInline(imageEntry.getKey(), imageSource, MediaType.IMAGE_PNG_VALUE);
+            }
+        }
 
 		// Send mail
 		mailSender.send(mimeMessage);

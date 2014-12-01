@@ -20,7 +20,7 @@ public class RankingController {
     @RequestMapping(method = RequestMethod.GET)
     @ApiOperation(value = "Get TOP 100 users", notes = "Users are ordered by rank ASC")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK")
     })
     public List<UserRankDto> getTopRank() {
         return new ArrayList<>();

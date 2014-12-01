@@ -31,7 +31,7 @@ public class UserRegistrationValidator implements Validator {
     	}
     	
     	User user = userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(userReg.getEmail(), userReg.getEmail());
-    	if (user != null) {
+    	if (user != null && Boolean.TRUE.equals(user.getEmailConfirmed())) {
     		errors.rejectValue("email", null, "Email already exists");
     	}
     }

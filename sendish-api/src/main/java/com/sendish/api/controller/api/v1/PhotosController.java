@@ -22,7 +22,7 @@ public class PhotosController {
     @RequestMapping(value = "/received", method = RequestMethod.GET)
     @ApiOperation(value = "Get list of received photos", notes = "This method will return the list of received photos")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK")
+         @ApiResponse(code = 200, message = "OK")
     })
     public List<PhotoDto> getReceivedPhotos(@RequestParam(defaultValue = "0") Integer page) {
         return getDummyPhotos();
@@ -31,7 +31,7 @@ public class PhotosController {
     @RequestMapping(value = "/sent", method = RequestMethod.GET)
     @ApiOperation(value = "Get list of sent photos", notes = "This method will return the list of sent photos")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK")
     })
     public List<PhotoDto> getSentPhotos(@RequestParam(defaultValue = "0") Integer page) {
         return getDummyPhotos();
@@ -45,7 +45,7 @@ public class PhotosController {
     @RequestMapping(value = "/{photoId}", method = RequestMethod.GET)
     @ApiOperation(value = "Get photo details")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK")
     })
     public PhotoDetailsDto details(@PathVariable Long photoId) {
         return new PhotoDetailsDto();
@@ -54,7 +54,7 @@ public class PhotosController {
     @RequestMapping(value = "/{photoId}/like", method = RequestMethod.PUT)
     @ApiOperation(value = "Like a given photo")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK")
     })
     public void like(@PathVariable Long photoId) {
 
@@ -63,7 +63,7 @@ public class PhotosController {
     @RequestMapping(value = "/{photoId}/dislike", method = RequestMethod.PUT)
     @ApiOperation(value = "Dislike a given photo")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK")
     })
     public void dislike(@PathVariable Long photoId) {
 
@@ -72,7 +72,7 @@ public class PhotosController {
     @RequestMapping(value = "/{photoId}/report", method = RequestMethod.PUT)
     @ApiOperation(value = "Report a given photo", notes = "Reason must be provided and reasonText is optional")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK")
     })
     public void report(@PathVariable Long photoId, @RequestParam String reason, @RequestParam(required = false) String reasonText) {
 

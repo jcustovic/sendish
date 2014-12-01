@@ -42,7 +42,7 @@ app:
   registration:
     mail:
       from: noreply@sendish.com
-
+  baseUrl: http://api.sendish.com
 
 ---
 

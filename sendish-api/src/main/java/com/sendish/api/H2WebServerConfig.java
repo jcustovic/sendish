@@ -21,6 +21,7 @@ public class H2WebServerConfig implements ServletContextInitializer {
     public void onStartup(ServletContext servletContext) throws ServletException {
         LOGGER.info("H2 WebServlet initialization start");
         ServletRegistration.Dynamic dynamic = servletContext.addServlet("h2", new WebServlet());
+        dynamic.setInitParameter("webAllowOthers", "");
         dynamic.addMapping("/h2/*");
         LOGGER.info("H2 WebServlet initialization finished");
     }

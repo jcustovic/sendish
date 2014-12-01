@@ -1,5 +1,21 @@
 package com.sendish.api.controller.api.v1;
 
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import scala.None;
+
+import com.mangofactory.swagger.annotations.ApiIgnore;
 import com.sendish.api.controller.model.ValidationError;
 import com.sendish.api.controller.validator.UserRegistrationValidator;
 import com.sendish.api.dto.UserRegistration;
@@ -8,14 +24,6 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
-
-import scala.None;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1.0/registration")
@@ -41,6 +49,18 @@ public class RegistrationController {
     })
     public void register(@Valid @RequestBody UserRegistration userRegistration) {
     	registrationService.registerNewUser(userRegistration);
+    }
+
+    @ApiIgnore
+    @RequestMapping(value = "/verify", method = { RequestMethod.POST, RequestMethod.GET })
+    public ResponseEntity<?> verifyRegistration(@RequestParam String token, @RequestParam String username) {
+        boolean success = registrationService.verifyToken(token, username);
+
+        if (success) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 }
