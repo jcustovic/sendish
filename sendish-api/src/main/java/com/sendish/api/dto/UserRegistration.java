@@ -13,7 +13,6 @@ public class UserRegistration implements Serializable {
 	@Email
 	private String email;
 
-	@NotEmpty
 	private String nickname;
 
 	@NotEmpty

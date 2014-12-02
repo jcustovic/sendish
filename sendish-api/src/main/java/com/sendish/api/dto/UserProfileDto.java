@@ -13,6 +13,7 @@ public class UserProfileDto extends BaseEntityDto {
     private Integer totalLikes;
     private Integer totalDislikes;
     private Integer citiesCount;
+    private Boolean signedWithEmail;
 
     public String getNick() {
         return nick;
@@ -84,6 +85,14 @@ public class UserProfileDto extends BaseEntityDto {
 
     public void setCitiesCount(Integer citiesCount) {
         this.citiesCount = citiesCount;
+    }
+
+    public Boolean getSignedWithEmail() {
+        return signedWithEmail;
+    }
+
+    public void setSignedWithEmail(Boolean signedWithEmail) {
+        this.signedWithEmail = signedWithEmail;
     }
 
 }
