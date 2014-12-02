@@ -42,7 +42,7 @@ public class RegistrationController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation(value = "Register new user", notes = "This method will register a new user and send email configration")
+    @ApiOperation(value = "Register new user", notes = "This method will register a new user and send email confirmation")
     @ApiResponses({ 
     	@ApiResponse(code = 200, message = "Registration is successful and emails was sent", response = None.class),
     	@ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
@@ -64,7 +64,7 @@ public class RegistrationController {
     }
 
     @RequestMapping(value = "/reset-password/{username}", method = RequestMethod.GET)
-    @ApiOperation(value = "Request password reset")
+    @ApiOperation(value = "Request password reset", notes = "Only if the user signed with email registration!")
     @ApiResponses({
         @ApiResponse(code = 200, message = "Reset password email is sent (NOTE: Only if a user exists in the system).", response = None.class)
     })

@@ -48,6 +48,7 @@ public class RegistrationServiceImpl {
 		user.setEmail(userRegistration.getEmail());
 		user.setPassword(shaPasswordEncoder.encodePassword(userRegistration.getPassword(), null));
 		user.setNickname(userRegistration.getNickname());
+        user.setEmailRegistration(true);
 		
 		String verificationCode = UUID.randomUUID().toString();
 		user.setVerificationCode(verificationCode);

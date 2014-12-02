@@ -52,6 +52,7 @@ create table auth_user (
   au_disabled boolean not null,
   au_deleted boolean not null,
   au_email_confirmed boolean not null,
+  au_email_registration boolean not null,
   au_verification_code varchar(36),
   au_modified_date timestamp not null,
   au_created_date timestamp not null,

@@ -58,6 +58,9 @@ public class User extends BaseEntity {
     @Column(name = "au_deleted", nullable = false)
     private Boolean deleted = false;
 
+    @Column(name = "au_email_registration", nullable = false)
+    private Boolean emailRegistration = false;
+
     @Column(name = "au_verification_code", length = UUID_LENGTH)
     private String verificationCode;
 
@@ -187,6 +190,14 @@ public class User extends BaseEntity {
 
     public void setVerificationCode(String verificationCode) {
         this.verificationCode = verificationCode;
+    }
+
+    public Boolean getEmailRegistration() {
+        return emailRegistration;
+    }
+
+    public void setEmailRegistration(Boolean emailRegistration) {
+        this.emailRegistration = emailRegistration;
     }
 
     public DateTime getCreatedDate() {
