@@ -63,7 +63,7 @@ public class RegistrationController {
         }
     }
 
-    @RequestMapping(value = "/reset-password/{username}", method = RequestMethod.GET)
+    @RequestMapping(value = "/reset-password/{username}", method = RequestMethod.POST)
     @ApiOperation(value = "Request password reset", notes = "Only if the user signed with email registration!")
     @ApiResponses({
         @ApiResponse(code = 200, message = "Reset password email is sent (NOTE: Only if a user exists in the system).", response = None.class)
