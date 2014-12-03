@@ -1,4 +1,4 @@
-package com.sendish.api.controller.model;
+package com.sendish.api.web.controller.model;
 
 import java.io.Serializable;
 import java.util.List;

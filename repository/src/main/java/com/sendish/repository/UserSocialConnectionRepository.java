@@ -21,8 +21,8 @@ import javax.persistence.QueryHint;
 public interface UserSocialConnectionRepository extends JpaRepository<UserSocialConnection, UserSocialConnectionId>, JpaSpecificationExecutor<UserSocialConnection>, UserSocialConnectionRepositoryCustom {
 
 	@QueryHints({
-			@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"),
-			@QueryHint(name = org.hibernate.annotations.QueryHints.CACHE_REGION, value = "com.sendish.repository.UserSocialConnectionRepository.findUserId") 
+        @QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"),
+        @QueryHint(name = org.hibernate.annotations.QueryHints.CACHE_REGION, value = "com.sendish.repository.UserSocialConnectionRepository.findUserId")
 	})
     @Query("SELECT usc.userId FROM UserSocialConnection usc WHERE usc.providerId = ?1 AND usc.providerUserId = ?2")
     List<Long> findUserId(String p_providerId, String p_providerUserId);

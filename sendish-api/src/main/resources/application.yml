@@ -43,6 +43,9 @@ app:
     mail:
       from: noreply@sendish.com
   baseUrl: http://api.sendish.com
+  store:
+    data:
+      path: C:\Users\janc\sendish\data
 
 ---
 

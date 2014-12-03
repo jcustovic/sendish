@@ -1,5 +1,6 @@
 package com.sendish.api.security.authentication;
 
+import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         Collection<SimpleGrantedAuthority> roles = new ArrayList<>();
         roles.add(new SimpleGrantedAuthority("USER"));
 
-        final org.springframework.security.core.userdetails.User userDetails = new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), !user.getDisabled(), true, true, !user.getDeleted(), roles);
+        final AuthUser userDetails = new AuthUser(user.getId(), user.getUsername(), user.getPassword(), !user.getDisabled(), true, true, !user.getDeleted(), roles);
 
         return userDetails;
     }

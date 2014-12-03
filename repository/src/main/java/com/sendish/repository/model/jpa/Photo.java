@@ -38,8 +38,8 @@ public class Photo extends BaseEntity implements LocationAware {
     @Column(name = "p_sender_deleted", nullable = false)
     private Boolean senderDeleted = false;
 
-    @Column(name = "p_file_location", length = 200, nullable = false)
-    private String location;
+    @Column(name = "p_storage_id", length = 200, nullable = false, unique = true)
+    private String storageId;
 
     @Column(name = "p_width", nullable = false)
     private Integer width;
@@ -47,8 +47,8 @@ public class Photo extends BaseEntity implements LocationAware {
     @Column(name = "p_height", nullable = false)
     private Integer height;
 
-    @Column(name = "p_size_kb", nullable = false)
-    private Integer sizeKb;
+    @Column(name = "p_size_byte", nullable = false)
+    private Long size;
 
     @Column(name = "p_created_date", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -136,12 +136,12 @@ public class Photo extends BaseEntity implements LocationAware {
         this.senderDeleted = senderDeleted;
     }
 
-    public String getLocation() {
-        return location;
+    public String getStorageId() {
+        return storageId;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setStorageId(String storageId) {
+        this.storageId = storageId;
     }
 
     public Integer getWidth() {
@@ -160,12 +160,12 @@ public class Photo extends BaseEntity implements LocationAware {
         this.height = height;
     }
 
-    public Integer getSizeKb() {
-        return sizeKb;
+    public Long getSize() {
+        return size;
     }
 
-    public void setSizeKb(Integer sizeKb) {
-        this.sizeKb = sizeKb;
+    public void setSize(Long size) {
+        this.size = size;
     }
 
     public DateTime getCreatedDate() {

@@ -36,4 +36,11 @@
 		timeToIdleSeconds="3600"
 		overflowToDisk="true" />
 
+    <cache name="com.sendish.repository.UserRepository.findByUsername"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToLiveSeconds="3600"
+           timeToIdleSeconds="3600"
+           overflowToDisk="true" />
+
 </ehcache>

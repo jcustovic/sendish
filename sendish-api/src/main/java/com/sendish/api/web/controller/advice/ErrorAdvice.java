@@ -1,9 +1,10 @@
-package com.sendish.api.controller.advice;
+package com.sendish.api.web.controller.advice;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.sendish.api.controller.model.ValidationError;
+import com.sendish.api.web.controller.model.ValidationError;
 
 import java.util.*;
 
@@ -30,8 +31,17 @@ public class ErrorAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ValidationError handleValidationException(MethodArgumentNotValidException exception) {
-        BindingResult result = exception.getBindingResult();
+        return buildValidationError(exception.getBindingResult());
+    }
 
+    @ExceptionHandler(BindException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ValidationError handleValidationException(BindException exception) {
+        return buildValidationError(exception.getBindingResult());
+    }
+
+    private ValidationError buildValidationError(BindingResult result) {
         Map<String, List<String>> errors = new HashMap<>(result.getFieldErrorCount());
         for (FieldError fieldError : result.getFieldErrors()) {
             List<String> fieldErrors =  errors.get(fieldError.getField());

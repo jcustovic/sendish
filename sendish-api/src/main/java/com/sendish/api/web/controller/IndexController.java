@@ -1,4 +1,4 @@
-package com.sendish.api.controller;
+package com.sendish.api.web.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
