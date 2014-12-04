@@ -9,4 +9,6 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
     Photo findByUuid(String uuid);
 
+    Photo findByUserIdAndUuid(Long userId, String photoUUID);
+
 }

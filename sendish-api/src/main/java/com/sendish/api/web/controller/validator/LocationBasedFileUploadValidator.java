@@ -1,17 +1,23 @@
 package com.sendish.api.web.controller.validator;
 
 import com.sendish.api.dto.LocationBasedFileUpload;
+import com.sendish.api.util.ImageUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+import java.awt.*;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
 @Component
 public class LocationBasedFileUploadValidator implements Validator {
+
+    public static final int IMAGE_HEIGHT = 640;
+    public static final int IMAGE_WIDTH = 640;
 
     private static List<String> allowedContentTypes;
     static {
@@ -40,6 +46,16 @@ public class LocationBasedFileUploadValidator implements Validator {
 
         if (!allowedContentTypes.contains(fileUpload.getImage().getContentType())) {
             errors.rejectValue("image", null, "Content type not allowed");
+        }
+
+        Dimension dimension;
+        try {
+            dimension = ImageUtils.getDimension(fileUpload.getImage().getInputStream());
+            if (dimension.getHeight() != IMAGE_HEIGHT || dimension.getWidth() != IMAGE_WIDTH) {
+                errors.rejectValue("image", null, "Image size must be exactly 640px in width X 640px in height");
+            }
+        } catch (IOException e) {
+            errors.rejectValue("image", null, "Cannot read image dimensions for file " + fileUpload.getImage().getName());
         }
     }
 

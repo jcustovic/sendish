@@ -26,7 +26,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import scala.None;
 
 import javax.validation.Valid;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
@@ -66,6 +65,18 @@ public class PhotosController {
         return new PhotoDetailsDto();
     }
 
+    @RequestMapping(value = "/received/{photoUUID}/download", method = RequestMethod.GET)
+    @ApiOperation(value = "Get photo details")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    public ResponseEntity<InputStreamResource> receivedDownload(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
+        Photo photo = photoService.findReceivedByUuid(photoUUID, user.getUserId());
+
+        return download(webRequest, photo);
+    }
+
     @RequestMapping(value = "/sent", method = RequestMethod.GET)
     @ApiOperation(value = "Get list of sent photos", notes = "This method will return the list of sent photos")
     @ApiResponses({
@@ -85,6 +96,18 @@ public class PhotosController {
         return new PhotoDetailsDto();
     }
 
+    @RequestMapping(value = "/sent/{photoUUID}/download", method = RequestMethod.GET)
+    @ApiOperation(value = "Get photo details")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    public ResponseEntity<InputStreamResource> sentDownload(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
+        Photo photo = photoService.findByUserIdAndUuid(user.getUserId(), photoUUID);
+
+        return download(webRequest, photo);
+    }
+
     @RequestMapping(value = "/sendish-upload", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Upload new photo")
@@ -92,39 +115,17 @@ public class PhotosController {
         @ApiResponse(code = 201, message = "Image upload is successful and the resource is created", response = None.class),
         @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
     })
-    public void upload(@Valid @ModelAttribute LocationBasedFileUpload upload, MultipartFile image, @RequestHeader HttpHeaders headers, AuthUser user) { // FIXME: MultipartFile image is also specified here because of swagger!
+    public ResponseEntity<Void> upload(@Valid @ModelAttribute LocationBasedFileUpload upload, MultipartFile image, AuthUser user) { // FIXME: MultipartFile image is also specified here because of swagger!
         Long photoId = photoService.saveNewImage(upload, user.getUserId());
 
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentServletMapping().path("/api/v1.0/photos/{id}").build()
                 .expand(photoId).toUri();
 
+        HttpHeaders headers = new HttpHeaders();
         headers.setLocation(location);
-    }
 
-    @RequestMapping(value = "/{photoUUID}/download", method = RequestMethod.GET)
-    @ApiOperation(value = "Get photo details")
-    @ApiResponses({
-        @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 404, message = "Not found")
-    })
-    public ResponseEntity<InputStreamResource> download(@PathVariable String photoUUID, WebRequest webRequest, @RequestHeader HttpHeaders headers) {
-        Photo photo = photoService.findByUuid(photoUUID);
-        if (photo == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else if (webRequest.checkNotModified(photo.getCreatedDate().getMillis())) {
-            return null;
-        }
-
-        headers.setContentType(MediaType.valueOf(photo.getContentType()));
-        headers.setContentLength(photo.getSize());
-
-        try {
-            InputStreamResource isr = new InputStreamResource(photoService.getPhotoContent(photo.getStorageId()));
-            return new ResponseEntity<InputStreamResource>(isr, headers, HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{photoId}/like", method = RequestMethod.PUT)
@@ -152,6 +153,25 @@ public class PhotosController {
     })
     public void report(@PathVariable Long photoId, @RequestParam String reason, @RequestParam(required = false) String reasonText) {
 
+    }
+
+    private ResponseEntity<InputStreamResource> download(WebRequest webRequest, Photo photo) {
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if (webRequest.checkNotModified(photo.getCreatedDate().getMillis())) {
+            return null;
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.valueOf(photo.getContentType()));
+        headers.setContentLength(photo.getSize());
+
+        try {
+            InputStreamResource isr = new InputStreamResource(photoService.getPhotoContent(photo.getStorageId()));
+            return new ResponseEntity<>(isr, headers, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     public List<PhotoDto> getDummyPhotos() {

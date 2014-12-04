@@ -4,6 +4,7 @@ import com.sendish.api.dto.LocationBasedFileUpload;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.util.ImageUtils;
+import com.sendish.repository.PhotoReceiverRepository;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.Location;
@@ -22,6 +23,9 @@ public class PhotoServiceImpl {
 
     @Autowired
     private PhotoRepository photoRepository;
+
+    @Autowired
+    private PhotoReceiverRepository photoReceiverRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -73,6 +77,14 @@ public class PhotoServiceImpl {
 
     public InputStream getPhotoContent(String fileStoreId) throws ResourceNotFoundException {
         return fileStore.getAsInputStream(fileStoreId);
+    }
+
+    public Photo findReceivedByUuid(String photoUUID, Long userId) {
+        return photoReceiverRepository.findPhotoByUserIdAndPhotoUUID(userId, photoUUID);
+    }
+
+    public Photo findByUserIdAndUuid(Long userId, String photoUUID) {
+        return photoRepository.findByUserIdAndUuid(userId, photoUUID);
     }
 
 }
