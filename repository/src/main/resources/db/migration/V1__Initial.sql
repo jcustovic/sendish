@@ -129,6 +129,7 @@ create table photo (
   p_width int4 not null,
   p_height int4 not null,
   p_size_byte int8 not null,
+  p_content_type varchar(128) not null,
   p_created_date timestamp not null,
   p_origin_latitude numeric(19, 10) not null,
   p_origin_longitude numeric(19, 10) not null,

@@ -50,6 +50,9 @@ public class Photo extends BaseEntity implements LocationAware {
     @Column(name = "p_size_byte", nullable = false)
     private Long size;
 
+    @Column(name = "p_content_type", nullable = false)
+    private String contentType;
+
     @Column(name = "p_created_date", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime createdDate;
@@ -166,6 +169,14 @@ public class Photo extends BaseEntity implements LocationAware {
 
     public void setSize(Long size) {
         this.size = size;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     public DateTime getCreatedDate() {

@@ -7,4 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
+    Photo findByUuid(String uuid);
+
 }

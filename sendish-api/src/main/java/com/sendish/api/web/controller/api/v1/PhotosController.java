@@ -1,28 +1,32 @@
 package com.sendish.api.web.controller.api.v1;
 
 import com.sendish.api.security.userdetails.AuthUser;
+import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.web.controller.model.ValidationError;
 import com.sendish.api.web.controller.validator.LocationBasedFileUploadValidator;
 import com.sendish.api.dto.LocationBasedFileUpload;
 import com.sendish.api.dto.PhotoDetailsDto;
 import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.service.impl.PhotoServiceImpl;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiResponse;
-import com.wordnik.swagger.annotations.ApiResponses;
+import com.sendish.repository.model.jpa.Photo;
+import com.wordnik.swagger.annotations.*;
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import scala.None;
 
 import javax.validation.Valid;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,8 +52,18 @@ public class PhotosController {
     @ApiResponses({
          @ApiResponse(code = 200, message = "OK")
     })
-    public List<PhotoDto> getReceivedPhotos(@RequestParam(defaultValue = "0") Integer page) {
+    public List<PhotoDto> getReceivedPhotos(@RequestParam(defaultValue = "0") Integer page, AuthUser user) {
         return getDummyPhotos();
+    }
+
+    @RequestMapping(value = "/received/{photoId}", method = RequestMethod.GET)
+    @ApiOperation(value = "Get photo details of received photo")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
+    })
+    public PhotoDetailsDto receivedPhotoDetails(@PathVariable Long photoId, AuthUser user) {
+        return new PhotoDetailsDto();
     }
 
     @RequestMapping(value = "/sent", method = RequestMethod.GET)
@@ -57,8 +71,18 @@ public class PhotosController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK")
     })
-    public List<PhotoDto> getSentPhotos(@RequestParam(defaultValue = "0") Integer page) {
+    public List<PhotoDto> getSentPhotos(@RequestParam(defaultValue = "0") Integer page, AuthUser user) {
         return getDummyPhotos();
+    }
+
+    @RequestMapping(value = "/sent/{photoId}", method = RequestMethod.GET)
+    @ApiOperation(value = "Get photo details", notes = "Only for the owner of the photo!")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
+    })
+    public PhotoDetailsDto details(@PathVariable Long photoId, AuthUser user) {
+        return new PhotoDetailsDto();
     }
 
     @RequestMapping(value = "/sendish-upload", method = RequestMethod.POST)
@@ -78,13 +102,29 @@ public class PhotosController {
         headers.setLocation(location);
     }
 
-    @RequestMapping(value = "/{photoId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{photoUUID}/download", method = RequestMethod.GET)
     @ApiOperation(value = "Get photo details")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
-    public PhotoDetailsDto details(@PathVariable Long photoId) {
-        return new PhotoDetailsDto();
+    public ResponseEntity<InputStreamResource> download(@PathVariable String photoUUID, WebRequest webRequest, @RequestHeader HttpHeaders headers) {
+        Photo photo = photoService.findByUuid(photoUUID);
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if (webRequest.checkNotModified(photo.getCreatedDate().getMillis())) {
+            return null;
+        }
+
+        headers.setContentType(MediaType.valueOf(photo.getContentType()));
+        headers.setContentLength(photo.getSize());
+
+        try {
+            InputStreamResource isr = new InputStreamResource(photoService.getPhotoContent(photo.getStorageId()));
+            return new ResponseEntity<InputStreamResource>(isr, headers, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @RequestMapping(value = "/{photoId}/like", method = RequestMethod.PUT)

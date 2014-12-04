@@ -22,11 +22,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.sendish.api.security.userdetails.AuthUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -112,6 +114,9 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public SwaggerSpringMvcPlugin customImplementation() {
+        springSwaggerConfig.defaultIgnorableParameterTypes().add(AuthUser.class);
+        springSwaggerConfig.defaultIgnorableParameterTypes().add(WebRequest.class);
+
         return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
                 .includePatterns("/api/v1.0/.*")
                 .swaggerGroup("v1.0")

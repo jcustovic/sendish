@@ -2,6 +2,10 @@
 spring:
   application:
     name: sendish-location-importer
+  datasource:
+    url: jdbc:h2:file:~/sendish/db
+    username: sa
+    password: cHusica
   jpa:
     hibernate:
       ddl-auto: validate

@@ -2,6 +2,7 @@ package com.sendish.api.service.impl;
 
 import com.sendish.api.dto.LocationBasedFileUpload;
 import com.sendish.api.store.FileStore;
+import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.util.ImageUtils;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.UserRepository;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 @Service
@@ -30,12 +32,12 @@ public class PhotoServiceImpl {
     @Autowired
     private FileStore fileStore;
 
-
     public Long saveNewImage(LocationBasedFileUpload p_upload, Long p_userId) {
         MultipartFile file = p_upload.getImage();
         Photo photo = new Photo();
         photo.setUser(userRepository.findOne(p_userId));
         photo.setName(file.getName());
+        photo.setContentType(file.getContentType());
         photo.setSize(file.getSize());
         photo.setDescription(p_upload.getDescription());
         photo.setResend(true);
@@ -63,6 +65,14 @@ public class PhotoServiceImpl {
         photo = photoRepository.save(photo);
 
         return photo.getId();
+    }
+
+    public Photo findByUuid(String p_uuid) {
+        return photoRepository.findByUuid(p_uuid);
+    }
+
+    public InputStream getPhotoContent(String fileStoreId) throws ResourceNotFoundException {
+        return fileStore.getAsInputStream(fileStoreId);
     }
 
 }
