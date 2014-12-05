@@ -60,7 +60,6 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
 	    ));
 
         responses.put(PUT, asList(
-            new ResponseMessage(CREATED.value(), CREATED.getReasonPhrase(), toOption(null)),
             new ResponseMessage(NOT_FOUND.value(), NOT_FOUND.getReasonPhrase(), toOption(null)),
             new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), toOption(null)),
             new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, toOption(null))

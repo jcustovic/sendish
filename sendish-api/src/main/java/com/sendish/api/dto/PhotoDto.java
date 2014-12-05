@@ -8,7 +8,7 @@ public class PhotoDto extends BaseEntityDto {
     private String country;
     private String description;
     private String timeAgo;
-    private String imgLocation;
+    private String imgUuid;
     private Integer likeCount;
     private Integer cityCount;
     private Integer commentCount;
@@ -45,12 +45,12 @@ public class PhotoDto extends BaseEntityDto {
         this.timeAgo = timeAgo;
     }
 
-    public String getImgLocation() {
-        return imgLocation;
+    public String getImgUuid() {
+        return imgUuid;
     }
 
-    public void setImgLocation(String imgLocation) {
-        this.imgLocation = imgLocation;
+    public void setImgUuid(String imgUuid) {
+        this.imgUuid = imgUuid;
     }
 
     public Integer getLikeCount() {

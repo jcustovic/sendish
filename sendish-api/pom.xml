@@ -79,6 +79,11 @@
 			<artifactId>mail</artifactId>
 		</dependency>
 
+        <dependency>
+            <groupId>net.sf.dozer</groupId>
+            <artifactId>dozer</artifactId>
+        </dependency>
+
         <!-- Enable JSP -->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>

@@ -206,6 +206,7 @@ create table photo_statistics (
   pst_reports_count int4 not null default 0,
   pst_cities_count int4 not null default 0,
   pst_countries_count int4 not null default 0,
+  pst_comments_count int4 not null default 0,
   pst_users_count int4 not null default 0,
   pst_modified_date timestamp not null,
 

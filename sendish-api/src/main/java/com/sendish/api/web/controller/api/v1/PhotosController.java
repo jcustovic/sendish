@@ -10,8 +10,6 @@ import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.repository.model.jpa.Photo;
 import com.wordnik.swagger.annotations.*;
-import org.joda.time.DateTime;
-import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -23,11 +21,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import scala.None;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.LinkedList;
 import java.util.List;
 
 @RestController
@@ -49,10 +45,10 @@ public class PhotosController {
     @RequestMapping(value = "/received", method = RequestMethod.GET)
     @ApiOperation(value = "Get list of received photos", notes = "This method will return the list of received photos")
     @ApiResponses({
-         @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK")
     })
     public List<PhotoDto> getReceivedPhotos(@RequestParam(defaultValue = "0") Integer page, AuthUser user) {
-        return getDummyPhotos();
+        return photoService.findReceivedByUserId(user.getUserId(), page);
     }
 
     @RequestMapping(value = "/received/{photoId}", method = RequestMethod.GET)
@@ -61,15 +57,20 @@ public class PhotosController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
     })
-    public PhotoDetailsDto receivedPhotoDetails(@PathVariable Long photoId, AuthUser user) {
-        return new PhotoDetailsDto();
+    public ResponseEntity<PhotoDetailsDto> receivedPhotoDetails(@PathVariable Long photoId, AuthUser user) {
+        PhotoDetailsDto photo = photoService.findReceivedByIdAndUserId(photoId, user.getUserId());
+        if (photo == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            } else {
+                return new ResponseEntity<>(photo, HttpStatus.NOT_FOUND);
+        }
     }
 
     @RequestMapping(value = "/received/{photoUUID}/download", method = RequestMethod.GET)
     @ApiOperation(value = "Get photo details")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<InputStreamResource> receivedDownload(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
         Photo photo = photoService.findReceivedByUuid(photoUUID, user.getUserId());
@@ -83,7 +84,7 @@ public class PhotosController {
         @ApiResponse(code = 200, message = "OK")
     })
     public List<PhotoDto> getSentPhotos(@RequestParam(defaultValue = "0") Integer page, AuthUser user) {
-        return getDummyPhotos();
+        return photoService.findByUserId(user.getUserId(), page);
     }
 
     @RequestMapping(value = "/sent/{photoId}", method = RequestMethod.GET)
@@ -92,15 +93,20 @@ public class PhotosController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
     })
-    public PhotoDetailsDto details(@PathVariable Long photoId, AuthUser user) {
-        return new PhotoDetailsDto();
+    public ResponseEntity<PhotoDetailsDto> details(@PathVariable Long photoId, AuthUser user) {
+        PhotoDetailsDto photo = photoService.findByIdAndUserId(photoId, user.getUserId());
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(photo, HttpStatus.NOT_FOUND);
+        }
     }
 
     @RequestMapping(value = "/sent/{photoUUID}/download", method = RequestMethod.GET)
     @ApiOperation(value = "Get photo details")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<InputStreamResource> sentDownload(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
         Photo photo = photoService.findByUserIdAndUuid(user.getUserId(), photoUUID);
@@ -109,10 +115,10 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/sendish-upload", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(value = "Upload new photo")
+    @ApiOperation(value = "Upload new photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created photo")
     @ApiResponses({
-        @ApiResponse(code = 201, message = "Image upload is successful and the resource is created", response = None.class),
+        @ApiResponse(code = 200, message = "NOT USED! 201 will be returned", response = Void.class),
+        @ApiResponse(code = 201, message = "Image upload is successful and the resource is created", response = Void.class),
         @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
     })
     public ResponseEntity<Void> upload(@Valid @ModelAttribute LocationBasedFileUpload upload, MultipartFile image, AuthUser user) { // FIXME: MultipartFile image is also specified here because of swagger!
@@ -133,8 +139,8 @@ public class PhotosController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK")
     })
-    public void like(@PathVariable Long photoId) {
-
+    public void like(@PathVariable Long photoId, AuthUser user) {
+        photoService.like(photoId, user.getUserId());
     }
 
     @RequestMapping(value = "/{photoId}/dislike", method = RequestMethod.PUT)
@@ -142,8 +148,8 @@ public class PhotosController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK")
     })
-    public void dislike(@PathVariable Long photoId) {
-
+    public void dislike(@PathVariable Long photoId, AuthUser user) {
+        photoService.dislike(photoId, user.getUserId());
     }
 
     @RequestMapping(value = "/{photoId}/report", method = RequestMethod.PUT)
@@ -151,8 +157,8 @@ public class PhotosController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK")
     })
-    public void report(@PathVariable Long photoId, @RequestParam String reason, @RequestParam(required = false) String reasonText) {
-
+    public void report(@PathVariable Long photoId, @RequestParam String reason, @RequestParam(required = false) String reasonText, AuthUser user) {
+        photoService.report(photoId, reason, reasonText, user.getUserId());
     }
 
     private ResponseEntity<InputStreamResource> download(WebRequest webRequest, Photo photo) {
@@ -172,35 +178,6 @@ public class PhotosController {
         } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
-
-    public List<PhotoDto> getDummyPhotos() {
-        List<PhotoDto> dummyPhotos = new LinkedList<>();
-        PrettyTime prettyTime = new PrettyTime();
-        PhotoDto photo1 = new PhotoDto();
-        photo1.setDescription("Cool photo");
-        photo1.setCityCount(10);
-        photo1.setCommentCount(4);
-        photo1.setLikeCount(7);
-        photo1.setImgLocation("test");
-        photo1.setCity("Zagreb");
-        photo1.setCountry("Croatia");
-        photo1.setTimeAgo(prettyTime.format(DateTime.now().minusMinutes(30).toDate()));
-
-        PhotoDto photo2 = new PhotoDto();
-        photo2.setDescription("Cool photo no 2");
-        photo2.setCityCount(20);
-        photo2.setCommentCount(7);
-        photo2.setLikeCount(1);
-        photo2.setImgLocation("test23");
-        photo2.setCity("München");
-        photo2.setCountry("Germany");
-        photo2.setTimeAgo(prettyTime.format(DateTime.now().minusHours(10).toDate()));
-
-        dummyPhotos.add(photo1);
-        dummyPhotos.add(photo2);
-
-        return dummyPhotos;
     }
 
 }

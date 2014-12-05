@@ -35,6 +35,9 @@ public class PhotoStatistics implements Serializable {
     @Column(name = "pst_countries_count", nullable = false)
     private Integer countries = 0;
 
+    @Column(name = "pst_comments_count", nullable = false)
+    private Integer comments = 0;
+
     @Column(name = "pst_users_count", nullable = false)
     private Integer users = 0;
 
@@ -43,6 +46,7 @@ public class PhotoStatistics implements Serializable {
     private DateTime modifiedDate;
 
     @PreUpdate
+    @PrePersist
     public final void updateModifyDate() {
         modifiedDate = DateTime.now();
     }
@@ -111,6 +115,14 @@ public class PhotoStatistics implements Serializable {
 
     public void setUsers(Integer users) {
         this.users = users;
+    }
+
+    public Integer getComments() {
+        return comments;
+    }
+
+    public void setComments(Integer comments) {
+        this.comments = comments;
     }
 
     public DateTime getModifiedDate() {
