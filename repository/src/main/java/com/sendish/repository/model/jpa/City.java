@@ -2,16 +2,19 @@ package com.sendish.repository.model.jpa;
 
 import com.sendish.repository.model.jpa.listener.LocationAware;
 import com.sendish.repository.model.jpa.listener.LocationListener;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "city")
 @SequenceGenerator(name = "idSequence", sequenceName = "city_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "ct_id"))
 @EntityListeners(LocationListener.class)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class City extends BaseEntity implements LocationAware {
 
     private static final long serialVersionUID = 1L;
@@ -30,7 +33,7 @@ public class City extends BaseEntity implements LocationAware {
     })
     private Location location;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "ct_country_id")
     private Country country;
 

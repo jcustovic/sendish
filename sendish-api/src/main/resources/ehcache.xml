@@ -21,6 +21,34 @@
         timeToLiveSeconds="600"
         timeToIdleSeconds="600"
         overflowToDisk="true" />
+
+    <cache name="com.sendish.repository.model.jpa.UserDetails"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToLiveSeconds="600"
+           timeToIdleSeconds="600"
+           overflowToDisk="true" />
+
+    <cache name="com.sendish.repository.model.jpa.City"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToLiveSeconds="86400"
+           timeToIdleSeconds="86400"
+           overflowToDisk="true" />
+
+    <cache name="com.sendish.repository.model.jpa.Country"
+           maxElementsInMemory="300"
+           eternal="false"
+           timeToLiveSeconds="86400"
+           timeToIdleSeconds="86400"
+           overflowToDisk="true" />
+
+    <cache name="com.sendish.repository.model.jpa.Photo"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToLiveSeconds="600"
+           timeToIdleSeconds="600"
+           overflowToDisk="true" />
     
     <cache name="com.sendish.repository.UserSocialConnectionRepository.findUserId" 
     	maxElementsInMemory="10000"

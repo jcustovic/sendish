@@ -1,8 +1,6 @@
 package com.sendish.api.service.impl;
 
-import com.sendish.api.dto.LocationBasedFileUpload;
-import com.sendish.api.dto.PhotoDetailsDto;
-import com.sendish.api.dto.PhotoDto;
+import com.sendish.api.dto.*;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.util.ImageUtils;
@@ -10,10 +8,8 @@ import com.sendish.repository.PhotoReceiverRepository;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.PhotoStatisticsRepository;
 import com.sendish.repository.UserRepository;
-import com.sendish.repository.model.jpa.Location;
-import com.sendish.repository.model.jpa.Photo;
-import com.sendish.repository.model.jpa.PhotoReceiver;
-import com.sendish.repository.model.jpa.PhotoStatistics;
+import com.sendish.repository.model.jpa.*;
+import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +20,7 @@ import javax.transaction.Transactional;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
 
@@ -49,6 +46,9 @@ public class PhotoServiceImpl {
     @Autowired
     private PhotoStatisticsRepository photoStatisticsRepository;
 
+    @Autowired
+    private UserServiceImpl userService;
+
     private static PrettyTime prettyTime = new PrettyTime();
 
     @Transactional
@@ -61,8 +61,6 @@ public class PhotoServiceImpl {
         photo.setSize(file.getSize());
         photo.setDescription(p_upload.getDescription());
         photo.setResend(true);
-        photo.setOriginLocation(new Location(p_upload.getLatitude(), p_upload.getLongitude()));
-        photo.setCity(cityService.findNearest(p_upload.getLatitude(), p_upload.getLongitude()));
         photo.setUuid(UUID.randomUUID().toString());
 
         Dimension dimension;
@@ -82,8 +80,14 @@ public class PhotoServiceImpl {
         }
         photo.setStorageId(fileStoreId);
 
+        Location location = new Location(p_upload.getLatitude(), p_upload.getLongitude());
+        City city = cityService.findNearest(p_upload.getLatitude(), p_upload.getLongitude());
+        photo.setOriginLocation(location);
+        photo.setCity(city);
+
         photo = photoRepository.save(photo);
         createPhotoStatistics(photo);
+        userService.updateLocation(p_userId, location, city);
 
         return photo.getId();
     }
@@ -92,10 +96,6 @@ public class PhotoServiceImpl {
         PhotoStatistics photoStatistics = new PhotoStatistics();
         photoStatistics.setPhotoId(photo.getId());
         photoStatisticsRepository.save(photoStatistics);
-    }
-
-    public Photo findByUuid(String p_uuid) {
-        return photoRepository.findByUuid(p_uuid);
     }
 
     public InputStream getPhotoContent(String fileStoreId) throws ResourceNotFoundException {
@@ -116,10 +116,10 @@ public class PhotoServiceImpl {
         return getPhotoDtos(photos);
     }
 
-    public List<PhotoDto> findReceivedByUserId(Long userId, Integer page) {
-        List<Photo> photos = photoReceiverRepository.findPhotosByUserId(userId, new PageRequest(page, PHOTO_PAGE_SIZE));
+    public List<ReceivedPhotoDto> findReceivedByUserId(Long userId, Integer page) {
+        List<PhotoReceiver> photos = photoReceiverRepository.findByUserId(userId, new PageRequest(page, PHOTO_PAGE_SIZE));
 
-        return getPhotoDtos(photos);
+        return getReceivedPhotoDtos(photos);
     }
 
     public PhotoDetailsDto findByIdAndUserId(Long photoId, Long userId) {
@@ -131,14 +131,22 @@ public class PhotoServiceImpl {
         return null;
     }
 
-    public PhotoDetailsDto findReceivedByIdAndUserId(Long photoId, Long userId) {
+    public ReceivedPhotoDetailsDto findReceivedByIdAndUserId(Long photoId, BigDecimal longitude, BigDecimal latitude, Long userId) {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-        if (photoReceiver != null) {
-            // TODO: Mapping
-            return new PhotoDetailsDto();
+        if (photoReceiver == null) {
+            return null;
         }
 
-        return null;
+        if (photoReceiver.getOpenedDate() == null) {
+            photoReceiver.setOpenedDate(DateTime.now());
+            Location location = getUserLocation(userId, longitude, latitude);
+            photoReceiver.setOpenedLocation(location);
+            photoReceiver.setCity(cityService.findNearest(location.getLatitude(), location.getLongitude()));
+            photoReceiverRepository.save(photoReceiver);
+        }
+
+        // TODO: Mapping
+        return new ReceivedPhotoDetailsDto();
     }
 
     public void like(Long photoId, Long userId) {
@@ -190,12 +198,37 @@ public class PhotoServiceImpl {
 
     private PhotoDto getPhotoDto(Photo photo) {
         PhotoStatistics photoStatistics = photoStatisticsRepository.findOne(photo.getId());
+        PhotoDto photoDto = new PhotoDto();
+        mapToPhotoDto(photoDto, photo, photoStatistics);
 
-        return mapToPhotoDto(photo, photoStatistics);
+        return photoDto;
     }
 
-    private PhotoDto mapToPhotoDto(Photo photo, PhotoStatistics photoStatistics) {
-        PhotoDto photoDto = new PhotoDto();
+    private List<ReceivedPhotoDto> getReceivedPhotoDtos(List<PhotoReceiver> photos) {
+        if (photos.isEmpty()) {
+            return new ArrayList<>(0);
+        }
+
+        List<ReceivedPhotoDto> photoDtos = new ArrayList<>(photos.size());
+        for (PhotoReceiver photo : photos) {
+            photoDtos.add(getReceiverPhotoDto(photo));
+        }
+
+        return photoDtos;
+    }
+
+    private ReceivedPhotoDto getReceiverPhotoDto(PhotoReceiver photo) {
+        PhotoStatistics photoStatistics = photoStatisticsRepository.findOne(photo.getId());
+        ReceivedPhotoDto photoDto = new ReceivedPhotoDto();
+        mapToPhotoDto(photoDto, photo.getPhoto(), photoStatistics);
+        photoDto.setLike(photo.getLike());
+        photoDto.setReport(photo.getReport());
+        photoDto.setOpened(photo.getOpenedDate() != null);
+
+        return photoDto;
+    }
+
+    private PhotoDto mapToPhotoDto(PhotoDto photoDto, Photo photo, PhotoStatistics photoStatistics) {
         photoDto.setId(photo.getId());
         photoDto.setDescription(photo.getDescription());
         photoDto.setTimeAgo(prettyTime.format(photo.getCreatedDate().toDate()));
@@ -206,6 +239,15 @@ public class PhotoServiceImpl {
         photoDto.setLikeCount(photoStatistics.getLikes());
 
         return photoDto;
+    }
+
+    private Location getUserLocation(Long userId, BigDecimal longitude, BigDecimal latitude) {
+        if (longitude == null || latitude == null) {
+            return userService.getLastLocation(userId);
+        } else {
+            userService.updateLocation(userId, longitude, latitude);
+            return new Location(latitude, longitude);
+        }
     }
 
 }

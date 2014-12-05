@@ -85,14 +85,15 @@ create INDEX oauth1_search_idx on user_social_connection (usc_provider_id, usc_a
 -- UserDetails table
 create table auth_user_details (
   aud_user_id int8 not null,
-  aud_latitude numeric(19, 10) not null,
-  aud_longitude numeric(19, 10) not null,
-  aud_location geometry not null,
-  aud_last_location_time timestamp not null,
-  aud_current_city_id int8 not null,
-  aud_receive_limit_day int4 not null default 0,
-  aud_today_limit_count int4 not null default 0,
-  aud_limit_day date null,
+  aud_latitude numeric(19, 10),
+  aud_longitude numeric(19, 10),
+  aud_location geometry,
+  aud_last_location_time timestamp,
+  aud_current_city_id int8,
+  aud_receive_limit_day int4,
+  aud_send_limit_day int4,
+  aud_today_limit_count int4,
+  aud_limit_day date,
   aud_last_interaction_time timestamp not null,
 
   primary key (aud_user_id),

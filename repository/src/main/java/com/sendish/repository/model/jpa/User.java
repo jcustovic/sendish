@@ -10,9 +10,9 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "auth_user")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @SequenceGenerator(name = "idSequence", sequenceName = "auth_user_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "au_id"))
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

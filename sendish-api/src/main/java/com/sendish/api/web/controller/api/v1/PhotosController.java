@@ -1,12 +1,11 @@
 package com.sendish.api.web.controller.api.v1;
 
+import com.sendish.api.dto.*;
 import com.sendish.api.security.userdetails.AuthUser;
+import com.sendish.api.service.impl.UserServiceImpl;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.web.controller.model.ValidationError;
 import com.sendish.api.web.controller.validator.LocationBasedFileUploadValidator;
-import com.sendish.api.dto.LocationBasedFileUpload;
-import com.sendish.api.dto.PhotoDetailsDto;
-import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.repository.model.jpa.Photo;
 import com.wordnik.swagger.annotations.*;
@@ -16,6 +15,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -37,7 +38,10 @@ public class PhotosController {
     @Autowired
     private LocationBasedFileUploadValidator locationBasedFileUploadValidator;
 
-    @InitBinder
+    @Autowired
+    private UserServiceImpl userService;
+
+    @InitBinder("upload")
     protected void initBinder(WebDataBinder binder) {
         binder.addValidators(locationBasedFileUploadValidator);
     }
@@ -47,22 +51,31 @@ public class PhotosController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK")
     })
-    public List<PhotoDto> getReceivedPhotos(@RequestParam(defaultValue = "0") Integer page, AuthUser user) {
+    public List<ReceivedPhotoDto> getReceivedPhotos(@RequestParam(defaultValue = "0") Integer page, AuthUser user) {
         return photoService.findReceivedByUserId(user.getUserId(), page);
     }
 
     @RequestMapping(value = "/received/{photoId}", method = RequestMethod.GET)
-    @ApiOperation(value = "Get photo details of received photo")
+    @ApiOperation(value = "Get photo details of received photo", notes = "Always try to send GPS coordinates if you open the details for the FIRST TIME ONLY!")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
     })
-    public ResponseEntity<PhotoDetailsDto> receivedPhotoDetails(@PathVariable Long photoId, AuthUser user) {
-        PhotoDetailsDto photo = photoService.findReceivedByIdAndUserId(photoId, user.getUserId());
+    public ResponseEntity<ReceivedPhotoDetailsDto> receivedPhotoDetails(@PathVariable Long photoId, AuthUser user,
+                                                                        @ModelAttribute LocationDto location, BindingResult bindingResult) throws BindException {
+        if (location.getLatitude() == null || location.getLongitude() == null) {
+            if (userService.getLastLocation(user.getUserId()) == null) {
+                bindingResult.rejectValue("latitude", null, "Latitude must be provided because user location cannot be determined");
+                bindingResult.rejectValue("longitude", null, "Longitude must be provided because user location cannot be determined");
+                throw new BindException(bindingResult);
+            }
+        }
+
+        ReceivedPhotoDetailsDto photo = photoService.findReceivedByIdAndUserId(photoId, location.getLongitude(), location.getLatitude(), user.getUserId());
         if (photo == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            } else {
-                return new ResponseEntity<>(photo, HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(photo, HttpStatus.OK);
         }
     }
 

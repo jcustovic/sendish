@@ -1,11 +1,16 @@
 package com.sendish.repository.model.jpa;
 
+import org.hibernate.annotations.*;
+
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "country")
 @SequenceGenerator(name = "idSequence", sequenceName = "country_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name="c_id"))
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Country extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

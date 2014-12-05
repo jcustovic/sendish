@@ -14,8 +14,8 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "auth_user_details")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EntityListeners(LocationListener.class)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class UserDetails implements Serializable, LocationAware {
 
     private static final long serialVersionUID = 1L;
@@ -30,27 +30,30 @@ public class UserDetails implements Serializable, LocationAware {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "latitude", column = @Column(name = "aud_latitude", nullable = false))
-            , @AttributeOverride(name = "longitude", column = @Column(name = "aud_longitude", nullable = false))
-            , @AttributeOverride(name = "location", column = @Column(name = "aud_location", nullable = false))
+            @AttributeOverride(name = "latitude", column = @Column(name = "aud_latitude"))
+            , @AttributeOverride(name = "longitude", column = @Column(name = "aud_longitude"))
+            , @AttributeOverride(name = "location", column = @Column(name = "aud_location"))
     })
     private Location location;
 
-    @Column(name = "aud_last_location_time", nullable = false)
+    @Column(name = "aud_last_location_time")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime lastLocationTime;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "aud_current_city_id")
     private City currentCity;
 
-    @Column(name = "aud_receive_limit_day", nullable = false)
-    private Integer receiveLimitPerDay = 0;
+    @Column(name = "aud_receive_limit_day")
+    private Integer receiveLimitPerDay;
 
-    @Column(name = "aud_today_limit_count", nullable = false)
-    private Integer todayReceivedCount = 0;
+    @Column(name = "aud_send_limit_day")
+    private Integer sendLimitPerDay;
 
-    @Column(name = "aud_limit_day", nullable = false)
+    @Column(name = "aud_today_limit_count")
+    private Integer todayReceivedCount;
+
+    @Column(name = "aud_limit_day")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
     private LocalDate limitDate;
 
@@ -113,6 +116,14 @@ public class UserDetails implements Serializable, LocationAware {
 
     public void setReceiveLimitPerDay(Integer receiveLimitPerDay) {
         this.receiveLimitPerDay = receiveLimitPerDay;
+    }
+
+    public Integer getSendLimitPerDay() {
+        return sendLimitPerDay;
+    }
+
+    public void setSendLimitPerDay(Integer sendLimitPerDay) {
+        this.sendLimitPerDay = sendLimitPerDay;
     }
 
     public Integer getTodayReceivedCount() {

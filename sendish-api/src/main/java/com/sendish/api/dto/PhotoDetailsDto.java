@@ -14,7 +14,6 @@ public class PhotoDetailsDto extends BaseEntityDto {
     private Integer likeCount;
     private Integer cityCount;
     private Integer commentCount;
-    private boolean rated;
     private List<CommentDto> comments;
 
     public String getCity() {
@@ -79,14 +78,6 @@ public class PhotoDetailsDto extends BaseEntityDto {
 
     public void setCommentCount(Integer commentCount) {
         this.commentCount = commentCount;
-    }
-
-    public boolean isRated() {
-        return rated;
-    }
-
-    public void setRated(boolean rated) {
-        this.rated = rated;
     }
 
     public List<CommentDto> getComments() {

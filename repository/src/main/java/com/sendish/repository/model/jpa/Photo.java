@@ -2,16 +2,19 @@ package com.sendish.repository.model.jpa;
 
 import com.sendish.repository.model.jpa.listener.LocationAware;
 import com.sendish.repository.model.jpa.listener.LocationListener;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "photo")
 @SequenceGenerator(name = "idSequence", sequenceName = "photo_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "p_id"))
 @EntityListeners(LocationListener.class)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Photo extends BaseEntity implements LocationAware {
 
     private static final long serialVersionUID = 1L;

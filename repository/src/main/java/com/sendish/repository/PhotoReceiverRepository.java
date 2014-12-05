@@ -16,7 +16,7 @@ public interface PhotoReceiverRepository extends JpaRepository<PhotoReceiver, Lo
     Photo findPhotoByUserIdAndPhotoUUID(Long userId, String photoUUID);
 
     @Query("SELECT pr.photo FROM PhotoReceiver pr WHERE pr.user.id = ?1")
-    List<Photo> findPhotosByUserId(Long userId, Pageable pageRequest);
+    List<PhotoReceiver> findByUserId(Long userId, Pageable pageRequest);
 
     PhotoReceiver findByPhotoIdAndUserId(Long photoId, Long userId);
 
