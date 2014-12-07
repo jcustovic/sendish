@@ -4,61 +4,52 @@ import java.io.Serializable;
 
 public class CommentDto implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private String user;
-    private String city;
-    private String country;
-    private String timeAgo;
-    private String comment;
-    private Integer likes;
+	private String userName;
+	private String timeAgo;
+	private String comment;
+	private Integer likes;
+	private Integer dislikes;
 
-    public String getUser() {
-        return user;
-    }
+	public String getUserName() {
+		return userName;
+	}
 
-    public void setUser(String user) {
-        this.user = user;
-    }
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
-    public String getCity() {
-        return city;
-    }
+	public String getTimeAgo() {
+		return timeAgo;
+	}
 
-    public void setCity(String city) {
-        this.city = city;
-    }
+	public void setTimeAgo(String timeAgo) {
+		this.timeAgo = timeAgo;
+	}
 
-    public String getCountry() {
-        return country;
-    }
+	public String getComment() {
+		return comment;
+	}
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 
-    public String getTimeAgo() {
-        return timeAgo;
-    }
+	public Integer getLikes() {
+		return likes;
+	}
 
-    public void setTimeAgo(String timeAgo) {
-        this.timeAgo = timeAgo;
-    }
+	public void setLikes(Integer likes) {
+		this.likes = likes;
+	}
 
-    public String getComment() {
-        return comment;
-    }
+	public Integer getDislikes() {
+		return dislikes;
+	}
 
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    public Integer getLikes() {
-        return likes;
-    }
-
-    public void setLikes(Integer likes) {
-        this.likes = likes;
-    }
+	public void setDislikes(Integer dislikes) {
+		this.dislikes = dislikes;
+	}
 
 }

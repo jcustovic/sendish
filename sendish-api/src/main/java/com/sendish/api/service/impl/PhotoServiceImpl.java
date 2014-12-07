@@ -9,14 +9,17 @@ import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.PhotoStatisticsRepository;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.*;
+
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +31,7 @@ import java.util.List;
 public class PhotoServiceImpl {
 
     private static final int PHOTO_PAGE_SIZE = 10;
+    
     @Autowired
     private PhotoRepository photoRepository;
 
@@ -111,13 +115,15 @@ public class PhotoServiceImpl {
     }
 
     public List<PhotoDto> findByUserId(Long userId, Integer page) {
-        List<Photo> photos = photoRepository.findByUserId(userId, new PageRequest(page, PHOTO_PAGE_SIZE));
+        List<Photo> photos = photoRepository.findByUserId(userId, 
+        		new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
 
         return getPhotoDtos(photos);
     }
 
     public List<ReceivedPhotoDto> findReceivedByUserId(Long userId, Integer page) {
-        List<PhotoReceiver> photos = photoReceiverRepository.findByUserId(userId, new PageRequest(page, PHOTO_PAGE_SIZE));
+        List<PhotoReceiver> photos = photoReceiverRepository.findByUserId(userId, 
+        		new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
 
         return getReceivedPhotoDtos(photos);
     }
