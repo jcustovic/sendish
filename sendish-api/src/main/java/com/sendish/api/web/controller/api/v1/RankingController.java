@@ -23,6 +23,7 @@ public class RankingController {
         @ApiResponse(code = 200, message = "OK")
     })
     public List<UserRankDto> getTopRank() {
+        // TODO: Implement me
         return new ArrayList<>();
     }
 

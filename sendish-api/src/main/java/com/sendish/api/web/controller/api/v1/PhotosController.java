@@ -25,6 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -79,6 +80,16 @@ public class PhotosController {
         }
     }
 
+    @RequestMapping(value = "/received/{photoId}/traveled", method = RequestMethod.GET)
+    @ApiOperation(value = "Get where received photo has traveled")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK")
+    })
+    public List<PhotoTraveledDto> receivedTraveled(@PathVariable Long photoId, AuthUser user) {
+        // TODO: Implement me
+        return new ArrayList<>();
+    }
+
     @RequestMapping(value = "/received/{photoUUID}/download", method = RequestMethod.GET)
     @ApiOperation(value = "Get photo details")
     @ApiResponses({
@@ -113,6 +124,16 @@ public class PhotosController {
         } else {
             return new ResponseEntity<>(photo, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @RequestMapping(value = "/sent/{photoId}/traveled", method = RequestMethod.GET)
+    @ApiOperation(value = "Get where the sent photo has traveled")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK")
+    })
+    public List<PhotoTraveledDto> sentTraveled(@PathVariable Long photoId, AuthUser user) {
+        // TODO: Implement me
+        return new ArrayList<>();
     }
 
     @RequestMapping(value = "/sent/{photoUUID}/download", method = RequestMethod.GET)

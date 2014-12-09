@@ -69,7 +69,7 @@ public class RegistrationController {
         @ApiResponse(code = 200, message = "Reset password email is sent (NOTE: Only if a user exists in the system).", response = None.class)
     })
     public void resetPassword(@Valid @RequestBody UserRegistration userRegistration) {
-        // TODO:
+        // TODO: Implement me
     }
 
 }

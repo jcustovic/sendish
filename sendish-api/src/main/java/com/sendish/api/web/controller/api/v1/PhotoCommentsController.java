@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sendish.api.service.impl.PhotoServiceImpl;
+import com.sendish.repository.model.jpa.Photo;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -36,12 +38,20 @@ public class PhotoCommentsController {
 	@Autowired
 	private PhotoCommentServiceImpl photoCommentService;
 
+    @Autowired
+    private PhotoServiceImpl photoService;
+
     @RequestMapping(value = "/{photoId}", method = RequestMethod.GET)
     @ApiOperation(value = "Get comments for a specific photo")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK")
     })
     public List<CommentDto> list(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page) {
+        Photo photo = photoService.findOne(photoId);
+        if (photo == null) {
+            new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
     	final List<PhotoComment> comments = photoCommentService.findByPhotoId(photoId, page);
     	
         return mapToCommentDto(comments);
@@ -54,7 +64,12 @@ public class PhotoCommentsController {
         @ApiResponse(code = 201, message = "Comment created")
     })
     public ResponseEntity<Void> newComment(@PathVariable Long photoId, @RequestParam String comment, AuthUser user) {
-    	PhotoComment photoComment = photoCommentService.save(photoId, comment, user.getUserId());
+        Photo photo = photoService.findOne(photoId);
+        if (photo == null) {
+            new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        PhotoComment photoComment = photoCommentService.save(photoId, comment, user.getUserId());
     	
     	final URI location = ServletUriComponentsBuilder
                 .fromCurrentServletMapping().path("/api/v1.0/photo-comments/{id}").build()
@@ -67,11 +82,16 @@ public class PhotoCommentsController {
     }
     
     @RequestMapping(value = "/{photoId}/like", method = RequestMethod.PUT)
-    @ApiOperation(value = "Like a commnet")
+    @ApiOperation(value = "Like a comment")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK")
     })
     public void like(@PathVariable Long photoId, AuthUser user) {
+        Photo photo = photoService.findOne(photoId);
+        if (photo == null) {
+            new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
     	photoCommentService.like(photoId, user.getUserId());
     }
 
@@ -81,6 +101,11 @@ public class PhotoCommentsController {
         @ApiResponse(code = 200, message = "OK")
     })
     public void dislike(@PathVariable Long photoId, AuthUser user) {
+        Photo photo = photoService.findOne(photoId);
+        if (photo == null) {
+            new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
     	photoCommentService.dislike(photoId, user.getUserId());
     }
     

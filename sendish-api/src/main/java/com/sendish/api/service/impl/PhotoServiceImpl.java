@@ -55,6 +55,10 @@ public class PhotoServiceImpl {
 
     private static PrettyTime prettyTime = new PrettyTime();
 
+    public Photo findOne(Long photoId) {
+        return photoRepository.findOne(photoId);
+    }
+
     @Transactional
     public Long saveNewImage(LocationBasedFileUpload p_upload, Long p_userId) {
         MultipartFile file = p_upload.getImage();

@@ -37,7 +37,7 @@ public class UserProfileController {
         @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
     })
     public void register(@Valid @RequestBody ChangePasswordDto changePasswordDto) {
-        // TODO:
+        // TODO: Implement me
     }
 
 }
