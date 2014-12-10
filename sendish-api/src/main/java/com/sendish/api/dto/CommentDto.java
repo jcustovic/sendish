@@ -6,13 +6,22 @@ public class CommentDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+    private Long userId;
 	private String userName;
 	private String timeAgo;
 	private String comment;
 	private Integer likes;
 	private Integer dislikes;
 
-	public String getUserName() {
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
 		return userName;
 	}
 

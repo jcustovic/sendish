@@ -1,5 +1,6 @@
 package com.sendish.repository.model.jpa;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 @Table(name = "photo_comment")
 @SequenceGenerator(name = "idSequence", sequenceName = "photo_comment_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "pc_id"))
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class PhotoComment extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;

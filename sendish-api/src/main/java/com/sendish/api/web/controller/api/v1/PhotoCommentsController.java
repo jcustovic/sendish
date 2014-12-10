@@ -1,12 +1,10 @@
 package com.sendish.api.web.controller.api.v1;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.repository.model.jpa.Photo;
-import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,7 +20,6 @@ import com.sendish.api.dto.CommentDto;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.PhotoCommentServiceImpl;
 import com.sendish.repository.model.jpa.PhotoComment;
-import com.sendish.repository.model.jpa.UserDetails;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
@@ -33,15 +30,13 @@ import com.wordnik.swagger.annotations.ApiResponses;
 @Api(value = "photo-comments", description = "Comments on photo")
 public class PhotoCommentsController {
 	
-	private static PrettyTime prettyTime = new PrettyTime();
-	
 	@Autowired
 	private PhotoCommentServiceImpl photoCommentService;
 
     @Autowired
     private PhotoServiceImpl photoService;
 
-    @RequestMapping(value = "/{photoId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{photoId}/comments", method = RequestMethod.GET)
     @ApiOperation(value = "Get comments for a specific photo")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK")
@@ -52,9 +47,7 @@ public class PhotoCommentsController {
             new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-    	final List<PhotoComment> comments = photoCommentService.findByPhotoId(photoId, page);
-    	
-        return mapToCommentDto(comments);
+    	return photoCommentService.findByPhotoId(photoId, page);
     }
     
 	@RequestMapping(value = "/{photoId}", method = RequestMethod.POST)
@@ -81,47 +74,42 @@ public class PhotoCommentsController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
     
-    @RequestMapping(value = "/{photoId}/like", method = RequestMethod.PUT)
+    @RequestMapping(value = "/comment/{photoCommentId}/like", method = RequestMethod.PUT)
     @ApiOperation(value = "Like a comment")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Validator errors or if you vote on your own comment")
     })
-    public void like(@PathVariable Long photoId, AuthUser user) {
-        Photo photo = photoService.findOne(photoId);
-        if (photo == null) {
-            new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Void> like(@PathVariable Long photoCommentId, AuthUser user) {
+        PhotoComment photoComment = photoCommentService.findOne(photoCommentId);
+        if (photoComment == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if (photoComment.getUser().getId().equals(user.getUserId())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-    	photoCommentService.like(photoId, user.getUserId());
+        photoCommentService.like(photoCommentId, user.getUserId());
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{photoId}/dislike", method = RequestMethod.PUT)
+    @RequestMapping(value = "/comment/{photoCommentId}/dislike", method = RequestMethod.PUT)
     @ApiOperation(value = "Dislike a comment")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Validator errors or if you vote on your own comment")
     })
-    public void dislike(@PathVariable Long photoId, AuthUser user) {
-        Photo photo = photoService.findOne(photoId);
-        if (photo == null) {
-            new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Void> dislike(@PathVariable Long photoCommentId, AuthUser user) {
+        PhotoComment photoComment = photoCommentService.findOne(photoCommentId);
+        if (photoComment == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if (photoComment.getUser().getId().equals(user.getUserId())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-    	photoCommentService.dislike(photoId, user.getUserId());
+    	photoCommentService.dislike(photoCommentId, user.getUserId());
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
-    
-    private List<CommentDto> mapToCommentDto(List<PhotoComment> comments) {
-    	List<CommentDto> commentDtos = new ArrayList<>();
-    	for (PhotoComment comment : comments) {
-    		CommentDto commentDto = new CommentDto();
-    		UserDetails userDetails = comment.getUser().getDetails();
-    		commentDto.setUserName(userDetails.getCurrentCity().getName() + ", " + userDetails.getCurrentCity().getCountry().getName());
-    		commentDto.setComment(comment.getComment());
-    		commentDto.setLikes(comment.getLikes());
-    		commentDto.setDislikes(comment.getDislikes());
-    		commentDto.setTimeAgo(prettyTime.format(comment.getCreatedDate().toDate()));
-    	}
-    	
-		return commentDtos;
-	}
 
 }

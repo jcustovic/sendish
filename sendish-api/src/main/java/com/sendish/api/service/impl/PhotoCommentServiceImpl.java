@@ -1,7 +1,12 @@
 package com.sendish.api.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.sendish.api.dto.CommentDto;
+import com.sendish.repository.PhotoCommentVoteRepository;
+import com.sendish.repository.model.jpa.*;
+import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -10,14 +15,15 @@ import org.springframework.stereotype.Service;
 import com.sendish.repository.PhotoCommentRepository;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.UserRepository;
-import com.sendish.repository.model.jpa.Photo;
-import com.sendish.repository.model.jpa.PhotoComment;
-import com.sendish.repository.model.jpa.User;
+
+import javax.transaction.Transactional;
 
 @Service
+@Transactional
 public class PhotoCommentServiceImpl {
 	
 	private static final int COMMENT_PAGE_SIZE = 20;
+    private static PrettyTime prettyTime = new PrettyTime();
 	
 	@Autowired
 	private PhotoCommentRepository photoCommentRepository;
@@ -27,6 +33,9 @@ public class PhotoCommentServiceImpl {
 	
 	@Autowired
 	private UserRepository userRepository;
+
+    @Autowired
+    private PhotoCommentVoteRepository photoCommentVoteRepository;
 
 	public PhotoComment save(Long photoId, String comment, Long userId) {
 		Photo photo = photoRepository.findOne(photoId);
@@ -42,19 +51,53 @@ public class PhotoCommentServiceImpl {
 		return photoCommentRepository.save(photoComment);
 	}
 	
-	public List<PhotoComment> findByPhotoId(Long photoId, Integer page) {
+	public List<CommentDto> findByPhotoId(Long photoId, Integer page) {
         List<PhotoComment> photoComments = photoCommentRepository.findByPhotoId(photoId, 
         		new PageRequest(page, COMMENT_PAGE_SIZE, Direction.DESC, "createdDate"));
 
-        return photoComments;
+        return mapToCommentDto(photoComments);
     }
 
-	public void like(Long photoId, Long userId) {
-		// TODO Auto-generated method stub
+	public void like(Long photoCommentId, Long userId) {
+        voteOnComment(photoCommentId, userId, true);
 	}
 
-	public void dislike(Long photoId, Long userId) {
-		// TODO Auto-generated method stub
+    public void dislike(Long photoCommentId, Long userId) {
+        voteOnComment(photoCommentId, userId, false);
 	}
+
+    public PhotoComment findOne(Long photoCommentId) {
+        return photoCommentRepository.findOne(photoCommentId);
+    }
+
+    private List<CommentDto> mapToCommentDto(List<PhotoComment> comments) {
+        List<CommentDto> commentDtos = new ArrayList<>(comments.size());
+        for (PhotoComment comment : comments) {
+            CommentDto commentDto = new CommentDto();
+            UserDetails userDetails = comment.getUser().getDetails();
+            commentDto.setUserId(userDetails.getUserId());
+            commentDto.setUserName(userDetails.getCurrentCity().getName() + ", " + userDetails.getCurrentCity().getCountry().getName());
+            commentDto.setComment(comment.getComment());
+            commentDto.setLikes(comment.getLikes());
+            commentDto.setDislikes(comment.getDislikes());
+            commentDto.setTimeAgo(prettyTime.format(comment.getCreatedDate().toDate()));
+
+            commentDtos.add(commentDto);
+        }
+
+        return commentDtos;
+    }
+
+    private void voteOnComment(Long photoCommentId, Long userId, boolean like) {
+        PhotoCommentVote photoCommentVote = photoCommentVoteRepository.findOne(new PhotoCommentVoteId(userId, photoCommentId));
+        if (photoCommentVote == null) {
+            // TODO: Counter on PhotoComment
+            PhotoCommentVote newVote = new PhotoCommentVote();
+            newVote.setLike(like);
+            newVote.setUser(userRepository.findOne(userId));
+            newVote.setComment(photoCommentRepository.findOne(photoCommentId));
+            photoCommentVoteRepository.save(newVote);
+        }
+    }
 
 }

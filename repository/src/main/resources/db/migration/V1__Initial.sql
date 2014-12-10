@@ -164,6 +164,18 @@ create table photo_comment (
   constraint photo_comment_photo_id_fk foreign key (pc_photo_id) references photo
 );
 
+-- PhotoCommentVote table
+create table photo_comment_vote (
+  pcv_pc_id int8 not null,
+  pcv_user_id int8 not null,
+  pcv_like boolean not null,
+  pcv_created_date timestamp not null,
+
+  primary key (pcv_pc_id, pcv_user_id),
+  constraint photo_comment_vote_user_id_fk foreign key (pcv_pc_id) references auth_user,
+  constraint photo_comment_vote_photo_comment_id_fk foreign key (pcv_user_id) references photo_comment
+);
+
 -- PhotoReceiver table
 create sequence photo_receiver_seq;
 
