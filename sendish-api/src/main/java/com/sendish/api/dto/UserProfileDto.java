@@ -1,19 +1,22 @@
 package com.sendish.api.dto;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 public class UserProfileDto extends BaseEntityDto {
 
     private static final long serialVersionUID = 1L;
 
     private String nick;
-    private String city;
-    private String country;
-    private Double lastLng;
-    private Double lastLat;
+    private String lastPlace;
+    private BigDecimal lastLng;
+    private BigDecimal lastLat;
+    private Date lastLocationTime;
     private Integer rank;
     private Integer totalLikes;
     private Integer totalDislikes;
     private Integer citiesCount;
-    private Boolean signedWithEmail;
+    private Boolean emailRegistration;
 
     public String getNick() {
         return nick;
@@ -23,36 +26,36 @@ public class UserProfileDto extends BaseEntityDto {
         this.nick = nick;
     }
 
-    public String getCity() {
-        return city;
+    public String getLastPlace() {
+        return lastPlace;
     }
 
-    public void setCity(String city) {
-        this.city = city;
+    public void setLastPlace(String lastPlace) {
+        this.lastPlace = lastPlace;
     }
 
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public Double getLastLng() {
+    public BigDecimal getLastLng() {
         return lastLng;
     }
 
-    public void setLastLng(Double lastLng) {
+    public void setLastLng(BigDecimal lastLng) {
         this.lastLng = lastLng;
     }
 
-    public Double getLastLat() {
+    public BigDecimal getLastLat() {
         return lastLat;
     }
 
-    public void setLastLat(Double lastLat) {
+    public void setLastLat(BigDecimal lastLat) {
         this.lastLat = lastLat;
+    }
+
+    public Date getLastLocationTime() {
+        return lastLocationTime;
+    }
+
+    public void setLastLocationTime(Date lastLocationTime) {
+        this.lastLocationTime = lastLocationTime;
     }
 
     public Integer getRank() {
@@ -87,12 +90,12 @@ public class UserProfileDto extends BaseEntityDto {
         this.citiesCount = citiesCount;
     }
 
-    public Boolean getSignedWithEmail() {
-        return signedWithEmail;
+    public Boolean getEmailRegistration() {
+        return emailRegistration;
     }
 
-    public void setSignedWithEmail(Boolean signedWithEmail) {
-        this.signedWithEmail = signedWithEmail;
+    public void setEmailRegistration(Boolean emailRegistration) {
+        this.emailRegistration = emailRegistration;
     }
 
 }

@@ -7,4 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public interface UserStatisticsRepository extends JpaRepository<UserStatistics, Long> {
 
+    UserStatistics findByUserId(Long userId);
+
 }

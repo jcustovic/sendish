@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
@@ -12,7 +11,6 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sendish.api.dto.UserRegistration;
@@ -26,12 +24,12 @@ import org.springframework.util.StringUtils;
 @Service
 @Transactional
 public class RegistrationServiceImpl {
+
+    @Autowired
+    private UserServiceImpl userService;
 	
 	@Autowired
 	private UserRepository userRepository;
-	
-	@Autowired
-    private ShaPasswordEncoder shaPasswordEncoder;
 	
 	@Autowired
 	private MailSenderService mailSenderService;
@@ -43,18 +41,7 @@ public class RegistrationServiceImpl {
 	private String fromEmail;
 	
 	public void registerNewUser(UserRegistration userRegistration) {
-		User user = new User();
-		user.setUsername(userRegistration.getEmail());
-		user.setEmail(userRegistration.getEmail());
-		user.setPassword(shaPasswordEncoder.encodePassword(userRegistration.getPassword(), null));
-		user.setNickname(userRegistration.getNickname());
-        user.setEmailRegistration(true);
-		
-		String verificationCode = UUID.randomUUID().toString();
-		user.setVerificationCode(verificationCode);
-		
-		userRepository.save(user);
-		
+        User user = userService.createUser(userRegistration.getEmail(), userRegistration.getEmail(), userRegistration.getPassword(), userRegistration.getNickname(), true);
 		Map<String, Object> variables = new HashMap<>();
 		variables.put("user", user);
 		

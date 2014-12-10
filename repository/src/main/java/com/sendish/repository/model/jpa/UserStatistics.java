@@ -29,6 +29,9 @@ public class UserStatistics implements Serializable {
     @Column(name = "aus_dislikes_count", nullable = false)
     private Integer dislikes = 0;
 
+    @Column(name = "aus_cities_count", nullable = false)
+    private Integer cities = 0;
+
     @Column(name = "aus_reports_count", nullable = false)
     private Integer reports = 0;
 
@@ -76,6 +79,14 @@ public class UserStatistics implements Serializable {
 
     public void setDislikes(Integer dislikes) {
         this.dislikes = dislikes;
+    }
+
+    public Integer getCities() {
+        return cities;
+    }
+
+    public void setCities(Integer cities) {
+        this.cities = cities;
     }
 
     public Integer getReports() {

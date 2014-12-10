@@ -2,12 +2,12 @@ package com.sendish.api.security.web.authentication;
 
 import java.util.UUID;
 
+import com.sendish.api.service.impl.UserServiceImpl;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionSignUp;
 import org.springframework.social.connect.UserProfile;
@@ -20,13 +20,13 @@ public class UserConnectionSignUp implements ConnectionSignUp {
     private static final Logger          LOG = LoggerFactory.getLogger(UserConnectionSignUp.class);
 
     @Autowired
-    private transient UserRepository userRepository;
+    private UserServiceImpl userService;
 
     @Autowired
-    private transient ShaPasswordEncoder shaPasswordEncoder;
+    private UserRepository userRepository;
 
     @Autowired
-    private transient EntitySynchronizer entitySynchronizer;
+    private EntitySynchronizer entitySynchronizer;
 
     @Override
     public final String execute(final Connection<?> p_connection) {
@@ -38,7 +38,8 @@ public class UserConnectionSignUp implements ConnectionSignUp {
             User user = userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(username, username);
             if (user == null) {
                 final String randomPassword = UUID.randomUUID().toString();
-                final User newUser = new User(username, shaPasswordEncoder.encodePassword(randomPassword, null), userProfile.getEmail());
+                User newUser = userService.createUser(username, userProfile.getEmail(), randomPassword, null, false);
+
                 newUser.setFirstName(userProfile.getFirstName());
                 newUser.setLastName(userProfile.getLastName());
                 if (StringUtils.hasText(userProfile.getEmail())) {

@@ -106,6 +106,7 @@ create table auth_user_statistics (
   aus_user_id int8 not null,
   aus_likes_count int4 not null default 0,
   aus_dislikes_count int4 not null default 0,
+  aus_cities_count int4 not null default 0,
   aus_reports_count int4 not null default 0,
   aus_rank int4 null,
   aus_modified_date timestamp not null,
