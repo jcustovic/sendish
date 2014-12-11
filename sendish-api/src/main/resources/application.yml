@@ -21,22 +21,17 @@ spring:
     facebook:
       app-id: 364597623699443
       app-secret: ddd32b42d6c5db5386655def6e703f44
+  mail:
+    host: mail.sendish.com
+    port: 587
+    username: app.sender@sendish.com
+    password: 4fLlmz2qtlDF
 
 security:
   enable-csrf: false
 
 flyway:
   locations = classpath:db/migrations,classpath:db/migrations/h2
-  
-email:
-  host: mail.sendish.com
-  port: 587
-  username: app.sender@sendish.com
-  password: 4fLlmz2qtlDF
-#  smtp:
-#    auth: 
-#    starttls:
-#      enabled: true
 
 app:
   registration:
