@@ -6,41 +6,23 @@ public class UserRankDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String nickName;
-    private String country;
-    private String city;
-    private Integer rank;
+    private String name;
+    private String rank;
     private Long points;
 
-    public String getNickName() {
-        return nickName;
+    public String getName() {
+        return name;
     }
 
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public Integer getRank() {
+    public String getRank() {
         return rank;
     }
 
-    public void setRank(Integer rank) {
+    public void setRank(String rank) {
         this.rank = rank;
     }
 

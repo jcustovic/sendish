@@ -12,7 +12,7 @@ public class UserProfileDto extends BaseEntityDto {
     private BigDecimal lastLng;
     private BigDecimal lastLat;
     private Date lastLocationTime;
-    private Integer rank;
+    private String rank;
     private Integer totalLikes;
     private Integer totalDislikes;
     private Integer citiesCount;
@@ -58,11 +58,11 @@ public class UserProfileDto extends BaseEntityDto {
         this.lastLocationTime = lastLocationTime;
     }
 
-    public Integer getRank() {
+    public String getRank() {
         return rank;
     }
 
-    public void setRank(Integer rank) {
+    public void setRank(String rank) {
         this.rank = rank;
     }
 
