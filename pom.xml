@@ -36,6 +36,7 @@
         <commons-io.version>2.4</commons-io.version>
         <dozer.version>5.5.1</dozer.version>
         <scala-library.version>2.10.4</scala-library.version>
+        <apns.version>0.2.3</apns.version>
     </properties>
 
     <dependencies>
@@ -126,6 +127,12 @@
                 <groupId>org.scala-lang</groupId>
                 <artifactId>scala-library</artifactId>
                 <version>${scala-library.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.notnoop.apns</groupId>
+                <artifactId>apns</artifactId>
+                <version>${apns.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

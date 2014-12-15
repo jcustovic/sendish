@@ -119,7 +119,8 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
         return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
                 .includePatterns("/api/v1.0/.*")
                 .swaggerGroup("v1.0")
-                .apiInfo(apiInfo());
+                .apiInfo(apiInfo())
+                .useDefaultResponseMessages(true);
     }
 
     private ApiInfo apiInfo() {

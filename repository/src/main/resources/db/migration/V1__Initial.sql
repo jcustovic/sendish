@@ -229,3 +229,55 @@ create table photo_statistics (
   constraint photo_statistics_photo_id_fk foreign key (pst_photo_id) references photo
 );
 
+-- Push notifications related tables
+create sequence notification_message_seq;
+
+create table notification_message (
+  nm_id int8 not null default nextval('notification_message_seq'),
+	nm_notification_type varchar(15) not null,
+	nm_ref_id int8,
+	nm_status varchar(10) not null,
+	nm_created_date timestamp not null,
+	nm_done_sending_date timestamp,
+	nm_finished_date timestamp,
+	nm_gcm_count int4 not null,
+	nm_gcm_success int4 not null,
+	nm_apns_count int4 not null,
+	nm_apns_success int4 not null,
+
+	primary key (nm_id)
+);
+
+create sequence notification_partial_result_seq;
+
+create table notification_partial_result (
+	npr_id int8 not null default nextval('notification_partial_result_seq'),
+	npr_platform_type varchar(4) not null,
+	npr_send_date timestamp not null,
+	npr_response_date timestamp not null,
+	npr_notification_msg_id int8 not null,
+	npr_total_count int4 not null,
+	npr_failure_count int4 not null,
+
+	primary key (npr_id),
+	constraint notification_partial_result_not_msg_id_fk foreign key (npr_notification_msg_id) references notification_message
+);
+
+create index notification_partial_result_msg_id_idx on notification_partial_result (npr_notification_msg_id);
+
+create sequence push_notification_token_seq;
+
+create table push_notification_token (
+	pt_id int8 not null default nextval('push_notification_token_seq'),
+	pt_token varchar(200) not null,
+	pt_platform_type varchar(4) not null,
+	pt_modified_date timestamp not null,
+	pt_user_id int8 not null,
+	pt_dev_token boolean not null default false,
+
+	primary key (pt_id),
+  constraint push_notification_token_user_id_fk foreign key (pt_user_id) references auth_user,
+  constraint push_notification_token_uq unique (pt_token, pt_platform_type)
+);
+
+create index push_notification_token_user_id_idx on push_notification_token (pt_user_id);

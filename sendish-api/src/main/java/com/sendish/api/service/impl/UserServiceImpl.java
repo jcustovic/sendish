@@ -76,7 +76,11 @@ public class UserServiceImpl {
         }
         userProfileDto.setEmailRegistration(user.getEmailRegistration());
         userProfileDto.setNick(user.getNickname());
-        userProfileDto.setRank(userStatistics.getRank());
+        if (userStatistics.getRank() == null) {
+            userProfileDto.setRank("No rank");
+        } else {
+            userProfileDto.setRank(String.valueOf(userStatistics.getRank()));
+        }
         userProfileDto.setTotalDislikes(userStatistics.getDislikes());
         userProfileDto.setTotalLikes(userStatistics.getLikes());
         userProfileDto.setCitiesCount(userStatistics.getCities());
