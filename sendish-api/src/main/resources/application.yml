@@ -27,6 +27,9 @@ spring:
     username: app.sender@sendish.com
     password: 4fLlmz2qtlDF
 
+management:
+  context-path: /manage
+
 security:
   enable-csrf: false
 
