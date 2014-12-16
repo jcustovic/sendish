@@ -8,6 +8,7 @@ import com.sendish.api.web.controller.model.ValidationError;
 import com.sendish.api.web.controller.validator.LocationBasedFileUploadValidator;
 import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.repository.model.jpa.Photo;
+import com.sendish.repository.model.jpa.PhotoReceiver;
 import com.wordnik.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -72,7 +73,7 @@ public class PhotosController {
             }
         }
 
-        ReceivedPhotoDetailsDto photo = photoService.findReceivedByIdAndUserId(photoId, location.getLongitude(), location.getLatitude(), user.getUserId());
+        ReceivedPhotoDetailsDto photo = photoService.findReceivedByIdAndUserId(photoId, user.getUserId(), location.getLongitude(), location.getLatitude());
         if (photo == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
@@ -83,23 +84,29 @@ public class PhotosController {
     @RequestMapping(value = "/received/{photoId}/traveled", method = RequestMethod.GET)
     @ApiOperation(value = "Get where received photo has traveled")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
-    public List<PhotoTraveledDto> receivedTraveled(@PathVariable Long photoId, AuthUser user) {
-        // TODO: Implement me
-        return new ArrayList<>();
+    public ResponseEntity<List<PhotoTraveledDto>> receivedTraveled(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page, AuthUser user) {
+        PhotoReceiver photo = photoService.findReceivedByIdAndUserId(photoId, user.getUserId());
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            List<PhotoTraveledDto> traveledLocations = photoService.getTraveledLocations(photoId, page);
+            return new ResponseEntity<>(traveledLocations, HttpStatus.OK);
+        }
     }
 
-    @RequestMapping(value = "/received/{photoUUID}/download", method = RequestMethod.GET)
+    @RequestMapping(value = "/received/{photoUUID}/view", method = RequestMethod.GET)
     @ApiOperation(value = "Get photo details")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
     })
-    public ResponseEntity<InputStreamResource> receivedDownload(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
+    public ResponseEntity<InputStreamResource> receivedView(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
         Photo photo = photoService.findReceivedByUuid(photoUUID, user.getUserId());
 
-        return download(webRequest, photo);
+        return viewPhoto(webRequest, photo);
     }
 
     @RequestMapping(value = "/sent", method = RequestMethod.GET)
@@ -129,23 +136,29 @@ public class PhotosController {
     @RequestMapping(value = "/sent/{photoId}/traveled", method = RequestMethod.GET)
     @ApiOperation(value = "Get where the sent photo has traveled")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
-    public List<PhotoTraveledDto> sentTraveled(@PathVariable Long photoId, AuthUser user) {
-        // TODO: Implement me
-        return new ArrayList<>();
+    public ResponseEntity<List<PhotoTraveledDto>> sentTraveled(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page, AuthUser user) {
+        PhotoDetailsDto photo = photoService.findByIdAndUserId(photoId, user.getUserId());
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            List<PhotoTraveledDto> traveledLocations = photoService.getTraveledLocations(photoId, page);
+            return new ResponseEntity<>(traveledLocations, HttpStatus.OK);
+        }
     }
 
-    @RequestMapping(value = "/sent/{photoUUID}/download", method = RequestMethod.GET)
+    @RequestMapping(value = "/sent/{photoUUID}/view", method = RequestMethod.GET)
     @ApiOperation(value = "Get photo details")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
     })
-    public ResponseEntity<InputStreamResource> sentDownload(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
+    public ResponseEntity<InputStreamResource> sentView(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
         Photo photo = photoService.findByUserIdAndUuid(user.getUserId(), photoUUID);
 
-        return download(webRequest, photo);
+        return viewPhoto(webRequest, photo);
     }
 
     @RequestMapping(value = "/sendish-upload", method = RequestMethod.POST)
@@ -196,7 +209,7 @@ public class PhotosController {
         photoService.report(photoId, reason, reasonText, user.getUserId());
     }
 
-    private ResponseEntity<InputStreamResource> download(WebRequest webRequest, Photo photo) {
+    private ResponseEntity<InputStreamResource> viewPhoto(WebRequest webRequest, Photo photo) {
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else if (webRequest.checkNotModified(photo.getCreatedDate().getMillis())) {

@@ -32,6 +32,7 @@ import java.util.List;
 public class PhotoServiceImpl {
 
     private static final int PHOTO_PAGE_SIZE = 10;
+    private static final int PHOTO_LOCATION_PAGE_SIZE = 20;
     
     @Autowired
     private PhotoRepository photoRepository;
@@ -141,7 +142,11 @@ public class PhotoServiceImpl {
         return null;
     }
 
-    public ReceivedPhotoDetailsDto findReceivedByIdAndUserId(Long photoId, BigDecimal longitude, BigDecimal latitude, Long userId) {
+    public PhotoReceiver findReceivedByIdAndUserId(Long photoId, Long userId) {
+        return photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
+    }
+
+    public ReceivedPhotoDetailsDto findReceivedByIdAndUserId(Long photoId, Long userId, BigDecimal longitude, BigDecimal latitude) {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
         if (photoReceiver == null) {
             return null;
@@ -183,6 +188,12 @@ public class PhotoServiceImpl {
         // TODO: Counting
 
         photoReceiverRepository.save(photoReceiver);
+    }
+
+    public List<PhotoTraveledDto> getTraveledLocations(Long photoId, Integer page) {
+        List<PhotoReceiver> receivedList = photoReceiverRepository.findByPhotoId(photoId, new PageRequest(page, PHOTO_LOCATION_PAGE_SIZE, Direction.DESC, "createdDate"));
+
+        return getPhotoTraveledDtos(receivedList);
     }
 
     private PhotoDetailsDto getPhotoDetailsDto(Photo photo) {
@@ -242,7 +253,7 @@ public class PhotoServiceImpl {
         photoDto.setId(photo.getId());
         photoDto.setDescription(photo.getDescription());
         photoDto.setTimeAgo(prettyTime.format(photo.getCreatedDate().toDate()));
-        photoDto.setCity(photo.getCity().getName() + ", " + photo.getCity().getCountry().getName());
+        photoDto.setCity(getLocationName(photo));
         photoDto.setImgUuid(photo.getUuid());
         photoDto.setCityCount(photoStatistics.getCities());
         photoDto.setCommentCount(photoStatistics.getComments());
@@ -258,6 +269,25 @@ public class PhotoServiceImpl {
             userService.updateLocation(userId, longitude, latitude);
             return new Location(latitude, longitude);
         }
+    }
+
+    private List<PhotoTraveledDto> getPhotoTraveledDtos(List<PhotoReceiver> receivedList) {
+        List<PhotoTraveledDto> dtos = new ArrayList<>(receivedList.size());
+        for (PhotoReceiver photoReceiver : receivedList) {
+            PhotoTraveledDto dto = new PhotoTraveledDto();
+            dto.setLiked(photoReceiver.getLike());
+            dto.setLocation(getLocationName(photoReceiver.getPhoto()));
+            dto.setTimeAgo(prettyTime.format(photoReceiver.getCreatedDate().toDate()));
+            dto.setId(photoReceiver.getId());
+
+            dtos.add(dto);
+        }
+
+        return dtos;
+    }
+
+    private String getLocationName(Photo photo) {
+        return photo.getCity().getName() + ", " + photo.getCity().getCountry().getName();
     }
 
 }

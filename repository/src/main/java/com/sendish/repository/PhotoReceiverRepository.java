@@ -20,4 +20,6 @@ public interface PhotoReceiverRepository extends JpaRepository<PhotoReceiver, Lo
 
     PhotoReceiver findByPhotoIdAndUserId(Long photoId, Long userId);
 
+    List<PhotoReceiver> findByPhotoId(Long photoId, Pageable pageRequest);
+
 }
