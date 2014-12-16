@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -43,13 +44,13 @@ public class ApnsNotificationProvider implements NotificationProvider {
     private NotificationPartialResultRepository notificationPartialResultRepository;
 
     @Value("${app.ios.cert.path:}")
-    private File certificatePath;
+    private Resource certificatePath;
 
     @Value("${app.ios.cert.pass:}")
     private String certificatePassword;
 
     @Value("${app.ios.cert.dev.path:}")
-    private File devCertificatePath;
+    private Resource devCertificatePath;
 
     @Value("${app.ios.cert.dev.pass:}")
     private String devCertificatePassword;
@@ -65,10 +66,10 @@ public class ApnsNotificationProvider implements NotificationProvider {
     private transient ApnsService devService;
 
     @PostConstruct
-    public void setup() {
+    public void setup() throws IOException {
         if (certificatePath != null && certificatePath.exists()) {
             prodService = new JKSApnsServiceBuilder() //
-                    .withCert(certificatePath.getAbsolutePath(), certificatePassword) //
+                    .withCert(certificatePath.getInputStream(), certificatePassword) //
                     .withProductionDestination() //
                     .asPool(POOL_SIZE) //
                     .withDelegate(apnsDelegate) //
@@ -77,7 +78,7 @@ public class ApnsNotificationProvider implements NotificationProvider {
 
         if (devCertificatePath != null && devCertificatePath.exists()) {
             devService = new JKSApnsServiceBuilder() //
-                    .withCert(devCertificatePath.getAbsolutePath(), devCertificatePassword) //
+                    .withCert(devCertificatePath.getInputStream(), devCertificatePassword) //
                     .withSandboxDestination() //
                     .withDelegate(apnsDelegate) //
                     .build();
