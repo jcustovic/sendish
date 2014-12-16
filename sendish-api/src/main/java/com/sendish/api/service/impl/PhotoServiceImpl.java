@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.List;
 
 @Service
+@Transactional
 public class PhotoServiceImpl {
 
     private static final int PHOTO_PAGE_SIZE = 10;
@@ -59,7 +60,6 @@ public class PhotoServiceImpl {
         return photoRepository.findOne(photoId);
     }
 
-    @Transactional
     public Long saveNewImage(LocationBasedFileUpload p_upload, Long p_userId) {
         MultipartFile file = p_upload.getImage();
         Photo photo = new Photo();

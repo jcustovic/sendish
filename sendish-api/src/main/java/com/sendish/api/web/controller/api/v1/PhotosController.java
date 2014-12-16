@@ -42,7 +42,7 @@ public class PhotosController {
     @Autowired
     private UserServiceImpl userService;
 
-    @InitBinder("upload")
+    @InitBinder("locationBasedFileUpload")
     protected void initBinder(WebDataBinder binder) {
         binder.addValidators(locationBasedFileUploadValidator);
     }
@@ -155,8 +155,9 @@ public class PhotosController {
         @ApiResponse(code = 201, message = "Image upload is successful and the resource is created"),
         @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
     })
-    public ResponseEntity<Void> upload(@Valid @ModelAttribute LocationBasedFileUpload upload, MultipartFile image, AuthUser user) { // FIXME: MultipartFile image is also specified here because of swagger!
-        Long photoId = photoService.saveNewImage(upload, user.getUserId());
+    public ResponseEntity<Void> upload(@Valid @ModelAttribute LocationBasedFileUpload locationBasedFileUpload,
+                                       MultipartFile image, AuthUser user) { // FIXME: MultipartFile image is also specified here because of swagger!
+        Long photoId = photoService.saveNewImage(locationBasedFileUpload, user.getUserId());
 
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentServletMapping().path("/api/v1.0/photos/{id}").build()
