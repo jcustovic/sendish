@@ -19,7 +19,6 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -27,7 +26,6 @@ import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 
-//@Service("apnsNotificationProvider")
 public class ApnsNotificationProvider implements NotificationProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApnsNotificationProvider.class);
@@ -39,26 +37,26 @@ public class ApnsNotificationProvider implements NotificationProvider {
     private static final int POOL_SIZE = 10;
 
     @Autowired
-    private transient ApnsPushTokenRepository apnsPushTokenRepository;
+    private ApnsPushTokenRepository apnsPushTokenRepository;
 
     @Autowired
-    private transient NotificationPartialResultRepository notificationPartialResultRepository;
+    private NotificationPartialResultRepository notificationPartialResultRepository;
 
-    @Value("${apns.cert.path}")
-    private transient File certificatePath;
+    @Value("${app.ios.cert.path:}")
+    private File certificatePath;
 
-    @Value("${apns.cert.password}")
-    private transient String certificatePassword;
+    @Value("${app.ios.cert.pass:}")
+    private String certificatePassword;
 
-    @Value("${apns.cert.dev.path}")
-    private transient File devCertificatePath;
+    @Value("${app.ios.cert.dev.path:}")
+    private File devCertificatePath;
 
-    @Value("${apns.cert.dev.password}")
-    private transient String devCertificatePassword;
+    @Value("${app.ios.cert.dev.pass:}")
+    private String devCertificatePassword;
 
-    @Qualifier("notificationExecutor")
+    @Qualifier("apnsNotificationExecutor")
     @Autowired
-    private transient TaskExecutor taskExecutor;
+    private TaskExecutor taskExecutor;
 
     @Autowired
     private transient ErrorApnsDelegate apnsDelegate;
@@ -68,18 +66,22 @@ public class ApnsNotificationProvider implements NotificationProvider {
 
     @PostConstruct
     public void setup() {
-        prodService = new JKSApnsServiceBuilder() //
-                .withCert(certificatePath.getAbsolutePath(), certificatePassword) //
-                .withProductionDestination() //
-                .asPool(POOL_SIZE) //
-                .withDelegate(apnsDelegate) //
-                .build();
+        if (certificatePath != null && certificatePath.exists()) {
+            prodService = new JKSApnsServiceBuilder() //
+                    .withCert(certificatePath.getAbsolutePath(), certificatePassword) //
+                    .withProductionDestination() //
+                    .asPool(POOL_SIZE) //
+                    .withDelegate(apnsDelegate) //
+                    .build();
+        }
 
-        devService = new JKSApnsServiceBuilder() //
-                .withCert(devCertificatePath.getAbsolutePath(), certificatePassword) //
-                .withSandboxDestination() //
-                .withDelegate(apnsDelegate) //
-                .build();
+        if (devCertificatePath != null && devCertificatePath.exists()) {
+            devService = new JKSApnsServiceBuilder() //
+                    .withCert(devCertificatePath.getAbsolutePath(), devCertificatePassword) //
+                    .withSandboxDestination() //
+                    .withDelegate(apnsDelegate) //
+                    .build();
+        }
     }
 
     @Transactional

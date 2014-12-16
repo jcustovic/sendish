@@ -41,6 +41,11 @@ app:
   store:
     data:
       path: C:\Users\janc\sendish\data
+  ios:
+    cert:
+      dev:
+        path: classpath:ios/apns/SendishAPNS_DEV.jks
+        pass: sendisH
 
 ---
 
