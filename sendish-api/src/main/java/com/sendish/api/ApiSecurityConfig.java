@@ -3,6 +3,7 @@ package com.sendish.api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -20,7 +21,7 @@ import com.sendish.api.security.web.authentication.SocialAuthenticationFilter;
 import com.sendish.repository.UserSocialConnectionRepository;
 
 @Configuration
-@Order(100)
+@Order(Ordered.LOWEST_PRECEDENCE)
 @EnableWebSecurity
 public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 

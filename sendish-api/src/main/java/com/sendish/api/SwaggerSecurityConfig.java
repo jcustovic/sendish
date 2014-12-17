@@ -2,6 +2,7 @@ package com.sendish.api;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,7 +12,7 @@ import org.springframework.security.web.authentication.www.DigestAuthenticationE
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
 
 @Configuration
-@Order(99)
+@Order(Ordered.LOWEST_PRECEDENCE - 1)
 public class SwaggerSecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String REALM_NAME = "Sendish Docs Realm";

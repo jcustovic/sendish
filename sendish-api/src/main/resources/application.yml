@@ -29,9 +29,14 @@ spring:
 
 management:
   context-path: /manage
+  security:
+    role: MANAGE
 
 security:
   enable-csrf: false
+  user:
+    name: mag
+    password: pass
 
 flyway:
   locations = classpath:db/migrations,classpath:db/migrations/h2

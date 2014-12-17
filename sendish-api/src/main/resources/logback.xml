@@ -3,6 +3,43 @@
 
     <include resource="org/springframework/boot/logging/logback/base.xml" />
 
+    <property name="PATTERN_DEFAULT" value="[%date{dd.MM.yyyy HH:mm:ss.SSS}] : %-5level : %thread : %contextName : [%logger.%method:%line] %X{referenceClass} - %msg%n" />
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/sendish-api.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/sendish-api.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${PATTERN_DEFAULT}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+        <smtpHost>mail.sendish.com</smtpHost>
+        <smtpPort>587</smtpPort>
+        <!--
+        <ssl>true</ssl>
+        -->
+        <username>app.sender@sendish.com</username>
+        <password>4fLlmz2qtlDF</password>
+
+        <to>jan.custovic@gmail.com</to>
+        <from>error@sendish.com</from>
+        <subject>[Sendish-API-error-${CONTEXT_NAME}]: %logger{20} - %m</subject>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${PATTERN_DEFAULT}</pattern>
+        </layout>
+    </appender>
+
+
     <logger name="com.mangofactory.swagger" level="warn" />
 
     <logger name="org.hibernate.SQL" level="trace" />
@@ -11,6 +48,11 @@
     <logger name="org.hibernate.cache" level="trace" />
     <logger name="net.sf.ehcache" level="trace" />
     -->
-    
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="EMAIL" />
+    </root>
 
 </configuration>
