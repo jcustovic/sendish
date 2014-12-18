@@ -48,10 +48,10 @@ public class ApnsNotificationProvider implements NotificationProvider {
     @Autowired
     private NotificationPartialResultRepository notificationPartialResultRepository;
 
-    @Value("${app.ios.cert.path:}")
+    @Value("${app.ios.cert.prod.path:}")
     private Resource certificatePath;
 
-    @Value("${app.ios.cert.pass:}")
+    @Value("${app.ios.cert.prod.pass:}")
     private String certificatePassword;
 
     @Value("${app.ios.cert.dev.path:}")
@@ -73,6 +73,7 @@ public class ApnsNotificationProvider implements NotificationProvider {
     @PostConstruct
     public void setup() throws IOException {
         if (certificatePath != null && certificatePath.exists()) {
+            LOG.info("Configuring prod certificate service...");
             prodService = new JKSApnsServiceBuilder() //
                     .withCert(certificatePath.getInputStream(), certificatePassword) //
                     .withProductionDestination() //
@@ -82,6 +83,7 @@ public class ApnsNotificationProvider implements NotificationProvider {
         }
 
         if (devCertificatePath != null && devCertificatePath.exists()) {
+            LOG.info("Configuring dev certificate service...");
             devService = new JKSApnsServiceBuilder() //
                     .withCert(devCertificatePath.getInputStream(), devCertificatePassword) //
                     .withSandboxDestination() //

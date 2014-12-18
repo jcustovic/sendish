@@ -57,6 +57,9 @@ app:
       dev:
         path: classpath:ios/apns/SendishAPNS_DEV.jks
         pass: sendisH
+      prod:
+        path: classpath:ios/apns/SendishAPNS_PROD.jks
+        pass: sendisH
 
 ---
 

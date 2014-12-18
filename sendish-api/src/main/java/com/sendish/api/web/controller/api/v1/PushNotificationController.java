@@ -18,36 +18,36 @@ public class PushNotificationController {
     @Autowired
     private AsyncNotificationProvider notificationProvider;
 
-    @RequestMapping(value = "/apns/token/{p_token}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/apns/token/{token}", method = RequestMethod.PUT)
     @ApiOperation(value = "Register APNS token")
-    public final void registerApns(@ApiParam("APNS Token") @PathVariable final String p_token, @RequestParam(defaultValue = "false") Boolean p_devToken, AuthUser user) {
-        notificationService.registerApns(p_token, user.getUserId(), p_devToken);
+    public final void registerApns(@ApiParam("APNS Token") @PathVariable final String token, @RequestParam(defaultValue = "false") Boolean devToken, AuthUser user) {
+        notificationService.registerApns(token, user.getUserId(), devToken);
     }
 
-    @RequestMapping(value = "/gcm/token/{p_token}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/gcm/token/{token}", method = RequestMethod.PUT)
     @ApiOperation(value = "Register GCM token")
-    public final void registerGcm(@ApiParam("GCM Token") @PathVariable final String p_token, AuthUser user) {
-        notificationService.registerGcm(p_token, user.getUserId());
+    public final void registerGcm(@ApiParam("GCM Token") @PathVariable final String token, AuthUser user) {
+        notificationService.registerGcm(token, user.getUserId());
     }
 
-    @RequestMapping(value = "/apns/token/{p_token}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/apns/token/{token}", method = RequestMethod.DELETE)
     @ApiOperation(value = "Unregister APNS token")
     @ApiResponses({
         @ApiResponse(code = 200, message = "Token removed")
     })
-    public final void unregisterApns(@ApiParam("APNS Token") @PathVariable final String p_token, AuthUser user) {
+    public final void unregisterApns(@ApiParam("APNS Token") @PathVariable final String token, AuthUser user) {
         // TODO: 404 if token not found for user
-        notificationService.unregisterApns(p_token, user.getUserId());
+        notificationService.unregisterApns(token, user.getUserId());
     }
 
-    @RequestMapping(value = "/gcm/token/{p_token}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/gcm/token/{token}", method = RequestMethod.DELETE)
     @ApiOperation(value = "Unregister GCM token")
     @ApiResponses({
         @ApiResponse(code = 200, message = "Token removed")
     })
-    public final void unregisterGcm(@ApiParam("GCM Token") @PathVariable final String p_token, AuthUser user) {
+    public final void unregisterGcm(@ApiParam("GCM Token") @PathVariable final String token, AuthUser user) {
         // TODO: 404 if token not found for user
-        notificationService.unregisterGcm(p_token, user.getUserId());
+        notificationService.unregisterGcm(token, user.getUserId());
     }
 
     @RequestMapping(value = "/test-push", method = RequestMethod.POST)
