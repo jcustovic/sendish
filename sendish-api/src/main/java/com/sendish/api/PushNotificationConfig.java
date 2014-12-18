@@ -4,6 +4,7 @@ import com.sendish.api.notification.ApnsNotificationProvider;
 import com.sendish.api.notification.DelegateNotificationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
@@ -22,6 +23,7 @@ public class PushNotificationConfig {
         return executor;
     }
 
+    @DependsOn(value = "apnsNotificationExecutor")
     @Bean
     public ApnsNotificationProvider apnsNotificationProvider() {
         return new ApnsNotificationProvider();

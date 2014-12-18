@@ -2,9 +2,10 @@ package com.sendish.repository.model.jpa;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
 
 import javax.persistence.*;
-import java.util.Date;
 
 
 @Entity
@@ -23,13 +24,16 @@ public class NotificationMessage extends BaseEntity {
     private String             type;
 
     @Column(name = "nm_created_date", nullable = false, updatable = false)
-    private Date               createdDate;
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime           createdDate;
 
     @Column(name = "nm_done_sending_date")
-    private Date               doneSending;
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime           doneSending;
 
     @Column(name = "nm_finished_date")
-    private Date               finishedDate;
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime           finishedDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "nm_status", nullable = false)
@@ -49,7 +53,7 @@ public class NotificationMessage extends BaseEntity {
 
     @PrePersist
     public final void onPersist() {
-        createdDate = new Date();
+        createdDate = DateTime.now();
     }
 
     // Getters & setters
@@ -70,23 +74,23 @@ public class NotificationMessage extends BaseEntity {
         type = p_type;
     }
 
-    public final Date getCreatedDate() {
+    public final DateTime getCreatedDate() {
         return createdDate;
     }
 
-    public final Date getDoneSending() {
+    public final DateTime getDoneSending() {
         return doneSending;
     }
 
-    public final void setDoneSending(final Date p_doneSending) {
+    public final void setDoneSending(final DateTime p_doneSending) {
         doneSending = p_doneSending;
     }
 
-    public final Date getFinishedDate() {
+    public final DateTime getFinishedDate() {
         return finishedDate;
     }
 
-    public final void setFinishedDate(final Date p_finishedDate) {
+    public final void setFinishedDate(final DateTime p_finishedDate) {
         finishedDate = p_finishedDate;
     }
 

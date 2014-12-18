@@ -1,7 +1,9 @@
 package com.sendish.repository.model.jpa;
 
+import org.hibernate.annotations.Type;
+import org.joda.time.DateTime;
+
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table(name = "notification_partial_result")
@@ -16,10 +18,12 @@ public class NotificationPartialResult extends BaseEntity {
     private NotificationMessage      notification;
 
     @Column(name = "npr_send_date", nullable = false)
-    private Date                     sendDate;
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime                 sendDate;
 
     @Column(name = "npr_response_date", nullable = false)
-    private Date                     responseDate;
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime                 responseDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "npr_platform_type", nullable = false)
@@ -41,19 +45,19 @@ public class NotificationPartialResult extends BaseEntity {
         notification = p_notification;
     }
 
-    public final Date getSendDate() {
+    public final DateTime getSendDate() {
         return sendDate;
     }
 
-    public final void setSendDate(final Date p_sendDate) {
+    public final void setSendDate(final DateTime p_sendDate) {
         sendDate = p_sendDate;
     }
 
-    public final Date getResponseDate() {
+    public final DateTime getResponseDate() {
         return responseDate;
     }
 
-    public final void setResponseDate(final Date p_responseDate) {
+    public final void setResponseDate(final DateTime p_responseDate) {
         responseDate = p_responseDate;
     }
 

@@ -6,8 +6,8 @@ import java.util.Map;
 
 public interface NotificationProvider {
 
-    NotificationResult notify(NotificationMessage p_notification, String p_text, Map<String, Object> p_customData, JpaNotificationQueryHolder p_notificationQueryHolder);
+    NotificationResult pushNotificationMessage(NotificationMessage p_notification, String p_text, Map<String, Object> p_customData, JpaNotificationQueryHolder p_queryHolder);
 
-    NotificationResult notifyByToken(NotificationMessage p_notification, String p_text, Map<String, Object> p_customData, String p_token, boolean p_devToken);
+    NotificationResult pushPlainTextMessage(String p_text, Map<String, Object> p_customData, JpaNotificationQueryHolder p_queryHolder);
 
 }

@@ -20,12 +20,14 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class ApnsNotificationProvider implements NotificationProvider {
 
@@ -33,9 +35,12 @@ public class ApnsNotificationProvider implements NotificationProvider {
 
     private static final int TOKEN_MAX_PAGE_SIZE = 1000;
 
-    private static final int EXPIRY_MINUTES = 60;
+    private static final int ONE_HOUR_EXPIRY = 60;
+    private static final int TWELVE_HOUR_EXPIRY = 60;
 
     private static final int POOL_SIZE = 10;
+
+    public static final int ONE_HOUR_RATE = 3600000;
 
     @Autowired
     private ApnsPushTokenRepository apnsPushTokenRepository;
@@ -85,47 +90,69 @@ public class ApnsNotificationProvider implements NotificationProvider {
         }
     }
 
-    @Transactional
-    @Override
-    public final NotificationResult notifyByToken(final NotificationMessage p_notification, final String p_text, final Map<String, Object> p_data, final String p_token, final boolean p_devToken) {
-        LOG.debug("Sending notification by user token (type: {}, text: {}, refId: {}, token: {}) --> msg {}", p_notification.getType(),
-                p_text,
-                p_notification.getReferenceId(),
-                p_token,
-                p_text);
-        final String message = buildMessage(p_notification, p_text, p_data);
-
-        if (p_devToken) {
-            sendMsg(devService, message, Arrays.asList(p_token), p_notification);
-        } else {
-            sendMsg(prodService, message, Arrays.asList(p_token), p_notification);
+    // TODO: Move to separate class
+    // @Scheduled(fixedDelay = ONE_HOUR_RATE)
+    public void checkForInvalidTokens() {
+        if (prodService != null) {
+            Map<String, Date> inactiveDevices = prodService.getInactiveDevices();
+            LOG.info("Invalid prod devices --> count: {}", inactiveDevices.size());
+            invalidatedTokens(inactiveDevices);
         }
 
-        return new NotificationResult(NotificationPlatformType.APNS, 1L);
+        if (devService != null) {
+            Map<String, Date> inactiveDevices = devService.getInactiveDevices();
+            LOG.info("Invalid prod devices --> count: {}", inactiveDevices.size());
+            invalidatedTokens(inactiveDevices);
+        }
     }
 
     @Transactional
     @Override
-    public final NotificationResult notify(final NotificationMessage p_notification, final String p_text, final Map<String, Object> p_customData, final JpaNotificationQueryHolder p_queryHolder) {
+    public final NotificationResult pushNotificationMessage(final NotificationMessage p_notification, final String p_text, final Map<String, Object> p_customData, final JpaNotificationQueryHolder p_queryHolder) {
         Page<ApnsPushToken> pageToken = searchNext(p_queryHolder, new PageRequest(0, TOKEN_MAX_PAGE_SIZE));
         if (pageToken.getNumberOfElements() > 0) {
             final String message = buildMessage(p_notification, p_text, p_customData);
 
-            LOG.debug("Sending notifications (type: {}, text: {}, refId: {}) --> total pages {}; total elements: {}", p_text,
+            LOG.debug("Sending notifications message (type: {}, text: {}, refId: {}) --> total pages {}; total elements: {}", p_text,
                     p_notification.getType(),
                     p_notification.getReferenceId(),
                     pageToken.getTotalPages(),
                     pageToken.getTotalElements());
             LOG.debug("\t --> sending page {} with {} tokens", pageToken.getNumber(), pageToken.getNumberOfElements());
 
-            saveAndSend(pageToken, p_notification, message);
+            sendMessageNotificationMessage(pageToken, p_notification, message);
 
             while (pageToken.hasNext()) {
                 pageToken = searchNext(p_queryHolder, pageToken.nextPageable());
 
                 LOG.debug("\t --> sending page {} with {} tokens", pageToken.getNumber(), pageToken.getNumberOfElements());
 
-                saveAndSend(pageToken, p_notification, message);
+                sendMessageNotificationMessage(pageToken, p_notification, message);
+            }
+        }
+
+        return new NotificationResult(NotificationPlatformType.APNS, pageToken.getTotalElements());
+    }
+
+    @Override
+    public NotificationResult pushPlainTextMessage(String p_text, Map<String, Object> p_customData, JpaNotificationQueryHolder p_queryHolder) {
+        Page<ApnsPushToken> pageToken = searchNext(p_queryHolder, new PageRequest(0, TOKEN_MAX_PAGE_SIZE));
+        if (pageToken.getNumberOfElements() > 0) {
+            final String message = buildMessage(p_text, p_customData);
+
+            LOG.debug("Sending plain text message (text: {}) --> total pages {}; total elements: {}", p_text,
+                    pageToken.getTotalPages(),
+                    pageToken.getTotalElements());
+            LOG.debug("\t --> sending page {} with {} tokens", pageToken.getNumber(), pageToken.getNumberOfElements());
+
+            sendMessage(pageToken, message);
+
+            while (pageToken.hasNext()) {
+                pageToken = searchNext(p_queryHolder, pageToken.nextPageable());
+
+                LOG.debug("\t --> sending page {} with {} tokens", pageToken.getNumber(), pageToken.getNumberOfElements());
+
+                sendMessage(pageToken, message);
             }
         }
 
@@ -150,53 +177,81 @@ public class ApnsNotificationProvider implements NotificationProvider {
         return builder.build();
     }
 
+    private String buildMessage(String p_text, Map<String, Object> p_data) {
+        final PayloadBuilder builder = APNS.newPayload() //
+                .alertBody(p_text) //
+                .sound("default");
+
+        if (p_data != null) {
+            for (Entry<String, Object> entry : p_data.entrySet()) {
+                builder.customField(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return builder.build();
+    }
+
     private Page<ApnsPushToken> searchNext(final JpaNotificationQueryHolder p_queryHolder, final Pageable p_pageable) {
         return apnsPushTokenRepository.findAll(p_queryHolder.getApnsQuery(), p_pageable);
     }
 
-    private void saveAndSend(final Page<ApnsPushToken> p_pageToken, final NotificationMessage p_notification, final String p_payload) {
-        final List<String> refIds = new ArrayList<>(p_pageToken.getNumberOfElements());
-        final List<String> devRefIds = new LinkedList<>();
-        for (final ApnsPushToken token : p_pageToken) {
-            if (token.isDevToken()) {
-                LOG.debug("Sending to test device with token {}", token.getToken());
-                devRefIds.add(token.getToken());
-            } else {
-                refIds.add(token.getToken());
-            }
+    private void sendMessageNotificationMessage(final Page<ApnsPushToken> p_pageToken, final NotificationMessage p_notification, final String p_payload) {
+        final List<String> refIds =  p_pageToken.getContent().stream().filter(t -> !t.isDevToken()).map(t -> t.getToken()).collect(Collectors.toList());
+        if (!refIds.isEmpty()) {
+            sendPushMessageAndCollectResults(prodService, p_payload, refIds, p_notification);
         }
 
-        if (!refIds.isEmpty()) {
-            sendMsg(prodService, p_payload, refIds, p_notification);
-        }
+        final List<String> devRefIds =  p_pageToken.getContent().stream().filter(t -> t.isDevToken()).map(t -> t.getToken()).collect(Collectors.toList());
         if (!devRefIds.isEmpty()) {
-            sendMsg(devService, p_payload, devRefIds, p_notification);
+            sendPushMessageAndCollectResults(devService, p_payload, devRefIds, p_notification);
         }
     }
 
-    private void sendMsg(final ApnsService p_service, final String p_message, final List<String> p_refIds, final NotificationMessage p_notification) {
-        final long expiry = DateTime.now().plusMinutes(EXPIRY_MINUTES).getMillis(); // Expire in 60min
+
+    private void sendMessage(Page<ApnsPushToken> p_pageToken, String p_message) {
+        final List<String> refIds =  p_pageToken.getContent().stream().filter(t -> !t.isDevToken()).map(t -> t.getToken()).collect(Collectors.toList());
+        if (!refIds.isEmpty()) {
+            sendPushMessage(prodService, p_message, refIds);
+        }
+
+        final List<String> devRefIds =  p_pageToken.getContent().stream().filter(t -> t.isDevToken()).map(t -> t.getToken()).collect(Collectors.toList());
+        if (!devRefIds.isEmpty()) {
+            sendPushMessage(devService, p_message, devRefIds);
+        }
+    }
+
+    private void sendPushMessageAndCollectResults(final ApnsService p_service, final String p_message, final List<String> p_refIds, final NotificationMessage p_notification) {
+        final long expiry = DateTime.now().plusMinutes(TWELVE_HOUR_EXPIRY).getMillis(); // Expire in 60min
         taskExecutor.execute(() -> {
             final NotificationPartialResult notificationResult = new NotificationPartialResult();
             notificationResult.setNotification(p_notification);
             notificationResult.setPlatformType(NotificationPlatformType.APNS);
-            notificationResult.setSendDate(new Date());
+            notificationResult.setSendDate(DateTime.now());
             notificationResult.setTotalCount(p_refIds.size());
 
             // Send notification
             p_service.push(p_refIds, p_message, new Date(expiry));
 
-            notificationResult.setResponseDate(new Date());
-            final Map<String, Date> inactiveDevices = p_service.getInactiveDevices();
-            notificationResult.setFailureCount(inactiveDevices.size());
+            notificationResult.setResponseDate(DateTime.now());
+            notificationResult.setFailureCount(0); // We cannot know the failure count
             notificationPartialResultRepository.save(notificationResult);
 
-            LOG.debug("Notification sent --> total: {}, inactive: {}", new Object[]{p_refIds.size(), inactiveDevices.size()});
-            if (!inactiveDevices.isEmpty()) {
-                LOG.info("Deleting inactive devices...");
-                apnsPushTokenRepository.deleteByTokens(inactiveDevices.keySet());
-            }
+            LOG.debug("Notification sent --> count: {}", p_refIds.size());
         });
+    }
+
+    private void sendPushMessage(final ApnsService p_service, final String p_message, final List<String> p_refIds) {
+        final long expiry = DateTime.now().plusMinutes(ONE_HOUR_EXPIRY).getMillis(); // Expire in 60min
+        taskExecutor.execute(() -> {
+            p_service.push(p_refIds, p_message, new Date(expiry));
+        });
+    }
+
+    private void invalidatedTokens(Map<String, Date> inactiveDevices) {
+        if (!inactiveDevices.isEmpty()) {
+            LOG.debug("Deleting inactive devices...");
+            apnsPushTokenRepository.deleteByTokens(inactiveDevices.keySet());
+        }
     }
 
 }
