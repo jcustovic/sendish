@@ -1,6 +1,6 @@
 package com.sendish.api.web.controller.api.v1;
 
-import com.sendish.api.notification.DelegateNotificationProvider;
+import com.sendish.api.notification.AsyncNotificationProvider;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.NotificationServiceImpl;
 import com.wordnik.swagger.annotations.*;
@@ -16,7 +16,7 @@ public class PushNotificationController {
     private NotificationServiceImpl notificationService;
 
     @Autowired
-    private DelegateNotificationProvider notificationProvider;
+    private AsyncNotificationProvider notificationProvider;
 
     @RequestMapping(value = "/apns/token/{p_token}", method = RequestMethod.PUT)
     @ApiOperation(value = "Register APNS token")
