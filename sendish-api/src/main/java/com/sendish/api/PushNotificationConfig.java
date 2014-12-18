@@ -1,6 +1,7 @@
 package com.sendish.api;
 
 import com.sendish.api.notification.ApnsNotificationProvider;
+import com.sendish.api.notification.DelegateNotificationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -24,6 +25,11 @@ public class PushNotificationConfig {
     @Bean
     public ApnsNotificationProvider apnsNotificationProvider() {
         return new ApnsNotificationProvider();
+    }
+
+    @Bean
+    public DelegateNotificationProvider delegateNotificationProvider() {
+        return new DelegateNotificationProvider();
     }
 
 }

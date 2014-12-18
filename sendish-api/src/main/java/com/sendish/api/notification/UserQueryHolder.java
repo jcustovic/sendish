@@ -17,11 +17,11 @@ public class UserQueryHolder implements JpaNotificationQueryHolder {
 
     private static final Logger  LOG = LoggerFactory.getLogger(UserQueryHolder.class);
 
-    private final transient User user;
+    private final transient Long userId;
 
-    public UserQueryHolder(final User p_user) {
+    public UserQueryHolder(final Long p_userId) {
         super();
-        user = p_user;
+        userId = p_userId;
     }
 
     @Override
@@ -39,12 +39,12 @@ public class UserQueryHolder implements JpaNotificationQueryHolder {
     }
 
     private Predicate buildQuery(final Root<?> p_root, final CriteriaQuery<?> p_query, final CriteriaBuilder p_builder) {
-        return p_builder.and(p_builder.equal(p_root.get("user").as(User.class), user));
+        return p_builder.and(p_builder.equal(p_root.get("user").get("id").as(Long.class), userId));
     }
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("user", user).toString();
+        return new ToStringBuilder(this).append("userId", userId).toString();
     }
 
 }

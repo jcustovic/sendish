@@ -1,5 +1,6 @@
 package com.sendish.api.web.controller.api.v1;
 
+import com.sendish.api.notification.DelegateNotificationProvider;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.NotificationServiceImpl;
 import com.wordnik.swagger.annotations.*;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.*;
 public class PushNotificationController {
 
     @Autowired
-    private transient NotificationServiceImpl notificationService;
+    private NotificationServiceImpl notificationService;
+
+    @Autowired
+    private DelegateNotificationProvider notificationProvider;
 
     @RequestMapping(value = "/apns/token/{p_token}", method = RequestMethod.PUT)
     @ApiOperation(value = "Register APNS token")
@@ -44,6 +48,12 @@ public class PushNotificationController {
     public final void unregisterGcm(@ApiParam("GCM Token") @PathVariable final String p_token, AuthUser user) {
         // TODO: 404 if token not found for user
         notificationService.unregisterGcm(p_token, user.getUserId());
+    }
+
+    @RequestMapping(value = "/test-push", method = RequestMethod.POST)
+    @ApiOperation(value = "Send test notification to user devices")
+    public final void sendTestNotification(@RequestParam final String message, AuthUser user) {
+        notificationProvider.sendPlainTextNotification(message, user.getUserId());
     }
 
 }

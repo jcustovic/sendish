@@ -1,11 +1,14 @@
 package com.sendish.api.notification;
 
-import com.sendish.repository.model.jpa.User;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.Map;
 
 public interface AsyncNotificationProvider {
 
-    void notifyAsync(Long p_refId, String p_refType, String p_message, Map<String, Object> p_data, User p_user);
+    @Async
+    void sendPlainTextNotification(String p_message, Long p_userId);
+
+    void notifyAsync(Long p_refId, String p_refType, String p_message, Map<String, Object> p_data, Long p_userId);
 
 }

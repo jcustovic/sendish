@@ -43,6 +43,7 @@ public class UserStatistics implements Serializable {
     private DateTime modifiedDate;
 
     @PreUpdate
+    @PrePersist
     public final void updateModifyDate() {
         modifiedDate = DateTime.now();
     }

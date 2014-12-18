@@ -106,10 +106,10 @@ public class ApnsNotificationProvider implements NotificationProvider {
 
     @Transactional
     @Override
-    public final NotificationResult notify(final NotificationMessage p_notification, final String p_text, final Map<String, Object> p_data, final JpaNotificationQueryHolder p_queryHolder) {
+    public final NotificationResult notify(final NotificationMessage p_notification, final String p_text, final Map<String, Object> p_customData, final JpaNotificationQueryHolder p_queryHolder) {
         Page<ApnsPushToken> pageToken = searchNext(p_queryHolder, new PageRequest(0, TOKEN_MAX_PAGE_SIZE));
         if (pageToken.getNumberOfElements() > 0) {
-            final String message = buildMessage(p_notification, p_text, p_data);
+            final String message = buildMessage(p_notification, p_text, p_customData);
 
             LOG.debug("Sending notifications (type: {}, text: {}, refId: {}) --> total pages {}; total elements: {}", p_text,
                     p_notification.getType(),

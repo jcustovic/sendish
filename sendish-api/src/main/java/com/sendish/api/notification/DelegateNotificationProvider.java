@@ -31,7 +31,13 @@ public class DelegateNotificationProvider implements AsyncNotificationProvider {
 
     @Async
     @Override
-    public final void notifyAsync(final Long p_refId, final String p_refType, final String p_message, final Map<String, Object> p_data, User p_user) {
+    public final void sendPlainTextNotification(final String p_message, Long p_userId) {
+        notifyAsync(null, "PLAIN_TEXT", p_message, null, p_userId);
+    }
+
+    @Async
+    @Override
+    public final void notifyAsync(final Long p_refId, final String p_refType, final String p_message, final Map<String, Object> p_customData, Long p_userId) {
         try {
             NotificationMessage notification = new NotificationMessage();
             notification.setReferenceId(p_refId);
@@ -45,9 +51,9 @@ public class DelegateNotificationProvider implements AsyncNotificationProvider {
                You can build a wide range of QueryHolders to target any set of users (keep in mind to
                change the Notification object also to not require User if it will be general notification)
              */
-            final JpaNotificationQueryHolder queryHolder = new UserQueryHolder(p_user);
+            final JpaNotificationQueryHolder queryHolder = new UserQueryHolder(p_userId);
 
-            final List<NotificationResult> results = notify(notification, p_message, p_data, queryHolder);
+            final List<NotificationResult> results = notify(notification, p_message, p_customData, queryHolder);
             saveResults(notification, results);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
@@ -78,7 +84,7 @@ public class DelegateNotificationProvider implements AsyncNotificationProvider {
 
     private List<NotificationResult> notify(final NotificationMessage p_notification,
                                             final String p_notificationText,
-                                            Map<String, Object> p_data,
+                                            Map<String, Object> p_customData,
                                             final JpaNotificationQueryHolder p_queryHolder) {
         final List<NotificationResult> results = new LinkedList<>();
         if (notifyProviders.isEmpty()) {
@@ -89,7 +95,7 @@ public class DelegateNotificationProvider implements AsyncNotificationProvider {
             final List<Long> notifiedUserIds = new LinkedList<>();
             for (final NotificationProvider notifyProvider : notifyProviders) {
                 LOG.debug("\t --> invoking provider {} for id ", notifyProvider.getClass().getName(), p_notification.getReferenceId());
-                final NotificationResult result = notifyProvider.notify(p_notification, p_notificationText, p_data, p_queryHolder);
+                final NotificationResult result = notifyProvider.notify(p_notification, p_notificationText, p_customData, p_queryHolder);
                 results.add(result);
             }
 

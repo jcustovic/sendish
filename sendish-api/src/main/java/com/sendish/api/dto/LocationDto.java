@@ -1,10 +1,14 @@
 package com.sendish.api.dto;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public class LocationDto {
 
+    @NotNull
     private BigDecimal longitude;
+
+    @NotNull
     private BigDecimal latitude;
 
     public BigDecimal getLongitude() {
