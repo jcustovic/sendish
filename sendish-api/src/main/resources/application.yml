@@ -1,4 +1,3 @@
-
 spring:
   application:
     name: sendish-location-importer
@@ -37,6 +36,10 @@ security:
   user:
     name: mag
     password: pass
+
+endpoints:
+  shutdown:
+    enabled: true
 
 flyway:
   locations = classpath:db/migrations,classpath:db/migrations/h2

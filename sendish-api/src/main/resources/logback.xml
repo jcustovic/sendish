@@ -41,6 +41,7 @@
 
 
     <logger name="com.mangofactory.swagger" level="warn" />
+    <logger name="org.springframework.boot.actuate" level="warn" />
 
     <logger name="org.hibernate.SQL" level="trace" />
     <logger name="org.hibernate.stat.Statistics" level="trace" />

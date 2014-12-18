@@ -51,12 +51,12 @@ public class UserServiceImpl {
         user = userRepository.save(user);
 
         UserDetails userDetails = new UserDetails();
-        userDetails.setUser(user);
+        userDetails.setUserId(user.getId());
         userDetails.setLastInteractionTime(DateTime.now());
         userDetailsRepository.save(userDetails);
 
         UserStatistics userStatistics = new UserStatistics();
-        userStatistics.setUser(user);
+        userStatistics.setUserId(user.getId());
         userStatisticsRepository.save(userStatistics);
 
         return user;

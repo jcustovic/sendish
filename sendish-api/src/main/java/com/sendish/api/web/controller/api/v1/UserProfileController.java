@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wordnik.swagger.annotations.Api;
-import scala.None;
 
 import javax.validation.Valid;
 
@@ -39,10 +38,10 @@ public class UserProfileController {
     @RequestMapping(value = "/change-password", method = RequestMethod.POST)
     @ApiOperation(value = "Change user password", notes = "Only if the user signed with email registration!")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Password change successful", response = None.class),
+        @ApiResponse(code = 200, message = "Password change successful", response = Void.class),
         @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
     })
-    public void register(@Valid @RequestBody ChangePasswordDto changePasswordDto, AuthUser authUser) {
+    public void changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto, AuthUser authUser) {
         // TODO: Implement me
     }
 
