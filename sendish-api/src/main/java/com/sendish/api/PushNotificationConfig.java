@@ -1,6 +1,6 @@
 package com.sendish.api;
 
-import com.sendish.api.notification.ApnsNotificationProvider;
+import com.sendish.api.notification.ApnsNotificationProviderImpl;
 import com.sendish.api.notification.DelegateNotificationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,8 +25,8 @@ public class PushNotificationConfig {
 
     @DependsOn(value = "apnsNotificationExecutor")
     @Bean
-    public ApnsNotificationProvider apnsNotificationProvider() {
-        return new ApnsNotificationProvider();
+    public ApnsNotificationProviderImpl apnsNotificationProvider() {
+        return new ApnsNotificationProviderImpl();
     }
 
     @Bean
