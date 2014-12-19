@@ -8,6 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -53,6 +54,11 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/h2/**", "/");
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
         SocialAuthenticationFilter socialAuthenticationFilter = new SocialAuthenticationFilter(basicAuthenticationEntryPoint());
         socialAuthenticationFilter.setUserDetailsService(userDetailsService());
@@ -67,8 +73,6 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(socialAuthenticationFilter, BasicAuthenticationFilter.class)
             .httpBasic().realmName(REALM_NAME).and()
             .authorizeRequests()
-	            .antMatchers("/h2/**").permitAll()
-	            .antMatchers("/").permitAll()
 	            .antMatchers("/api/v1.0/registration/**").permitAll()
                 .antMatchers("/api/d/registration/**").permitAll()
 	            .anyRequest().fullyAuthenticated();

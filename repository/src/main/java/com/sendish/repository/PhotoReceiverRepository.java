@@ -12,12 +12,13 @@ import java.util.List;
 @Transactional(readOnly = true)
 public interface PhotoReceiverRepository extends JpaRepository<PhotoReceiver, Long> {
 
-    @Query("SELECT pr.photo FROM PhotoReceiver pr WHERE pr.user.id = ?1 AND pr.photo.uuid = ?2")
+    @Query("SELECT pr.photo FROM PhotoReceiver pr WHERE pr.user.id = ?1 AND pr.photo.uuid = ?2 AND pr.deleted = false")
     Photo findPhotoByUserIdAndPhotoUUID(Long userId, String photoUUID);
 
-    @Query("SELECT pr.photo FROM PhotoReceiver pr WHERE pr.user.id = ?1")
+    @Query("SELECT pr.photo FROM PhotoReceiver pr WHERE pr.user.id = ?1 AND pr.deleted = false")
     List<PhotoReceiver> findByUserId(Long userId, Pageable pageRequest);
 
+    @Query("SELECT pr.photo FROM PhotoReceiver pr WHERE pr.photo.id = ?1 AND pr.user.id = ?2 AND pr.deleted = false")
     PhotoReceiver findByPhotoIdAndUserId(Long photoId, Long userId);
 
     List<PhotoReceiver> findByPhotoId(Long photoId, Pageable pageRequest);

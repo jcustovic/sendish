@@ -111,7 +111,7 @@ public class PhotoServiceImpl {
         return fileStore.getAsInputStream(fileStoreId);
     }
 
-    public Photo findReceivedByUuid(String photoUUID, Long userId) {
+    public Photo findReceivedByPhotoUuid(String photoUUID, Long userId) {
         return photoReceiverRepository.findPhotoByUserIdAndPhotoUUID(userId, photoUUID);
     }
 
@@ -142,11 +142,11 @@ public class PhotoServiceImpl {
         return null;
     }
 
-    public PhotoReceiver findReceivedByIdAndUserId(Long photoId, Long userId) {
+    public PhotoReceiver findReceivedByPhotoIdAndUserId(Long photoId, Long userId) {
         return photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
     }
 
-    public ReceivedPhotoDetailsDto findReceivedByIdAndUserId(Long photoId, Long userId, BigDecimal longitude, BigDecimal latitude) {
+    public ReceivedPhotoDetailsDto findReceivedByPhotoIdAndUserId(Long photoId, Long userId, BigDecimal longitude, BigDecimal latitude) {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
         if (photoReceiver == null) {
             return null;
@@ -194,6 +194,20 @@ public class PhotoServiceImpl {
         List<PhotoReceiver> receivedList = photoReceiverRepository.findByPhotoId(photoId, new PageRequest(page, PHOTO_LOCATION_PAGE_SIZE, Direction.DESC, "createdDate"));
 
         return getPhotoTraveledDtos(receivedList);
+    }
+
+    public void deletePhotoReceiver(Long photoId, Long userId) {
+        PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
+        photoReceiver.setDeleted(true);
+
+        photoReceiverRepository.save(photoReceiver);
+    }
+
+    public void deletePhoto(Long photoId) {
+        Photo photo = photoRepository.findOne(photoId);
+        photo.setDeleted(true);
+
+        photoRepository.save(photo);
     }
 
     private PhotoDetailsDto getPhotoDetailsDto(Photo photo) {

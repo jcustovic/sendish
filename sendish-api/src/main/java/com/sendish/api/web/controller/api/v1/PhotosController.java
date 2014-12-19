@@ -72,11 +72,27 @@ public class PhotosController {
             }
         }
 
-        ReceivedPhotoDetailsDto photo = photoService.findReceivedByIdAndUserId(photoId, user.getUserId(), location.getLongitude(), location.getLatitude());
+        ReceivedPhotoDetailsDto photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId(), location.getLongitude(), location.getLatitude());
         if (photo == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(photo, HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = "/received/{photoId}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "Delete received photo")
+    @ApiResponses({
+        @ApiResponse(code = 204, message = "Photo deleted"),
+        @ApiResponse(code = 404, message = "Not found")
+    })
+    public ResponseEntity<Void> deleteReceived(@PathVariable Long photoId, AuthUser user) {
+        PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            photoService.deletePhotoReceiver(photoId, user.getUserId());
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 
@@ -87,7 +103,7 @@ public class PhotosController {
         @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<List<PhotoTraveledDto>> receivedTraveled(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page, AuthUser user) {
-        PhotoReceiver photo = photoService.findReceivedByIdAndUserId(photoId, user.getUserId());
+        PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
@@ -103,7 +119,7 @@ public class PhotosController {
         @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<InputStreamResource> receivedView(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
-        Photo photo = photoService.findReceivedByUuid(photoUUID, user.getUserId());
+        Photo photo = photoService.findReceivedByPhotoUuid(photoUUID, user.getUserId());
 
         return viewPhoto(webRequest, photo);
     }
@@ -129,6 +145,22 @@ public class PhotosController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(photo, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping(value = "/sent/{photoId}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "Delete sent photo")
+    @ApiResponses({
+            @ApiResponse(code = 204, message = "Photo deleted"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    public ResponseEntity<Void> deleteSent(@PathVariable Long photoId, AuthUser user) {
+        PhotoDetailsDto photo = photoService.findByIdAndUserId(photoId, user.getUserId());
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            photoService.deletePhoto(photoId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 

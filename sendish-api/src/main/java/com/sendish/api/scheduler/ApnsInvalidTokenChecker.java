@@ -31,7 +31,7 @@ public class ApnsInvalidTokenChecker {
         invalidatedTokens(inactiveDevices);
 
         inactiveDevices = apnsNotificationProvider.getInactiveDevicesDev();
-        LOG.debug("Invalid prod devices --> count: {}", inactiveDevices.size());
+        LOG.debug("Invalid dev devices --> count: {}", inactiveDevices.size());
         invalidatedTokens(inactiveDevices);
     }
 
