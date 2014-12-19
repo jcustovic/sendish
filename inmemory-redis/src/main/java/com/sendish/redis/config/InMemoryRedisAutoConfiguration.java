@@ -2,7 +2,11 @@ package com.sendish.redis.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import redis.embedded.RedisServer;
@@ -13,17 +17,25 @@ import java.io.IOException;
 
 @Configuration
 @ConditionalOnClass({ RedisServer.class })
+@EnableConfigurationProperties({ InMemoryRedisConfigurationProperties.class })
+@ConditionalOnProperty(prefix = "app.redis.inmemory", name = "enabled", matchIfMissing = true)
 public class InMemoryRedisAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(InMemoryRedisAutoConfiguration.class);
 
+    @Autowired
+    private InMemoryRedisConfigurationProperties config;
+
     @Bean
     public RedisServer redisServer() throws IOException {
-        RedisServer redisServer = RedisServer.builder()
-                .port(6379)
-                .build();
+        RedisServer.Builder redisServer = RedisServer.builder()
+                .port(6379);
 
-        return redisServer;
+        if (config.getExecutable() != null) {
+            redisServer.executable(config.getExecutable().getFile());
+        }
+
+        return redisServer.build();
     }
 
     @PostConstruct

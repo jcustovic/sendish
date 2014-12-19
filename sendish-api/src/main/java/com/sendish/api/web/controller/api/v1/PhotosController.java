@@ -48,7 +48,7 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/received", method = RequestMethod.GET)
-    @ApiOperation(value = "Get list of received photos", notes = "This method will return the list of received photos")
+    @ApiOperation(value = "Get received photos list", notes = "This method will return the list of received photos")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK")
     })
@@ -57,7 +57,7 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/received/{photoId}", method = RequestMethod.GET)
-    @ApiOperation(value = "Get photo details of received photo", notes = "Always try to send GPS coordinates if you open the details for the FIRST TIME ONLY!")
+    @ApiOperation(value = "Get received photo details", notes = "Always try to send GPS coordinates if you open the details for the FIRST TIME ONLY!")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
@@ -113,7 +113,7 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/received/{photoUUID}/view", method = RequestMethod.GET)
-    @ApiOperation(value = "Get photo details")
+    @ApiOperation(value = "View received photo")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
@@ -124,8 +124,53 @@ public class PhotosController {
         return viewPhoto(webRequest, photo);
     }
 
+    @RequestMapping(value = "/received/{photoId}/like", method = RequestMethod.PUT)
+    @ApiOperation(value = "Like received given photo")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK")
+    })
+    public ResponseEntity<Void> like(@PathVariable Long photoId, AuthUser user) {
+        PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            photoService.like(photoId, user.getUserId());
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = "/received/{photoId}/dislike", method = RequestMethod.PUT)
+    @ApiOperation(value = "Dislike received given photo")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK")
+    })
+    public ResponseEntity<Void> dislike(@PathVariable Long photoId, AuthUser user) {
+        PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            photoService.dislike(photoId, user.getUserId());
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = "/received/{photoId}/report", method = RequestMethod.PUT)
+    @ApiOperation(value = "Report received given photo", notes = "Reason must be provided and reasonText is optional")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK")
+    })
+    public ResponseEntity<Void> report(@PathVariable Long photoId, @RequestParam String reason, @RequestParam(required = false) String reasonText, AuthUser user) {
+        PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            photoService.report(photoId, reason, reasonText, user.getUserId());
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
     @RequestMapping(value = "/sent", method = RequestMethod.GET)
-    @ApiOperation(value = "Get list of sent photos", notes = "This method will return the list of sent photos")
+    @ApiOperation(value = "Get sent photos list", notes = "This method will return the list of sent photos")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK")
     })
@@ -134,7 +179,7 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/sent/{photoId}", method = RequestMethod.GET)
-    @ApiOperation(value = "Get photo details", notes = "Only for the owner of the photo!")
+    @ApiOperation(value = "Get sent photo details", notes = "Only for the owner of the photo!")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
@@ -181,7 +226,7 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/sent/{photoUUID}/view", method = RequestMethod.GET)
-    @ApiOperation(value = "Get photo details")
+    @ApiOperation(value = "View sent photo")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
@@ -211,33 +256,6 @@ public class PhotosController {
         headers.setLocation(location);
 
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
-    }
-
-    @RequestMapping(value = "/{photoId}/like", method = RequestMethod.PUT)
-    @ApiOperation(value = "Like a given photo")
-    @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
-    })
-    public void like(@PathVariable Long photoId, AuthUser user) {
-        photoService.like(photoId, user.getUserId());
-    }
-
-    @RequestMapping(value = "/{photoId}/dislike", method = RequestMethod.PUT)
-    @ApiOperation(value = "Dislike a given photo")
-    @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
-    })
-    public void dislike(@PathVariable Long photoId, AuthUser user) {
-        photoService.dislike(photoId, user.getUserId());
-    }
-
-    @RequestMapping(value = "/{photoId}/report", method = RequestMethod.PUT)
-    @ApiOperation(value = "Report a given photo", notes = "Reason must be provided and reasonText is optional")
-    @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
-    })
-    public void report(@PathVariable Long photoId, @RequestParam String reason, @RequestParam(required = false) String reasonText, AuthUser user) {
-        photoService.report(photoId, reason, reasonText, user.getUserId());
     }
 
     private ResponseEntity<InputStreamResource> viewPhoto(WebRequest webRequest, Photo photo) {
