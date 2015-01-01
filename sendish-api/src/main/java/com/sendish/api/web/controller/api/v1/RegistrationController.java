@@ -29,7 +29,7 @@ public class RegistrationController {
     @Autowired
     private RegistrationServiceImpl registrationService;
 
-    @InitBinder
+    @InitBinder("userRegistration")
     protected void initBinder(WebDataBinder binder) {
         binder.addValidators(userRegistrationValidator);
     }
