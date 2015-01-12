@@ -36,11 +36,15 @@ public class LocationBasedFileUploadValidator implements Validator {
     public void validate(Object target, Errors errors) {
         LocationBasedFileUpload fileUpload = (LocationBasedFileUpload) target;
 
-        if (fileUpload.getLatitude().compareTo(BigDecimal.valueOf(-90)) < 0 || fileUpload.getLatitude().compareTo(BigDecimal.valueOf(90)) > 0) {
+        if (fileUpload.getLatitude() == null
+                || fileUpload.getLatitude().compareTo(BigDecimal.valueOf(-90)) < 0
+                || fileUpload.getLatitude().compareTo(BigDecimal.valueOf(90)) > 0) {
             errors.rejectValue("latitude", null, "Latitude value must be between -90 and 90");
         }
 
-        if (fileUpload.getLongitude().compareTo(BigDecimal.valueOf(-180)) < 0 || fileUpload.getLongitude().compareTo(BigDecimal.valueOf(180)) > 0) {
+        if (fileUpload.getLongitude() == null
+                || fileUpload.getLongitude().compareTo(BigDecimal.valueOf(-180)) < 0
+                || fileUpload.getLongitude().compareTo(BigDecimal.valueOf(180)) > 0) {
             errors.rejectValue("longitude", null, "Longitude value must be between -180 and 180");
         }
 

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.sendish.api.util.EntitySynchronizer;
 import com.sendish.repository.UserSocialConnectionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
@@ -21,6 +22,9 @@ public class JpaUsersConnectionRepository implements UsersConnectionRepository {
 
     @Autowired
     private transient UserSocialConnectionRepository userSocialConnectionRepository;
+
+    @Autowired
+    private EntitySynchronizer                       entitySynchronizer;
 
     private final transient ConnectionFactoryLocator connectionFactoryLocator;
 
@@ -38,21 +42,26 @@ public class JpaUsersConnectionRepository implements UsersConnectionRepository {
     @Override
     public final List<String> findUserIdsWithConnection(final Connection<?> p_connection) {
         final ConnectionKey key = p_connection.getKey();
-        final List<Long> localUserIds = userSocialConnectionRepository.findUserId(key.getProviderId(), key.getProviderUserId());
-        if (localUserIds.isEmpty()) {
-            final String newUserId = connectionSignUp.execute(p_connection);
-            if (newUserId != null) {
-                createConnectionRepository(newUserId).addConnection(p_connection);
-                return Arrays.asList(newUserId);
+        entitySynchronizer.lock(key); // This is introduced to not create user twice if multiple requests come.
+        try {
+            final List<Long> localUserIds = userSocialConnectionRepository.findUserId(key.getProviderId(), key.getProviderUserId());
+            if (localUserIds.isEmpty()) {
+                final String newUserId = connectionSignUp.execute(p_connection);
+                if (newUserId != null) {
+                    createConnectionRepository(newUserId).addConnection(p_connection);
+                    return Arrays.asList(newUserId);
+                }
             }
-        }
 
-        final List<String> stringList = new ArrayList<>(localUserIds.size());
-        for (final Long userId : localUserIds) {
-            stringList.add(String.valueOf(userId));
-        }
+            final List<String> stringList = new ArrayList<>(localUserIds.size());
+            for (final Long userId : localUserIds) {
+                stringList.add(String.valueOf(userId));
+            }
 
-        return stringList;
+            return stringList;
+        } finally {
+            entitySynchronizer.unlock();
+        }
     }
 
     @Override
