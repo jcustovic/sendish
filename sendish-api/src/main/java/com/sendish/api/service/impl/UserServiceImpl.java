@@ -65,7 +65,7 @@ public class UserServiceImpl {
     public UserProfileDto getUserProfile(Long userId) {
         UserDetails userDetails = getUserDetails(userId);
         User user = userDetails.getUser();
-        UserStatistics userStatistics = userStatisticsRepository.findByUserId(userId);
+        UserStatistics userStatistics = userStatisticsRepository.findOne(userId);
 
         UserProfileDto userProfileDto = new UserProfileDto();
         if (userDetails.getLastLocationTime() != null) {

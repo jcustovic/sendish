@@ -18,15 +18,29 @@
     <cache name="com.sendish.repository.model.jpa.User"
         maxElementsInMemory="10000"
         eternal="false"
-        timeToLiveSeconds="600"
-        timeToIdleSeconds="600"
+        timeToLiveSeconds="3600"
+        timeToIdleSeconds="3600"
         overflowToDisk="true" />
+
+    <cache name="com.sendish.repository.UserRepository.findByUsername"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToLiveSeconds="3600"
+           timeToIdleSeconds="3600"
+           overflowToDisk="true" />
+
+    <cache name="com.sendish.repository.model.jpa.UserStatistics"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToLiveSeconds="3600"
+           timeToIdleSeconds="3600"
+           overflowToDisk="true" />
 
     <cache name="com.sendish.repository.model.jpa.UserDetails"
            maxElementsInMemory="10000"
            eternal="false"
-           timeToLiveSeconds="600"
-           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600"
+           timeToIdleSeconds="3600"
            overflowToDisk="true" />
 
     <cache name="com.sendish.repository.model.jpa.City"
@@ -49,22 +63,8 @@
            timeToLiveSeconds="600"
            timeToIdleSeconds="600"
            overflowToDisk="true" />
-    
-    <cache name="com.sendish.repository.UserSocialConnectionRepository.findUserId" 
-    	maxElementsInMemory="10000"
-		eternal="false" 
-		timeToLiveSeconds="3600" 
-		timeToIdleSeconds="3600"
-		overflowToDisk="true" />
-		
-	<cache name="com.sendish.repository.UserSocialConnectionRepositoryCustom.findByOAuth2" 
-    	maxElementsInMemory="10000"
-		eternal="false" 
-		timeToLiveSeconds="3600" 
-		timeToIdleSeconds="3600"
-		overflowToDisk="true" />
 
-    <cache name="com.sendish.repository.UserRepository.findByUsername"
+    <cache name="com.sendish.repository.model.jpa.UserSocialConnection"
            maxElementsInMemory="10000"
            eternal="false"
            timeToLiveSeconds="3600"

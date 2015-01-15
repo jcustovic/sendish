@@ -8,22 +8,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.QueryHint;
-
 @Transactional(readOnly = true)
 public interface UserSocialConnectionRepository extends JpaRepository<UserSocialConnection, UserSocialConnectionId>, JpaSpecificationExecutor<UserSocialConnection>, UserSocialConnectionRepositoryCustom {
 
-	@QueryHints({
-        @QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"),
-        @QueryHint(name = org.hibernate.annotations.QueryHints.CACHE_REGION, value = "com.sendish.repository.UserSocialConnectionRepository.findUserId")
-	})
     @Query("SELECT usc.userId FROM UserSocialConnection usc WHERE usc.providerId = ?1 AND usc.providerUserId = ?2")
     List<Long> findUserId(String p_providerId, String p_providerUserId);
 
