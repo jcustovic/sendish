@@ -4,29 +4,20 @@ public class PhotoDto extends BaseEntityDto {
 
     private static final long serialVersionUID = 1L;
 
-    private String city;
-    private String country;
+    private String originLocation;
     private String description;
     private String timeAgo;
-    private String imgUuid;
-    private Integer likeCount;
-    private Integer cityCount;
-    private Integer commentCount;
+    private String uuid;
+    private Long likeCount;
+    private Long cityCount;
+    private Long commentCount;
 
-    public String getCity() {
-        return city;
+    public String getOriginLocation() {
+        return originLocation;
     }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
+    public void setOriginLocation(String originLocation) {
+        this.originLocation = originLocation;
     }
 
     public String getDescription() {
@@ -45,35 +36,35 @@ public class PhotoDto extends BaseEntityDto {
         this.timeAgo = timeAgo;
     }
 
-    public String getImgUuid() {
-        return imgUuid;
+    public String getUuid() {
+        return uuid;
     }
 
-    public void setImgUuid(String imgUuid) {
-        this.imgUuid = imgUuid;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
-    public Integer getLikeCount() {
+    public Long getLikeCount() {
         return likeCount;
     }
 
-    public void setLikeCount(Integer likeCount) {
+    public void setLikeCount(Long likeCount) {
         this.likeCount = likeCount;
     }
 
-    public Integer getCityCount() {
+    public Long getCityCount() {
         return cityCount;
     }
 
-    public void setCityCount(Integer cityCount) {
+    public void setCityCount(Long cityCount) {
         this.cityCount = cityCount;
     }
 
-    public Integer getCommentCount() {
+    public Long getCommentCount() {
         return commentCount;
     }
 
-    public void setCommentCount(Integer commentCount) {
+    public void setCommentCount(Long commentCount) {
         this.commentCount = commentCount;
     }
 

@@ -1,13 +1,12 @@
 package com.sendish.api.service.impl;
 
 import com.sendish.api.dto.*;
+import com.sendish.api.redis.dto.PhotoStatDto;
+import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.util.ImageUtils;
-import com.sendish.repository.PhotoReceiverRepository;
-import com.sendish.repository.PhotoRepository;
-import com.sendish.repository.PhotoStatisticsRepository;
-import com.sendish.repository.UserRepository;
+import com.sendish.repository.*;
 import com.sendish.repository.model.jpa.*;
 
 import org.joda.time.DateTime;
@@ -54,6 +53,12 @@ public class PhotoServiceImpl {
 
     @Autowired
     private UserServiceImpl userService;
+
+    @Autowired
+    private PhotoCommentServiceImpl photoCommentService;
+
+    @Autowired
+    private RedisStatisticsRepository statisticsRepository;
 
     private static PrettyTime prettyTime = new PrettyTime();
 
@@ -136,7 +141,10 @@ public class PhotoServiceImpl {
     public PhotoDetailsDto findByIdAndUserId(Long photoId, Long userId) {
         Photo photo = photoRepository.findByIdAndUserId(photoId, userId);
         if (photo != null) {
-            return getPhotoDetailsDto(photo);
+            PhotoDetailsDto photoDetailsDto = new PhotoDetailsDto();
+            mapPhotoDetailsDto(photo, photoDetailsDto);
+
+            return photoDetailsDto;
         }
 
         return null;
@@ -160,34 +168,46 @@ public class PhotoServiceImpl {
             photoReceiverRepository.save(photoReceiver);
         }
 
-        // TODO: Mapping
-        return new ReceivedPhotoDetailsDto();
+        ReceivedPhotoDetailsDto photoDetailsDto = new ReceivedPhotoDetailsDto();
+        mapPhotoDetailsDto(photoReceiver.getPhoto(), photoDetailsDto);
+        photoDetailsDto.setLike(photoReceiver.getLike());
+        photoDetailsDto.setReport(photoReceiver.getReport());
+
+        return photoDetailsDto;
     }
 
+    // TODO: Maybe allow changing dislike to like?
     public void like(Long photoId, Long userId) {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-        photoReceiver.setLike(true);
-        // TODO: Counting
+        if (photoReceiver.getLike() == null) {
+            photoReceiver.setLike(true);
+            photoReceiverRepository.save(photoReceiver);
 
-        photoReceiverRepository.save(photoReceiver);
+            statisticsRepository.likePhoto(photoId, photoReceiver.getPhoto().getUser().getId());
+        }
     }
 
+    // TODO: Maybe allow changing like to dislike?
     public void dislike(Long photoId, Long userId) {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-        photoReceiver.setLike(false);
-        // TODO: Counting
+        if (photoReceiver.getLike() == null) {
+            photoReceiver.setLike(false);
+            photoReceiverRepository.save(photoReceiver);
 
-        photoReceiverRepository.save(photoReceiver);
+            statisticsRepository.dislikePhoto(photoId, photoReceiver.getPhoto().getUser().getId());
+        }
     }
 
     public void report(Long photoId, String reason, String reasonText, Long userId) {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-        photoReceiver.setReport(true);
-        photoReceiver.setReportType(reason);
-        photoReceiver.setReportText(reasonText);
-        // TODO: Counting
+        if (photoReceiver.getReport() == null) {
+            photoReceiver.setReport(true);
+            photoReceiver.setReportType(reason);
+            photoReceiver.setReportText(reasonText);
+            photoReceiverRepository.save(photoReceiver);
 
-        photoReceiverRepository.save(photoReceiver);
+            statisticsRepository.reportPhoto(photoId, photoReceiver.getPhoto().getUser().getId());
+        }
     }
 
     public List<PhotoTraveledDto> getTraveledLocations(Long photoId, Integer page) {
@@ -210,12 +230,10 @@ public class PhotoServiceImpl {
         photoRepository.save(photo);
     }
 
-    private PhotoDetailsDto getPhotoDetailsDto(Photo photo) {
-        PhotoDetailsDto detailsDto = new PhotoDetailsDto();
-        detailsDto.setId(photo.getId());
-        // TODO: Mapping
+    private void mapPhotoDetailsDto(Photo photo, PhotoDetailsDto photoDetailsDto) {
+        mapToPhotoDto(photo, photoDetailsDto);
 
-        return detailsDto;
+        photoDetailsDto.setComments(photoCommentService.findFirstByPhotoId(photo.getId(), 3));
     }
 
     private List<PhotoDto> getPhotoDtos(List<Photo> photos) {
@@ -232,9 +250,8 @@ public class PhotoServiceImpl {
     }
 
     private PhotoDto getPhotoDto(Photo photo) {
-        PhotoStatistics photoStatistics = photoStatisticsRepository.findOne(photo.getId());
         PhotoDto photoDto = new PhotoDto();
-        mapToPhotoDto(photoDto, photo, photoStatistics);
+        mapToPhotoDto(photo, photoDto);
 
         return photoDto;
     }
@@ -253,9 +270,8 @@ public class PhotoServiceImpl {
     }
 
     private ReceivedPhotoDto getReceiverPhotoDto(PhotoReceiver photo) {
-        PhotoStatistics photoStatistics = photoStatisticsRepository.findOne(photo.getId());
         ReceivedPhotoDto photoDto = new ReceivedPhotoDto();
-        mapToPhotoDto(photoDto, photo.getPhoto(), photoStatistics);
+        mapToPhotoDto(photo.getPhoto(), photoDto);
         photoDto.setLike(photo.getLike());
         photoDto.setReport(photo.getReport());
         photoDto.setOpened(photo.getOpenedDate() != null);
@@ -263,17 +279,23 @@ public class PhotoServiceImpl {
         return photoDto;
     }
 
-    private PhotoDto mapToPhotoDto(PhotoDto photoDto, Photo photo, PhotoStatistics photoStatistics) {
+    private PhotoDto mapToPhotoDto(Photo photo, PhotoDto photoDto) {
         photoDto.setId(photo.getId());
+        photoDto.setOriginLocation(getLocationName(photo.getCity()));
         photoDto.setDescription(photo.getDescription());
-        photoDto.setTimeAgo(prettyTime.format(photo.getCreatedDate().toDate()));
-        photoDto.setCity(getLocationName(photo));
-        photoDto.setImgUuid(photo.getUuid());
-        photoDto.setCityCount(photoStatistics.getCities());
-        photoDto.setCommentCount(photoStatistics.getComments());
-        photoDto.setLikeCount(photoStatistics.getLikes());
+        photoDto.setTimeAgo(getPrettyTime(photo.getCreatedDate()));
+        photoDto.setUuid(photo.getUuid());
+
+        PhotoStatDto stats = statisticsRepository.getPhotoStatistics(photo.getId());
+        photoDto.setCityCount(stats.getCityCounter());
+        photoDto.setCommentCount(stats.getCommentCounter());
+        photoDto.setLikeCount(stats.getLikeCounter());
 
         return photoDto;
+    }
+
+    private String getPrettyTime(DateTime dateTime) {
+        return prettyTime.format(dateTime.toDate());
     }
 
     private Location getUserLocation(Long userId, BigDecimal longitude, BigDecimal latitude) {
@@ -290,7 +312,7 @@ public class PhotoServiceImpl {
         for (PhotoReceiver photoReceiver : receivedList) {
             PhotoTraveledDto dto = new PhotoTraveledDto();
             dto.setLiked(photoReceiver.getLike());
-            dto.setLocation(getLocationName(photoReceiver.getPhoto()));
+            dto.setLocation(getLocationName(photoReceiver.getCity()));
             dto.setTimeAgo(prettyTime.format(photoReceiver.getCreatedDate().toDate()));
             dto.setId(photoReceiver.getId());
 
@@ -300,8 +322,8 @@ public class PhotoServiceImpl {
         return dtos;
     }
 
-    private String getLocationName(Photo photo) {
-        return photo.getCity().getName() + ", " + photo.getCity().getCountry().getName();
+    private String getLocationName(City city) {
+        return city.getName() + ", " + city.getCountry().getName();
     }
 
 }

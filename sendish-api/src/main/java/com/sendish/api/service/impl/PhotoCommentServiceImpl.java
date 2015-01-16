@@ -58,6 +58,13 @@ public class PhotoCommentServiceImpl {
         return mapToCommentDto(photoComments);
     }
 
+    public List<CommentDto> findFirstByPhotoId(Long photoId, Integer howMany) {
+        List<PhotoComment> photoComments = photoCommentRepository.findByPhotoId(photoId,
+                new PageRequest(0, howMany, Direction.DESC, "createdDate"));
+
+        return mapToCommentDto(photoComments);
+    }
+
 	public void like(Long photoCommentId, Long userId) {
         voteOnComment(photoCommentId, userId, true);
 	}
