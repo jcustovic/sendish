@@ -11,6 +11,7 @@ public class PhotoStatDto {
         this.likeCounter = likeCounter;
         this.dislikeCounter = dislikeCounter;
         this.cityCounter = cityCounter;
+        this.commentCounter = commentCounter;
     }
 
     public long getLikeCounter() {
