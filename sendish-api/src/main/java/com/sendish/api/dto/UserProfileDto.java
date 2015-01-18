@@ -16,6 +16,7 @@ public class UserProfileDto extends BaseEntityDto {
     private Integer totalLikes;
     private Integer totalDislikes;
     private Integer citiesCount;
+    private Integer unseenPhotoCount;
     private Boolean emailRegistration;
 
     public String getNick() {
@@ -90,7 +91,15 @@ public class UserProfileDto extends BaseEntityDto {
         this.citiesCount = citiesCount;
     }
 
-    public Boolean getEmailRegistration() {
+    public Integer getUnseenPhotoCount() {
+		return unseenPhotoCount;
+	}
+
+	public void setUnseenPhotoCount(Integer unseenPhotoCount) {
+		this.unseenPhotoCount = unseenPhotoCount;
+	}
+
+	public Boolean getEmailRegistration() {
         return emailRegistration;
     }
 

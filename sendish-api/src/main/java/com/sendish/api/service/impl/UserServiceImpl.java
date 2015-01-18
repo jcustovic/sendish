@@ -84,6 +84,7 @@ public class UserServiceImpl {
         userProfileDto.setTotalDislikes(userStatistics.getDislikes());
         userProfileDto.setTotalLikes(userStatistics.getLikes());
         userProfileDto.setCitiesCount(userStatistics.getCities());
+        userProfileDto.setUnseenPhotoCount(0); // TODO: Implement me
         userProfileDto.setId(userId);
 
         return userProfileDto;

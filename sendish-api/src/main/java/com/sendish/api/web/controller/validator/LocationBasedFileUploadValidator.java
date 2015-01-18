@@ -35,6 +35,11 @@ public class LocationBasedFileUploadValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         LocationBasedFileUpload fileUpload = (LocationBasedFileUpload) target;
+        
+        if (fileUpload.getImage() == null) {
+        	errors.rejectValue("image", null, "Image/File not provided.");
+        	return;
+        }
 
         if (fileUpload.getLatitude() == null
                 || fileUpload.getLatitude().compareTo(BigDecimal.valueOf(-90)) < 0
