@@ -2,6 +2,7 @@ package com.sendish.api.web.controller.api.v1;
 
 import com.sendish.api.dto.*;
 import com.sendish.api.security.userdetails.AuthUser;
+import com.sendish.api.service.impl.ResizedPhotoServiceImpl;
 import com.sendish.api.service.impl.UserServiceImpl;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.web.controller.model.ValidationError;
@@ -9,7 +10,9 @@ import com.sendish.api.web.controller.validator.LocationBasedFileUploadValidator
 import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoReceiver;
+import com.sendish.repository.model.jpa.ResizedPhoto;
 import com.wordnik.swagger.annotations.*;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -41,6 +44,9 @@ public class PhotosController {
 
     @Autowired
     private UserServiceImpl userService;
+
+    @Autowired
+    private ResizedPhotoServiceImpl resizedPhotoService;
 
     @InitBinder("locationBasedFileUpload")
     protected void initBinder(WebDataBinder binder) {
@@ -113,15 +119,37 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/received/{photoUUID}/view", method = RequestMethod.GET)
-    @ApiOperation(value = "View received photo")
+    @ApiOperation(value = "View received photo in original size")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
     })
-    public ResponseEntity<InputStreamResource> receivedView(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
+    public ResponseEntity<InputStreamResource> viewOriginalReceived(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
         Photo photo = photoService.findReceivedByPhotoUuid(photoUUID, user.getUserId());
 
-        return viewPhoto(webRequest, photo);
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return viewPhoto(webRequest, photo.getCreatedDate(), photo.getContentType(), photo.getSize(), photo.getStorageId());
+        }
+    }
+
+    @RequestMapping(value = "/received/{photoUUID}/view/{sizeKey}", method = RequestMethod.GET)
+    @ApiOperation(value = "View received photo in different size")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "Not found")
+    })
+    public ResponseEntity<InputStreamResource> viewReceived(@PathVariable String photoUUID, String sizeKey, WebRequest webRequest, AuthUser user) {
+        Photo photo = photoService.findReceivedByPhotoUuid(photoUUID, user.getUserId());
+
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            ResizedPhoto resizedPhoto = resizedPhotoService.getResizedPhoto(photo.getId(), sizeKey);
+
+            return viewPhoto(webRequest, resizedPhoto.getCreatedDate(), photo.getContentType(), resizedPhoto.getSize(), resizedPhoto.getStorageId());
+        }
     }
 
     @RequestMapping(value = "/received/{photoId}/like", method = RequestMethod.PUT)
@@ -234,7 +262,11 @@ public class PhotosController {
     public ResponseEntity<InputStreamResource> sentView(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
         Photo photo = photoService.findByUserIdAndUuid(user.getUserId(), photoUUID);
 
-        return viewPhoto(webRequest, photo);
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return viewPhoto(webRequest, photo.getCreatedDate(), photo.getContentType(), photo.getSize(), photo.getStorageId());
+        }
     }
 
     @RequestMapping(value = "/sendish-upload", method = RequestMethod.POST)
@@ -242,11 +274,15 @@ public class PhotosController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "NOT USED! 201 will be returned"),
         @ApiResponse(code = 201, message = "Image upload is successful and the resource is created"),
-        @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
+        @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class),
+        @ApiResponse(code = 429, message = "Upload limit exceeded")
     })
     public ResponseEntity<Void> upload(@Valid @ModelAttribute LocationBasedFileUpload locationBasedFileUpload,
                                        MultipartFile image, AuthUser user) { // FIXME: MultipartFile image is also specified here because of swagger!
-        Long photoId = photoService.saveNewImage(locationBasedFileUpload, user.getUserId());
+        if (userService.getSentLimitLeft(user.getUserId()) <= 0) {
+            return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
+        }
+        Long photoId = photoService.processNewImage(locationBasedFileUpload, user.getUserId());
 
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentServletMapping().path("/api/v1.0/photos/{id}").build()
@@ -258,19 +294,17 @@ public class PhotosController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    private ResponseEntity<InputStreamResource> viewPhoto(WebRequest webRequest, Photo photo) {
-        if (photo == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else if (webRequest.checkNotModified(photo.getCreatedDate().getMillis())) {
-            return null;
+    private ResponseEntity<InputStreamResource> viewPhoto(WebRequest webRequest, DateTime createdDate, String contentType, Long size, String storageId) {
+        if (webRequest.checkNotModified(createdDate.getMillis())) {
+            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
         }
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.valueOf(photo.getContentType()));
-        headers.setContentLength(photo.getSize());
-
         try {
-            InputStreamResource isr = new InputStreamResource(photoService.getPhotoContent(photo.getStorageId()));
+            InputStreamResource isr = new InputStreamResource(photoService.getPhotoContent(storageId));
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.valueOf(contentType));
+            headers.setContentLength(size);
+
             return new ResponseEntity<>(isr, headers, HttpStatus.OK);
         } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

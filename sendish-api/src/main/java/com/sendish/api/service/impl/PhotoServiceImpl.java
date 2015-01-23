@@ -1,7 +1,7 @@
 package com.sendish.api.service.impl;
 
 import com.sendish.api.dto.*;
-import com.sendish.api.redis.dto.PhotoStatDto;
+import com.sendish.api.redis.dto.PhotoStatisticsDto;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
@@ -66,16 +66,10 @@ public class PhotoServiceImpl {
         return photoRepository.findOne(photoId);
     }
 
-    public Long saveNewImage(LocationBasedFileUpload p_upload, Long p_userId) {
+    public Long processNewImage(LocationBasedFileUpload p_upload, Long p_userId) {
+        DateTime receivedDate = DateTime.now();
         MultipartFile file = p_upload.getImage();
-        Photo photo = new Photo();
-        photo.setUser(userRepository.findOne(p_userId));
-        photo.setName(file.getName());
-        photo.setContentType(file.getContentType());
-        photo.setSize(file.getSize());
-        photo.setDescription(p_upload.getDescription());
-        photo.setResend(true);
-        photo.setUuid(UUID.randomUUID().toString());
+        Photo photo = mapToPhoto(p_upload, p_userId, file);
 
         Dimension dimension;
         try {
@@ -101,9 +95,22 @@ public class PhotoServiceImpl {
 
         photo = photoRepository.save(photo);
         createPhotoStatistics(photo);
-        userService.updateLocation(p_userId, location, city);
+        userService.updateStatisticsForNewSentPhoto(p_userId, receivedDate, location, city);
+        // TODO: Distribute new image and create PhotoSendingDetails
 
         return photo.getId();
+    }
+
+    private Photo mapToPhoto(LocationBasedFileUpload p_upload, Long p_userId, MultipartFile file) {
+        Photo photo = new Photo();
+        photo.setUser(userRepository.findOne(p_userId));
+        photo.setName(file.getName());
+        photo.setContentType(file.getContentType());
+        photo.setSize(file.getSize());
+        photo.setDescription(p_upload.getDescription());
+        photo.setUuid(UUID.randomUUID().toString());
+
+        return photo;
     }
 
     private void createPhotoStatistics(Photo photo) {
@@ -286,10 +293,10 @@ public class PhotoServiceImpl {
         photoDto.setTimeAgo(getPrettyTime(photo.getCreatedDate()));
         photoDto.setUuid(photo.getUuid());
 
-        PhotoStatDto stats = statisticsRepository.getPhotoStatistics(photo.getId());
-        photoDto.setCityCount(stats.getCityCounter());
-        photoDto.setCommentCount(stats.getCommentCounter());
-        photoDto.setLikeCount(stats.getLikeCounter());
+        PhotoStatisticsDto stats = statisticsRepository.getPhotoStatistics(photo.getId());
+        photoDto.setCityCount(stats.getCityCount());
+        photoDto.setCommentCount(stats.getCommentCount());
+        photoDto.setLikeCount(stats.getLikeCount());
 
         return photoDto;
     }

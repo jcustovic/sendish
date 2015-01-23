@@ -34,6 +34,10 @@ public class LocationBasedFileUploadValidator implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
+        if (errors.hasErrors()) {
+            // IF there are errors we won't continue
+            return;
+        }
         LocationBasedFileUpload fileUpload = (LocationBasedFileUpload) target;
         
         if (fileUpload.getImage() == null) {

@@ -1,6 +1,8 @@
 package com.sendish.api.service.impl;
 
 import com.sendish.api.dto.UserProfileDto;
+import com.sendish.api.redis.dto.UserStatisticsDto;
+import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.repository.UserDetailsRepository;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.UserStatisticsRepository;
@@ -18,6 +20,9 @@ import java.util.UUID;
 @Transactional
 public class UserServiceImpl {
 
+    public static final int DEFAULT_SEND_LIMIT_PER_DAY = 20;
+    public static final int DEFAULT_RECEIVE_LIMIT_PER_DAY = 50;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -32,6 +37,9 @@ public class UserServiceImpl {
 
     @Autowired
     private ShaPasswordEncoder shaPasswordEncoder;
+
+    @Autowired
+    private RedisStatisticsRepository statisticsRepository;
 
     public UserDetails getUserDetails(Long userId) {
         return userDetailsRepository.findOne(userId);
@@ -53,6 +61,8 @@ public class UserServiceImpl {
         UserDetails userDetails = new UserDetails();
         userDetails.setUserId(user.getId());
         userDetails.setLastInteractionTime(DateTime.now());
+        userDetails.setSendLimitPerDay(DEFAULT_SEND_LIMIT_PER_DAY);
+        userDetails.setReceiveLimitPerDay(DEFAULT_RECEIVE_LIMIT_PER_DAY);
         userDetailsRepository.save(userDetails);
 
         UserStatistics userStatistics = new UserStatistics();
@@ -64,8 +74,6 @@ public class UserServiceImpl {
 
     public UserProfileDto getUserProfile(Long userId) {
         UserDetails userDetails = getUserDetails(userId);
-        User user = userDetails.getUser();
-        UserStatistics userStatistics = userStatisticsRepository.findOne(userId);
 
         UserProfileDto userProfileDto = new UserProfileDto();
         if (userDetails.getLastLocationTime() != null) {
@@ -74,20 +82,36 @@ public class UserServiceImpl {
             userProfileDto.setLastLng(userDetails.getLocation().getLongitude());
             userProfileDto.setLastLocationTime(userDetails.getLastInteractionTime().toDate());
         }
+
+        User user = userDetails.getUser();
         userProfileDto.setEmailRegistration(user.getEmailRegistration());
         userProfileDto.setNick(user.getNickname());
-        if (userStatistics.getRank() == null) {
+
+        UserStatisticsDto userStatistics = statisticsRepository.getUserStatistics(userId);
+        if (userStatistics.getRank() == 0L) {
             userProfileDto.setRank("No rank");
         } else {
             userProfileDto.setRank(String.valueOf(userStatistics.getRank()));
         }
-        userProfileDto.setTotalDislikes(userStatistics.getDislikes());
-        userProfileDto.setTotalLikes(userStatistics.getLikes());
-        userProfileDto.setCitiesCount(userStatistics.getCities());
-        userProfileDto.setUnseenPhotoCount(0); // TODO: Implement me
+        userProfileDto.setTotalDislikes(userStatistics.getTotalDislikeCount());
+        userProfileDto.setTotalLikes(userStatistics.getTotalLikeCount());
+        userProfileDto.setCitiesCount(userStatistics.getTotalCityCount());
+        userProfileDto.setUnseenPhotoCount(userStatistics.getUnseenPhotoCount());
+        userProfileDto.setDailySendLimitLeft(getSentLimitLeft(userDetails, userStatistics));
         userProfileDto.setId(userId);
 
         return userProfileDto;
+    }
+
+    public Long getSentLimitLeft(Long userId) {
+        UserDetails userDetails = getUserDetails(userId);
+        UserStatisticsDto userStatistics = statisticsRepository.getUserStatistics(userId);
+
+        return getSentLimitLeft(userDetails, userStatistics);
+    }
+
+    private Long getSentLimitLeft(UserDetails userDetails, UserStatisticsDto userStatistics) {
+        return userDetails.getReceiveLimitPerDay() - userStatistics.getDailySendCount();
     }
 
     public Location getLastLocation(Long userId) {
@@ -110,18 +134,21 @@ public class UserServiceImpl {
         }
     }
 
-    public void updateLocation(Long userId, Location location, City city) {
+    public void updateStatisticsForNewSentPhoto(Long userId, DateTime photoDate, Location location, City city) {
         UserDetails userDetails = getUserDetails(userId);
-        Location currentLocation = userDetails.getLocation();
-        if (currentLocation == null || location.getLongitude().compareTo(currentLocation.getLongitude()) != 0
-                || location.getLatitude().compareTo(currentLocation.getLatitude()) != 0) {
-            userDetails.setLastLocationTime(DateTime.now());
-            userDetails.setLocation(location);
-            userDetails.setCurrentCity(city);
-            userDetails.setLastInteractionTime(DateTime.now());
+        userDetails.setLastSentTime(photoDate);
+        userDetails.setLastLocationTime(photoDate);
+        userDetails.setLocation(location);
+        userDetails.setCurrentCity(city);
+        userDetails.setLastInteractionTime(photoDate);
 
-            userDetailsRepository.save(userDetails);
+        Long currentCount = statisticsRepository.increaseDailySentPhotoCount(userId, photoDate.toLocalDate());
+
+        if (currentCount >= userDetails.getSendLimitPerDay()) {
+            userDetails.setSendAllowedTime(photoDate.withTimeAtStartOfDay().plusDays(1));
         }
+
+        userDetailsRepository.save(userDetails);
     }
 
 }

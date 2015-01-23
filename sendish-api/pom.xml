@@ -102,6 +102,11 @@
             <artifactId>apns</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+        </dependency>
+
         <!-- Enable JSP -->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>

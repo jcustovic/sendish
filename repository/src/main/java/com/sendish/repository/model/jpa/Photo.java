@@ -32,9 +32,6 @@ public class Photo extends BaseEntity implements LocationAware {
     @JoinColumn(name = "p_user_id")
     private User user;
 
-    @Column(name = "p_resend", nullable = false)
-    private Boolean resend = false;
-
     @Column(name = "p_deleted", nullable = false)
     private Boolean deleted = false;
 
@@ -116,14 +113,6 @@ public class Photo extends BaseEntity implements LocationAware {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public Boolean getResend() {
-        return resend;
-    }
-
-    public void setResend(Boolean resend) {
-        this.resend = resend;
     }
 
     public Boolean getDeleted() {

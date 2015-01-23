@@ -13,10 +13,11 @@ public class UserProfileDto extends BaseEntityDto {
     private BigDecimal lastLat;
     private Date lastLocationTime;
     private String rank;
-    private Integer totalLikes;
-    private Integer totalDislikes;
-    private Integer citiesCount;
-    private Integer unseenPhotoCount;
+    private Long totalLikes;
+    private Long totalDislikes;
+    private Long citiesCount;
+    private Long unseenPhotoCount;
+    private Long dailySendLimitLeft;
     private Boolean emailRegistration;
 
     public String getNick() {
@@ -67,39 +68,47 @@ public class UserProfileDto extends BaseEntityDto {
         this.rank = rank;
     }
 
-    public Integer getTotalLikes() {
+    public Long getTotalLikes() {
         return totalLikes;
     }
 
-    public void setTotalLikes(Integer totalLikes) {
+    public void setTotalLikes(Long totalLikes) {
         this.totalLikes = totalLikes;
     }
 
-    public Integer getTotalDislikes() {
+    public Long getTotalDislikes() {
         return totalDislikes;
     }
 
-    public void setTotalDislikes(Integer totalDislikes) {
+    public void setTotalDislikes(Long totalDislikes) {
         this.totalDislikes = totalDislikes;
     }
 
-    public Integer getCitiesCount() {
+    public Long getCitiesCount() {
         return citiesCount;
     }
 
-    public void setCitiesCount(Integer citiesCount) {
+    public void setCitiesCount(Long citiesCount) {
         this.citiesCount = citiesCount;
     }
 
-    public Integer getUnseenPhotoCount() {
+    public Long getUnseenPhotoCount() {
 		return unseenPhotoCount;
 	}
 
-	public void setUnseenPhotoCount(Integer unseenPhotoCount) {
+	public void setUnseenPhotoCount(Long unseenPhotoCount) {
 		this.unseenPhotoCount = unseenPhotoCount;
 	}
 
-	public Boolean getEmailRegistration() {
+    public Long getDailySendLimitLeft() {
+        return dailySendLimitLeft;
+    }
+
+    public void setDailySendLimitLeft(Long dailySendLimitLeft) {
+        this.dailySendLimitLeft = dailySendLimitLeft;
+    }
+
+    public Boolean getEmailRegistration() {
         return emailRegistration;
     }
 

@@ -90,10 +90,12 @@ create table auth_user_details (
   aud_location geometry,
   aud_last_location_time timestamp,
   aud_current_city_id int8,
-  aud_receive_limit_day int4,
-  aud_send_limit_day int4,
-  aud_today_limit_count int4,
-  aud_limit_day date,
+  aud_receive_limit_day int4 not null,
+  aud_send_limit_day int4 not null,
+  aud_last_received_time timestamp,
+  aud_last_sent_time timestamp,
+  aud_receive_allowed_time timestamp,
+  aud_send_allowed_time timestamp,
   aud_last_interaction_time timestamp not null,
 
   primary key (aud_user_id),
@@ -124,7 +126,6 @@ create table photo (
   p_name varchar(128) not null,
   p_description varchar(200),
   p_user_id int8 not null,
-  p_resend boolean not null,
   p_deleted boolean not null,
   p_sender_deleted boolean not null,
   p_storage_id varchar(200) not null unique,
@@ -145,6 +146,24 @@ create table photo (
 
 create index photo_user_id_idx on photo (p_user_id);
 create index photo_city_id_idx on photo (p_city_id);
+
+-- ResizedPhoto table
+create sequence resized_photo_seq;
+
+create table resized_photo (
+  rp_id int8 not null default nextval('resized_photo_seq'),
+  rp_photo_id int8 not null,
+  rp_key varchar(32) not null,
+  rp_storage_id varchar(200) not null unique,
+  rp_width int4 not null,
+  rp_height int4 not null,
+  rp_size_byte int8 not null,
+  rp_created_date timestamp not null,
+
+  primary key (rp_id),
+  constraint resized_photo_photo_id_fk foreign key (rp_photo_id) references photo,
+  constraint resized_photo_photo_key_uq unique (rp_photo_id, rp_key)
+);
 
 -- PhotoComment table
 create sequence photo_comment_seq;
@@ -202,15 +221,16 @@ create table photo_receiver (
   constraint photo_receiver_city_id_fk foreign key (pr_city_id) references city
 );
 
--- PhotoStatus table
-create table photo_status (
-  ps_photo_id int8 not null,
-  ps_last_photo_rec_id int8 null,
-  ps_resend_stopped boolean not null default 0,
+-- PhotoSendingDetails table
+create table photo_sending_details (
+  psd_photo_id int8 not null,
+  psd_last_photo_rec_id int8 null,
+  psd_photo_status varchar(9) not null,
+  psd_send_status varchar(7) null,
 
-  primary key (ps_photo_id),
-  constraint photo_status_photo_id_fk foreign key (ps_photo_id) references photo,
-  constraint photo_status_ps_photo_receiver_id_fk foreign key (ps_last_photo_rec_id) references photo_receiver,
+  primary key (psd_photo_id),
+  constraint photo_sending_details_photo_id_fk foreign key (psd_photo_id) references photo,
+  constraint photo_sending_details_photo_receiver_id_fk foreign key (psd_last_photo_rec_id) references photo_receiver
 );
 
 -- PhotoStatistics table

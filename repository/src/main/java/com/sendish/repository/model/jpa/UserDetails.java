@@ -5,7 +5,6 @@ import com.sendish.repository.model.jpa.listener.LocationListener;
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.Cache;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
@@ -44,18 +43,27 @@ public class UserDetails implements Serializable, LocationAware {
     @JoinColumn(name = "aud_current_city_id")
     private City currentCity;
 
-    @Column(name = "aud_receive_limit_day")
+    @Column(name = "aud_receive_limit_day", nullable = false)
     private Integer receiveLimitPerDay;
 
-    @Column(name = "aud_send_limit_day")
+    @Column(name = "aud_send_limit_day", nullable = false)
     private Integer sendLimitPerDay;
 
-    @Column(name = "aud_today_limit_count")
-    private Integer todayReceivedCount;
+    @Column(name = "aud_last_received_time")
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime lastReceivedTime;
 
-    @Column(name = "aud_limit_day")
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDate")
-    private LocalDate limitDate;
+    @Column(name = "aud_last_sent_time")
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime lastSentTime;
+
+    @Column(name = "aud_receive_allowed_time")
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime receiveAllowedTime;
+
+    @Column(name = "aud_send_allowed_time")
+    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+    private DateTime sendAllowedTime;
 
     @Column(name = "aud_last_interaction_time", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -126,20 +134,36 @@ public class UserDetails implements Serializable, LocationAware {
         this.sendLimitPerDay = sendLimitPerDay;
     }
 
-    public Integer getTodayReceivedCount() {
-        return todayReceivedCount;
+    public DateTime getLastReceivedTime() {
+        return lastReceivedTime;
     }
 
-    public void setTodayReceivedCount(Integer todayReceivedCount) {
-        this.todayReceivedCount = todayReceivedCount;
+    public void setLastReceivedTime(DateTime lastReceivedTime) {
+        this.lastReceivedTime = lastReceivedTime;
     }
 
-    public LocalDate getLimitDate() {
-        return limitDate;
+    public DateTime getLastSentTime() {
+        return lastSentTime;
     }
 
-    public void setLimitDate(LocalDate limitDate) {
-        this.limitDate = limitDate;
+    public void setLastSentTime(DateTime lastSentTime) {
+        this.lastSentTime = lastSentTime;
+    }
+
+    public DateTime getReceiveAllowedTime() {
+        return receiveAllowedTime;
+    }
+
+    public void setReceiveAllowedTime(DateTime receiveAllowedTime) {
+        this.receiveAllowedTime = receiveAllowedTime;
+    }
+
+    public DateTime getSendAllowedTime() {
+        return sendAllowedTime;
+    }
+
+    public void setSendAllowedTime(DateTime sendAllowedTime) {
+        this.sendAllowedTime = sendAllowedTime;
     }
 
     public DateTime getLastInteractionTime() {
