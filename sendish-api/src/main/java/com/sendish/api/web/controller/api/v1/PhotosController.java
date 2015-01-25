@@ -137,10 +137,11 @@ public class PhotosController {
     @RequestMapping(value = "/received/{photoUUID}/view/{sizeKey}", method = RequestMethod.GET)
     @ApiOperation(value = "View received photo in different size")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
-    public ResponseEntity<InputStreamResource> viewReceived(@PathVariable String photoUUID, String sizeKey, WebRequest webRequest, AuthUser user) {
+    public ResponseEntity<InputStreamResource> viewReceived(@PathVariable String photoUUID, @PathVariable String sizeKey, 
+    		WebRequest webRequest, AuthUser user) {
         Photo photo = photoService.findReceivedByPhotoUuid(photoUUID, user.getUserId());
 
         if (photo == null) {
@@ -254,18 +255,37 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/sent/{photoUUID}/view", method = RequestMethod.GET)
-    @ApiOperation(value = "View sent photo")
+    @ApiOperation(value = "View sent photo in original size")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
     })
-    public ResponseEntity<InputStreamResource> sentView(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
+    public ResponseEntity<InputStreamResource> viewOriginalSent(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
         Photo photo = photoService.findByUserIdAndUuid(user.getUserId(), photoUUID);
 
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             return viewPhoto(webRequest, photo.getCreatedDate(), photo.getContentType(), photo.getSize(), photo.getStorageId());
+        }
+    }
+    
+    @RequestMapping(value = "/sent/{photoUUID}/view/{sizeKey}", method = RequestMethod.GET)
+    @ApiOperation(value = "View sent photo in different size")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
+    })
+    public ResponseEntity<InputStreamResource> viewSent(@PathVariable String photoUUID, @PathVariable String sizeKey, 
+    		WebRequest webRequest, AuthUser user) {
+    	Photo photo = photoService.findByUserIdAndUuid(user.getUserId(), photoUUID);
+
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            ResizedPhoto resizedPhoto = resizedPhotoService.getResizedPhoto(photo.getId(), sizeKey);
+
+            return viewPhoto(webRequest, resizedPhoto.getCreatedDate(), photo.getContentType(), resizedPhoto.getSize(), resizedPhoto.getStorageId());
         }
     }
 

@@ -6,12 +6,16 @@ import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.ResizedPhotoRepository;
 import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.ResizedPhoto;
+
 import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.Thumbnails.Builder;
 import net.coobird.thumbnailator.geometry.Positions;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,8 +31,8 @@ public class ResizedPhotoServiceImpl {
 
     static {
         KEY_SIZE_MAP = new HashMap<>();
-        KEY_SIZE_MAP.put("list_medium", new int[] { 320, 107 }); // Aspect 3:1 (2x smaller)
-        KEY_SIZE_MAP.put("list_small", new int[] { 160, 53 }); // Aspect 3:1 (4x smaller)
+        KEY_SIZE_MAP.put("list_medium", new int[] { 320, 160 }); // Aspect 2:1 (2x smaller)
+        KEY_SIZE_MAP.put("list_small", new int[] { 160, 80 }); // Aspect 2:1 (4x smaller)
     }
 
     @Autowired
@@ -64,9 +68,9 @@ public class ResizedPhotoServiceImpl {
         }
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
-            Thumbnails.Builder thumbnails = Thumbnails.of(originalIS).useOriginalFormat().size(size[0], size[1]);
+            Builder<? extends InputStream> thumbnails = Thumbnails.of(originalIS).useOriginalFormat().size(size[0], size[1]);
             if (size[0] != size[1]) {
-                thumbnails.crop(Positions.TOP_CENTER);
+                thumbnails.crop(Positions.CENTER);
             }
             thumbnails.toOutputStream(out);
 
@@ -82,6 +86,7 @@ public class ResizedPhotoServiceImpl {
         resizedPhoto.setKey(sizeKey);
         resizedPhoto.setWidth(width);
         resizedPhoto.setHeight(height);
+        resizedPhoto.setSize((long) content.length);
 
         String storeId = fileStore.save(new ByteArrayInputStream(content));
 

@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 public class UserStatisticsDto implements Serializable {
 
-    private long rank;
+	private static final long serialVersionUID = 1L;
+	
+	private long rank;
     private long totalLikeCount;
     private long totalDislikeCount;
     private long totalReportCount;

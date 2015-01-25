@@ -41,6 +41,7 @@ public class CityItemProcessor implements ItemProcessor<FieldSet, City> {
 
             return city;
         } else {
+        	// TODO: Maybe update?
             return null;
         }
     }
