@@ -218,7 +218,7 @@ public class PhotosController {
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            return new ResponseEntity<>(photo, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(photo, HttpStatus.OK);
         }
     }
 
