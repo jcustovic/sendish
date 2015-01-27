@@ -52,7 +52,7 @@ app:
   baseUrl: http://api.sendish.com
   store:
     data:
-      path: C:\Users\chus\sendish\data
+      path: C:\Users\janc\sendish\data
   ios:
     cert:
       dev:
