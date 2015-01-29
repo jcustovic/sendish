@@ -96,7 +96,7 @@ create table auth_user_details (
   aud_last_sent_time timestamp,
   aud_receive_allowed_time timestamp,
   aud_send_allowed_time timestamp,
-  aud_last_interaction_time timestamp not null,
+  aud_last_interaction_time timestamp,
 
   primary key (aud_user_id),
   constraint auth_user_status_user_id_fk foreign key (aud_user_id) references auth_user,

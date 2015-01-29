@@ -65,7 +65,7 @@ public class UserDetails implements Serializable, LocationAware {
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime sendAllowedTime;
 
-    @Column(name = "aud_last_interaction_time", nullable = false)
+    @Column(name = "aud_last_interaction_time")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime lastInteractionTime;
 

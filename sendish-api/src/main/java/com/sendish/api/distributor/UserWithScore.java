@@ -2,15 +2,15 @@ package com.sendish.api.distributor;
 
 public class UserWithScore {
 
-    private Long userId;
+    private String userId;
     private Long score;
 
-    public UserWithScore(Long userId, Long score) {
+    public UserWithScore(String userId, Long score) {
         this.userId = userId;
         this.score = score;
     }
 
-    public Long getUserId() {
+    public String getUserId() {
         return userId;
     }
 

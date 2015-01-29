@@ -4,8 +4,6 @@ import java.util.List;
 
 public interface PhotoDistributor {
 
-    void sendPhoto(Long photoId);
-
-    void sendPhoto(List<Long> photoIds);
+    boolean sendPhoto(Long photoId);
 
 }

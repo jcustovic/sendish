@@ -60,7 +60,6 @@ public class UserServiceImpl {
 
         UserDetails userDetails = new UserDetails();
         userDetails.setUserId(user.getId());
-        userDetails.setLastInteractionTime(DateTime.now());
         userDetails.setSendLimitPerDay(DEFAULT_SEND_LIMIT_PER_DAY);
         userDetails.setReceiveLimitPerDay(DEFAULT_RECEIVE_LIMIT_PER_DAY);
         userDetailsRepository.save(userDetails);
