@@ -11,12 +11,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EntityScan(basePackages = "com.sendish.repository.model.jpa")
 @EnableJpaRepositories(basePackages = "com.sendish.repository")
-@EnableTransactionManagement
 @EnableConfigurationProperties
 @EnableCaching
 @EnableAsync

@@ -2,7 +2,7 @@ package com.sendish.api.dto;
 
 import java.io.Serializable;
 
-public class CommentDto implements Serializable {
+public class CommentDto extends BaseEntityDto {
 
 	private static final long serialVersionUID = 1L;
 

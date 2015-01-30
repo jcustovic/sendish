@@ -82,6 +82,7 @@ public class PhotoCommentServiceImpl {
         for (PhotoComment comment : comments) {
             CommentDto commentDto = new CommentDto();
             UserDetails userDetails = comment.getUser().getDetails();
+            commentDto.setId(comment.getId());
             commentDto.setUserId(userDetails.getUserId());
             commentDto.setUserName(userDetails.getCurrentCity().getName() + ", " + userDetails.getCurrentCity().getCountry().getName());
             commentDto.setComment(comment.getComment());

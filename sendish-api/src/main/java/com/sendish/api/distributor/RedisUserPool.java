@@ -48,18 +48,14 @@ public class RedisUserPool implements UserPool {
     }
 
     @Override
-    public UserWithScore getNextWithScore() {
-        return null;
-    }
-
-    @Override
-    public List<UserWithScore> getNextWithScore(int n) {
-        return null;
-    }
-
-    @Override
-    public List<UserWithScore> getNextWithOffsetWithScore(int offset, int n) {
-        return null;
+    public UserWithScore getLastWithScore() {
+        Set<ZSetOperations.TypedTuple<String>> results = userPool.reverseRangeWithScores(0, 0);
+        if (results.isEmpty()) {
+            return null;
+        } else {
+            ZSetOperations.TypedTuple<String> lastOne = results.iterator().next();
+            return new UserWithScore(lastOne.getValue(), lastOne.getScore().longValue());
+        }
     }
 
     @Override

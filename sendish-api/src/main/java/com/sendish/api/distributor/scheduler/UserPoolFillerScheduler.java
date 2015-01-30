@@ -8,7 +8,7 @@ public class UserPoolFillerScheduler {
 
     public static final long TEN_SECONDS_DELAY = 10000L;
 
-    @Scheduled(fixedDelay = TEN_SECONDS_DELAY)
+    //@Scheduled(fixedDelay = TEN_SECONDS_DELAY)
     public void fillUsers() {
         // UserDetails: (lastInteractionTime not null AND lastInteractionTime > today - 10days) AND (receiveAllowedTime IS NULL OR receiveAllowedTime >= now)
         // AND (lastReceivedTime >= redis (max lastReceivedTime) or lastReceivedTime == null) order by lastReceivedTime ASC

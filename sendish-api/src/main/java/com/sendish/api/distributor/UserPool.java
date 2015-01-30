@@ -13,11 +13,7 @@ public interface UserPool {
 
     Collection<String> getNextWithOffset(int offset, int n);
 
-    UserWithScore getNextWithScore();
-
-    Collection<UserWithScore> getNextWithScore(int n);
-
-    List<UserWithScore> getNextWithOffsetWithScore(int offset, int n);
+    UserWithScore getLastWithScore();
 
     void put(UserWithScore user);
 
