@@ -10,14 +10,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class DelegateNotificationProvider implements AsyncNotificationProvider {
 
-    private static final Logger              LOG = LoggerFactory.getLogger(DelegateNotificationProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DelegateNotificationProvider.class);
 
     @Autowired(required = false)
-    private List<NotificationProvider>       notifyProviders;
+    private List<NotificationProvider> notifyProviders;
 
     @Autowired
     private NotificationMessageRepository notificationMessageRepository;
@@ -25,8 +27,14 @@ public class DelegateNotificationProvider implements AsyncNotificationProvider {
     @Async
     @Override
     public final void sendPlainTextNotification(final String p_message, Long p_userId) {
+        sendPlainTextNotification(p_message, null, p_userId);
+    }
+
+    @Async
+    @Override
+    public final void sendPlainTextNotification(final String p_message, Map<String, Object> customData, Long p_userId) {
         try {
-            notify(p_message, null, new UserQueryHolder(p_userId));
+            notify(p_message, customData, new UserQueryHolder(p_userId));
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
         }
@@ -97,9 +105,9 @@ public class DelegateNotificationProvider implements AsyncNotificationProvider {
             }
 
             LOG.debug("Sending notification for type {} with id {} finished. Notified {} unique user.",
-                p_notification.getType(),
-                p_notification.getReferenceId(),
-                notifiedUserIds.size());
+                    p_notification.getType(),
+                    p_notification.getReferenceId(),
+                    notifiedUserIds.size());
         }
 
         return results;
