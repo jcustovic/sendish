@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.sendish.api.dto.CommentDto;
+import com.sendish.api.redis.dto.CommentStatisticsDto;
+import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.repository.PhotoCommentVoteRepository;
 import com.sendish.repository.model.jpa.*;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -37,7 +39,11 @@ public class PhotoCommentServiceImpl {
     @Autowired
     private PhotoCommentVoteRepository photoCommentVoteRepository;
 
+    @Autowired
+    private RedisStatisticsRepository statisticsRepository;
+
 	public PhotoComment save(Long photoId, String comment, Long userId) {
+        // TODO: Maybe restrict only to my photos or received photos?
 		Photo photo = photoRepository.findOne(photoId);
 		User user = userRepository.findOne(userId);
 		
@@ -45,20 +51,21 @@ public class PhotoCommentServiceImpl {
 		photoComment.setPhoto(photo);
 		photoComment.setUser(user);
 		photoComment.setComment(comment);
-		// TODO: Maybe restrict to only my photos and received photos?
-		// TODO: Increase comment count on photo
-		
-		return photoCommentRepository.save(photoComment);
+
+        photoComment = photoCommentRepository.save(photoComment);
+        statisticsRepository.increasePhotoCommentCount(photoId);
+
+		return photoComment;
 	}
 	
-	public List<CommentDto> findByPhotoId(Long photoId, Integer page) {
+	public List<CommentDto> findByPhotoId(Long photoId, int page) {
         List<PhotoComment> photoComments = photoCommentRepository.findByPhotoId(photoId, 
         		new PageRequest(page, COMMENT_PAGE_SIZE, Direction.DESC, "createdDate"));
 
         return mapToCommentDto(photoComments);
     }
 
-    public List<CommentDto> findFirstByPhotoId(Long photoId, Integer howMany) {
+    public List<CommentDto> findFirstByPhotoId(Long photoId, int howMany) {
         List<PhotoComment> photoComments = photoCommentRepository.findByPhotoId(photoId,
                 new PageRequest(0, howMany, Direction.DESC, "createdDate"));
 
@@ -77,6 +84,12 @@ public class PhotoCommentServiceImpl {
         return photoCommentRepository.findOne(photoCommentId);
     }
 
+    public void delete(Long photoCommentId) {
+        PhotoComment photoComment = photoCommentRepository.findOne(photoCommentId);
+        photoComment.setDeleted(true);
+        photoCommentRepository.save(photoComment);
+    }
+
     private List<CommentDto> mapToCommentDto(List<PhotoComment> comments) {
         List<CommentDto> commentDtos = new ArrayList<>(comments.size());
         for (PhotoComment comment : comments) {
@@ -86,9 +99,12 @@ public class PhotoCommentServiceImpl {
             commentDto.setUserId(userDetails.getUserId());
             commentDto.setUserName(userDetails.getCurrentCity().getName() + ", " + userDetails.getCurrentCity().getCountry().getName());
             commentDto.setComment(comment.getComment());
-            commentDto.setLikes(comment.getLikes());
-            commentDto.setDislikes(comment.getDislikes());
             commentDto.setTimeAgo(prettyTime.format(comment.getCreatedDate().toDate()));
+
+            // TODO: Maybe get from database when we will store it there so we save on trip to Redis.
+            CommentStatisticsDto commentStatistics = statisticsRepository.getCommentStatistics(comment.getId());
+            commentDto.setLikes(commentStatistics.getLikeCount());
+            commentDto.setDislikes(commentStatistics.getDislikeCount());
 
             commentDtos.add(commentDto);
         }
@@ -99,12 +115,18 @@ public class PhotoCommentServiceImpl {
     private void voteOnComment(Long photoCommentId, Long userId, boolean like) {
         PhotoCommentVote photoCommentVote = photoCommentVoteRepository.findOne(new PhotoCommentVoteId(userId, photoCommentId));
         if (photoCommentVote == null) {
-            // TODO: Counter on PhotoComment
+            // TODO: Maybe allow vote change?
             PhotoCommentVote newVote = new PhotoCommentVote();
             newVote.setLike(like);
             newVote.setUser(userRepository.findOne(userId));
             newVote.setComment(photoCommentRepository.findOne(photoCommentId));
             photoCommentVoteRepository.save(newVote);
+
+            if (like) {
+                statisticsRepository.likeComment(photoCommentId);
+            } else {
+                statisticsRepository.dislikeComment(photoCommentId);
+            }
         }
     }
 

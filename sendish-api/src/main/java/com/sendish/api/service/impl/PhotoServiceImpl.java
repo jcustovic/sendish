@@ -297,6 +297,7 @@ public class PhotoServiceImpl {
         photoDto.setCityCount(stats.getCityCount());
         photoDto.setCommentCount(stats.getCommentCount());
         photoDto.setLikeCount(stats.getLikeCount());
+        photoDto.setDislikeCount(stats.getDislikeCount());
 
         return photoDto;
     }

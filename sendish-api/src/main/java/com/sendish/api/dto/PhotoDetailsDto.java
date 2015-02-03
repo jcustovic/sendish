@@ -8,6 +8,8 @@ public class PhotoDetailsDto extends PhotoDto {
 
     private List<CommentDto> comments;
 
+    // Getters & setters
+
     public List<CommentDto> getComments() {
         return comments;
     }
