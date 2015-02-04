@@ -192,8 +192,8 @@ create table photo_comment_vote (
   pcv_created_date timestamp not null,
 
   primary key (pcv_pc_id, pcv_user_id),
-  constraint photo_comment_vote_user_id_fk foreign key (pcv_pc_id) references auth_user,
-  constraint photo_comment_vote_photo_comment_id_fk foreign key (pcv_user_id) references photo_comment
+  constraint photo_comment_vote_user_id_fk foreign key (pcv_user_id) references auth_user,
+  constraint photo_comment_vote_photo_comment_id_fk foreign key (pcv_pc_id) references photo_comment
 );
 
 -- PhotoReceiver table

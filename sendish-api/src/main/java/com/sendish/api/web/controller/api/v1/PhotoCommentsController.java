@@ -51,7 +51,7 @@ public class PhotoCommentsController {
     }
     
 	@RequestMapping(value = "/{photoId}", method = RequestMethod.POST)
-    @ApiOperation(value = "Get comments for a specific photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created photo")
+    @ApiOperation(value = "Post a comment to specific photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created comment")
     @ApiResponses({
     	@ApiResponse(code = 200, message = "NOT USED! 201 will be returned", response = Void.class),
         @ApiResponse(code = 201, message = "Comment created")
@@ -73,12 +73,31 @@ public class PhotoCommentsController {
 
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
+
+    @RequestMapping(value = "/comment/{photoCommentId}", method = RequestMethod.DELETE)
+    @ApiOperation(value = "Delete your comments or any comment on a photo that you own")
+    @ApiResponses({
+        @ApiResponse(code = 204, message = "Comment deleted"),
+        @ApiResponse(code = 404, message = "Comment not found or you are not the owner of the comment or photo")
+    })
+    public ResponseEntity<Void> delete(@PathVariable Long photoCommentId, AuthUser user) {
+        PhotoComment photoComment = photoCommentService.findOne(photoCommentId);
+        Long photoOwnerId = photoComment.getPhoto().getUser().getId();
+        Long commentOwnerId = photoComment.getUser().getId();
+        if (photoComment == null || !(photoOwnerId.equals(user.getUserId()) || commentOwnerId.equals(user.getUserId()))) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        photoCommentService.delete(photoCommentId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
     
     @RequestMapping(value = "/comment/{photoCommentId}/like", method = RequestMethod.PUT)
     @ApiOperation(value = "Like a comment")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Validator errors or if you vote on your own comment")
+        @ApiResponse(code = 400, message = "You vote on your own comment or validation error (bad request)")
     })
     public ResponseEntity<Void> like(@PathVariable Long photoCommentId, AuthUser user) {
         PhotoComment photoComment = photoCommentService.findOne(photoCommentId);
@@ -97,7 +116,7 @@ public class PhotoCommentsController {
     @ApiOperation(value = "Dislike a comment")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
-        @ApiResponse(code = 400, message = "Validator errors or if you vote on your own comment")
+        @ApiResponse(code = 400, message = "You vote on your own comment or validation error (bad request)")
     })
     public ResponseEntity<Void> dislike(@PathVariable Long photoCommentId, AuthUser user) {
         PhotoComment photoComment = photoCommentService.findOne(photoCommentId);
