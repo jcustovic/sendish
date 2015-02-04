@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class PhotoStatisticsDto implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private long likeCount;
     private long dislikeCount;
     private long cityCount;
@@ -20,32 +22,16 @@ public class PhotoStatisticsDto implements Serializable {
         return likeCount;
     }
 
-    public void setLikeCount(long likeCount) {
-        this.likeCount = likeCount;
-    }
-
     public long getDislikeCount() {
         return dislikeCount;
-    }
-
-    public void setDislikeCount(long dislikeCount) {
-        this.dislikeCount = dislikeCount;
     }
 
     public long getCityCount() {
         return cityCount;
     }
 
-    public void setCityCount(long cityCount) {
-        this.cityCount = cityCount;
-    }
-
     public long getCommentCount() {
         return commentCount;
-    }
-
-    public void setCommentCount(long commentCount) {
-        this.commentCount = commentCount;
     }
 
 }

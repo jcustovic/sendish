@@ -1,6 +1,7 @@
 package com.sendish.api.redis.repository;
 
 import com.sendish.api.redis.KeyUtils;
+import com.sendish.api.redis.dto.CommentStatisticsDto;
 import com.sendish.api.redis.dto.PhotoStatisticsDto;
 import com.sendish.api.redis.dto.UserStatisticsDto;
 import org.apache.commons.lang3.ObjectUtils;
@@ -38,6 +39,10 @@ public class RedisStatisticsRepository {
     public void reportPhoto(Long photoId, Long userId) {
         photoStatistics(photoId).increment("reportCount", 1);
         userStatistics(userId).increment("total.reportCount", 1);
+    }
+
+    public void increasePhotoCommentCount(Long photoId) {
+        photoStatistics(photoId).increment("commentCount", 1);
     }
 
     public PhotoStatisticsDto getPhotoStatistics(Long photoId) {
@@ -104,12 +109,37 @@ public class RedisStatisticsRepository {
         return Long.valueOf(userStatistics(userId).get("daily.receivedCount"));
     }
 
+    public void likeComment(Long photoCommentId) {
+        photoCommentStatistics(photoCommentId).increment("likeCount", 1);
+    }
+
+    public void dislikeComment(Long photoCommentId) {
+        photoCommentStatistics(photoCommentId).increment("dislikeCount", 1);
+    }
+
+    public CommentStatisticsDto getCommentStatistics(Long photoCommentId) {
+        List<String> fields = Arrays.asList("likeCount", "dislikeCount");
+        HashOperations<String, String, String> hashOp = template.opsForHash();
+        List<String> values = hashOp.multiGet(KeyUtils.photoCommentStatistics(photoCommentId), fields);
+
+        Long likeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(0), "0"));
+        Long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
+
+        return new CommentStatisticsDto(likeCount, dislikeCount);
+    }
+
+    // Redis objects
+
     private RedisMap<String, String> photoStatistics(Long photoId) {
         return new DefaultRedisMap<>(KeyUtils.photoStatistics(photoId), template);
     }
     
     private RedisMap<String, String> userStatistics(Long userId) {
         return new DefaultRedisMap<>(KeyUtils.userStatistics(userId), template);
+    }
+
+    private RedisMap<String, String> photoCommentStatistics(Long photoCommentId) {
+        return new DefaultRedisMap<>(KeyUtils.photoCommentStatistics(photoCommentId), template);
     }
 
 }

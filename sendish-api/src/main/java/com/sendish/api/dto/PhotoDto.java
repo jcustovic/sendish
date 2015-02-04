@@ -9,6 +9,7 @@ public class PhotoDto extends BaseEntityDto {
     private String timeAgo;
     private String uuid;
     private Long likeCount;
+    private Long dislikeCount;
     private Long cityCount;
     private Long commentCount;
 
@@ -50,6 +51,14 @@ public class PhotoDto extends BaseEntityDto {
 
     public void setLikeCount(Long likeCount) {
         this.likeCount = likeCount;
+    }
+
+    public Long getDislikeCount() {
+        return dislikeCount;
+    }
+
+    public void setDislikeCount(Long dislikeCount) {
+        this.dislikeCount = dislikeCount;
     }
 
     public Long getCityCount() {

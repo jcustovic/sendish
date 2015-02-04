@@ -8,6 +8,7 @@ public final class KeyUtils {
 
     private static final String USER = "user:";
     private static final String PHOTO = "photo:";
+    private static final String PHOTO_COMMENT = "photo:comment:";
     private static final String RANK = "rank:";
 
     /**
@@ -15,6 +16,13 @@ public final class KeyUtils {
      */
     public static String photoStatistics(long photoId) {
         return PHOTO + photoId + ":stat";
+    }
+
+    /**
+     * Hash holding stat properties for comment
+     */
+    public static String photoCommentStatistics(long photoCommentId) {
+        return PHOTO_COMMENT + photoCommentId + ":stat";
     }
 
     /**
