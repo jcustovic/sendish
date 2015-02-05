@@ -4,6 +4,7 @@ import com.sendish.api.dto.*;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.ResizedPhotoServiceImpl;
 import com.sendish.api.service.impl.UserServiceImpl;
+import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.web.controller.model.ValidationError;
 import com.sendish.api.web.controller.validator.LocationBasedFileUploadValidator;
@@ -47,6 +48,9 @@ public class PhotosController {
 
     @Autowired
     private ResizedPhotoServiceImpl resizedPhotoService;
+
+    @Autowired
+    private FileStore fileStore;
 
     @InitBinder("locationBasedFileUpload")
     protected void initBinder(WebDataBinder binder) {
@@ -320,7 +324,7 @@ public class PhotosController {
         }
 
         try {
-            InputStreamResource isr = new InputStreamResource(photoService.getPhotoContent(storageId));
+            InputStreamResource isr = new InputStreamResource(fileStore.getAsInputStream(storageId));
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.valueOf(contentType));
             headers.setContentLength(size);

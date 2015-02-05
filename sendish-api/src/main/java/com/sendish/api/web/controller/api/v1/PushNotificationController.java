@@ -7,7 +7,6 @@ import com.wordnik.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -55,14 +54,11 @@ public class PushNotificationController {
 
     @RequestMapping(value = "/test-push", method = RequestMethod.POST)
     @ApiOperation(value = "Send test notification to all users devices")
-    public final void sendTestNotification(@RequestParam final String message, @RequestParam(required = false) String customFieldName,
-                                           @RequestParam(required = false) String customFieldValue, AuthUser user) {
-        if (customFieldName == null) {
+    public final void sendTestNotification(@RequestParam final String message, @RequestBody Map<String, Object> customFields, AuthUser user) {
+        if (customFields == null || customFields.isEmpty()) {
             notificationProvider.sendPlainTextNotification(message, user.getUserId());
         } else {
-            Map<String, Object> customData = new HashMap<>();
-            customData.put(customFieldName, customFieldValue);
-            notificationProvider.sendPlainTextNotification(message, customData, user.getUserId());
+            notificationProvider.sendPlainTextNotification(message, customFields, user.getUserId());
         }
     }
 

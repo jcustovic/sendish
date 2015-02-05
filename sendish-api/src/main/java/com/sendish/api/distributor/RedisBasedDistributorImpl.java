@@ -19,11 +19,14 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
         Iterator<String> iterator = users.iterator();
         while (iterator.hasNext()) {
             String userId = iterator.next();
-            // STEP 1: Try to lock with timeout
-            // STEP 2: Can we send to that user
-            // STEP 3: Send photo
-            // STEP 4: Remove from list
-            // STEP 5: Unlock
+            // STEP 1: Try to lock (with timeout - 10s?)
+            // STEP 2: Can we send to that user (check all conditions; limits, already received etc.)
+
+            // STEP 3a: No - Unlock!
+            // STEP 4a: Break and try next user.
+
+            // STEP 3b: Yes - Send photo
+            // STEP 4b: Remove from list, keep lock and return!!!
         }
 
         return false;

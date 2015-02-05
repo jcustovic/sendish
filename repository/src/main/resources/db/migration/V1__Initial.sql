@@ -301,3 +301,72 @@ create table push_notification_token (
 );
 
 create index push_notification_token_user_id_idx on push_notification_token (pt_user_id);
+
+-- Image table
+create sequence image_seq;
+
+create table image (
+  i_id int8 not null default nextval('image_seq'),
+  i_uuid varchar(36) not null unique,
+  i_name varchar(128) not null,
+  i_storage_id varchar(200) not null unique,
+  i_width int4 not null,
+  i_height int4 not null,
+  i_size_byte int8 not null,
+  i_content_type varchar(128) not null,
+  i_created_date timestamp not null,
+
+  primary key (i_id)
+);
+
+-- ResizedImage table
+create sequence resized_image_seq;
+
+create table resized_image (
+  ri_id int8 not null default nextval('resized_image_seq'),
+  ri_image_id int8 not null,
+  ri_key varchar(32) not null,
+  ri_storage_id varchar(200) not null unique,
+  ri_width int4 not null,
+  ri_height int4 not null,
+  ri_size_byte int8 not null,
+  ri_created_date timestamp not null,
+
+  primary key (ri_id),
+  constraint resized_image_image_id_fk foreign key (ri_image_id) references image,
+  constraint resized_image_image_key_uq unique (ri_image_id, ri_key)
+);
+
+
+-- InboxMessage table
+create sequence inbox_message_seq;
+
+create table inbox_message (
+  im_id int8 not null default nextval('inbox_message_seq'),
+  im_short_title varchar(64) not null,
+  im_title varchar(256) not null,
+  im_message text not null,
+  im_url varchar(256),
+  im_image_id int8 not null,
+  im_created_date timestamp not null,
+
+  primary key (im_id),
+  constraint inbox_message_image_id_fk foreign key (im_image_id) references image
+);
+
+-- UserInbox table
+create sequence user_inbox_item_seq;
+
+create table user_inbox_item (
+  uii_id int8 not null default nextval('user_inbox_item_seq'),
+  uii_user_id int8 not null,
+  uii_inbox_message_id int8 not null unique,
+  uii_first_opened_date timestamp,
+  uii_deleted boolean not null default false,
+  uii_read boolean not null default false,
+  uii_created_date timestamp not null,
+
+  primary key (uii_id),
+  constraint user_inbox_item_user_id_fk foreign key (uii_user_id) references auth_user,
+  constraint user_inbox_item_inbox_message_id_fk foreign key (uii_inbox_message_id) references inbox_message
+);

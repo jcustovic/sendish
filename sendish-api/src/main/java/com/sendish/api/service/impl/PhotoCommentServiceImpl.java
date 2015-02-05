@@ -2,6 +2,7 @@ package com.sendish.api.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.sendish.api.dto.CommentDto;
 import com.sendish.api.redis.dto.CommentStatisticsDto;
@@ -91,25 +92,24 @@ public class PhotoCommentServiceImpl {
     }
 
     private List<CommentDto> mapToCommentDto(List<PhotoComment> comments) {
-        List<CommentDto> commentDtos = new ArrayList<>(comments.size());
-        for (PhotoComment comment : comments) {
-            CommentDto commentDto = new CommentDto();
-            UserDetails userDetails = comment.getUser().getDetails();
-            commentDto.setId(comment.getId());
-            commentDto.setUserId(userDetails.getUserId());
-            commentDto.setUserName(userDetails.getCurrentCity().getName() + ", " + userDetails.getCurrentCity().getCountry().getName());
-            commentDto.setComment(comment.getComment());
-            commentDto.setTimeAgo(prettyTime.format(comment.getCreatedDate().toDate()));
+        return comments.stream().map(comment -> mapToCommentDto(comment)).collect(Collectors.toList());
+    }
 
-            // TODO: Maybe get from database when we will store it there so we save on trip to Redis.
-            CommentStatisticsDto commentStatistics = statisticsRepository.getCommentStatistics(comment.getId());
-            commentDto.setLikes(commentStatistics.getLikeCount());
-            commentDto.setDislikes(commentStatistics.getDislikeCount());
+    private CommentDto mapToCommentDto(PhotoComment comment) {
+        CommentDto commentDto = new CommentDto();
+        UserDetails userDetails = comment.getUser().getDetails();
+        commentDto.setId(comment.getId());
+        commentDto.setUserId(userDetails.getUserId());
+        commentDto.setUserName(userDetails.getCurrentCity().getName() + ", " + userDetails.getCurrentCity().getCountry().getName());
+        commentDto.setComment(comment.getComment());
+        commentDto.setTimeAgo(prettyTime.format(comment.getCreatedDate().toDate()));
 
-            commentDtos.add(commentDto);
-        }
+        // TODO: Maybe get from database when we will store it there so we save on trip to Redis.
+        CommentStatisticsDto commentStatistics = statisticsRepository.getCommentStatistics(comment.getId());
+        commentDto.setLikes(commentStatistics.getLikeCount());
+        commentDto.setDislikes(commentStatistics.getDislikeCount());
 
-        return commentDtos;
+        return commentDto;
     }
 
     private void voteOnComment(Long photoCommentId, Long userId, boolean like) {

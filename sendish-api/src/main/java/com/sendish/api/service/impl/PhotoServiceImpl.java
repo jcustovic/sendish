@@ -21,16 +21,16 @@ import javax.transaction.Transactional;
 
 import java.awt.*;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class PhotoServiceImpl {
 
-    private static final int PHOTO_PAGE_SIZE = 10;
+    private static final int PHOTO_PAGE_SIZE = 20;
     private static final int PHOTO_LOCATION_PAGE_SIZE = 20;
     
     @Autowired
@@ -101,28 +101,6 @@ public class PhotoServiceImpl {
         return photo.getId();
     }
 
-    private Photo mapToPhoto(LocationBasedFileUpload p_upload, Long p_userId, MultipartFile file) {
-        Photo photo = new Photo();
-        photo.setUser(userRepository.findOne(p_userId));
-        photo.setName(file.getName());
-        photo.setContentType(file.getContentType());
-        photo.setSize(file.getSize());
-        photo.setDescription(p_upload.getDescription());
-        photo.setUuid(UUID.randomUUID().toString());
-
-        return photo;
-    }
-
-    private void createPhotoStatistics(Photo photo) {
-        PhotoStatistics photoStatistics = new PhotoStatistics();
-        photoStatistics.setPhotoId(photo.getId());
-        photoStatisticsRepository.save(photoStatistics);
-    }
-
-    public InputStream getPhotoContent(String fileStoreId) throws ResourceNotFoundException {
-        return fileStore.getAsInputStream(fileStoreId);
-    }
-
     public Photo findReceivedByPhotoUuid(String photoUUID, Long userId) {
         return photoReceiverRepository.findPhotoByUserIdAndPhotoUUID(userId, photoUUID);
     }
@@ -135,14 +113,14 @@ public class PhotoServiceImpl {
         List<Photo> photos = photoRepository.findByUserId(userId, 
         		new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
 
-        return getPhotoDtos(photos);
+        return mapToPhotoDto(photos);
     }
 
     public List<ReceivedPhotoDto> findReceivedByUserId(Long userId, Integer page) {
         List<PhotoReceiver> photos = photoReceiverRepository.findByUserId(userId, 
         		new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
 
-        return getReceivedPhotoDtos(photos);
+        return mapToReceivedPhotoDto(photos);
     }
 
     public PhotoDetailsDto findByIdAndUserId(Long photoId, Long userId) {
@@ -220,7 +198,7 @@ public class PhotoServiceImpl {
     public List<PhotoTraveledDto> getTraveledLocations(Long photoId, Integer page) {
         List<PhotoReceiver> receivedList = photoReceiverRepository.findByPhotoId(photoId, new PageRequest(page, PHOTO_LOCATION_PAGE_SIZE, Direction.DESC, "createdDate"));
 
-        return getPhotoTraveledDtos(receivedList);
+        return mapToPhotoTraveledDto(receivedList);
     }
 
     public void deletePhotoReceiver(Long photoId, Long userId) {
@@ -237,46 +215,46 @@ public class PhotoServiceImpl {
         photoRepository.save(photo);
     }
 
+    private Photo mapToPhoto(LocationBasedFileUpload p_upload, Long p_userId, MultipartFile file) {
+        Photo photo = new Photo();
+        photo.setUser(userRepository.findOne(p_userId));
+        photo.setName(file.getName());
+        photo.setContentType(file.getContentType());
+        photo.setSize(file.getSize());
+        photo.setDescription(p_upload.getDescription());
+        photo.setUuid(UUID.randomUUID().toString());
+
+        return photo;
+    }
+
+    private void createPhotoStatistics(Photo photo) {
+        PhotoStatistics photoStatistics = new PhotoStatistics();
+        photoStatistics.setPhotoId(photo.getId());
+        photoStatisticsRepository.save(photoStatistics);
+    }
+
     private void mapPhotoDetailsDto(Photo photo, PhotoDetailsDto photoDetailsDto) {
         mapToPhotoDto(photo, photoDetailsDto);
 
         photoDetailsDto.setComments(photoCommentService.findFirstByPhotoId(photo.getId(), 3));
     }
 
-    private List<PhotoDto> getPhotoDtos(List<Photo> photos) {
-        if (photos.isEmpty()) {
-            return new ArrayList<>(0);
-        }
-
-        List<PhotoDto> photoDtos = new ArrayList<>(photos.size());
-        for (Photo photo : photos) {
-            photoDtos.add(getPhotoDto(photo));
-        }
-
-        return photoDtos;
+    private List<PhotoDto> mapToPhotoDto(List<Photo> photos) {
+        return photos.stream().map(photo -> mapToPhotoDto(photo)).collect(Collectors.toList());
     }
 
-    private PhotoDto getPhotoDto(Photo photo) {
+    private PhotoDto mapToPhotoDto(Photo photo) {
         PhotoDto photoDto = new PhotoDto();
         mapToPhotoDto(photo, photoDto);
 
         return photoDto;
     }
 
-    private List<ReceivedPhotoDto> getReceivedPhotoDtos(List<PhotoReceiver> photos) {
-        if (photos.isEmpty()) {
-            return new ArrayList<>(0);
-        }
-
-        List<ReceivedPhotoDto> photoDtos = new ArrayList<>(photos.size());
-        for (PhotoReceiver photo : photos) {
-            photoDtos.add(getReceiverPhotoDto(photo));
-        }
-
-        return photoDtos;
+    private List<ReceivedPhotoDto> mapToReceivedPhotoDto(List<PhotoReceiver> photos) {
+        return photos.stream().map(photo -> mapToReceiverPhotoDto(photo)).collect(Collectors.toList());
     }
 
-    private ReceivedPhotoDto getReceiverPhotoDto(PhotoReceiver photo) {
+    private ReceivedPhotoDto mapToReceiverPhotoDto(PhotoReceiver photo) {
         ReceivedPhotoDto photoDto = new ReceivedPhotoDto();
         mapToPhotoDto(photo.getPhoto(), photoDto);
         photoDto.setLike(photo.getLike());
@@ -315,19 +293,18 @@ public class PhotoServiceImpl {
         }
     }
 
-    private List<PhotoTraveledDto> getPhotoTraveledDtos(List<PhotoReceiver> receivedList) {
-        List<PhotoTraveledDto> dtos = new ArrayList<>(receivedList.size());
-        for (PhotoReceiver photoReceiver : receivedList) {
-            PhotoTraveledDto dto = new PhotoTraveledDto();
-            dto.setLiked(photoReceiver.getLike());
-            dto.setLocation(getLocationName(photoReceiver.getCity()));
-            dto.setTimeAgo(prettyTime.format(photoReceiver.getCreatedDate().toDate()));
-            dto.setId(photoReceiver.getId());
+    private List<PhotoTraveledDto> mapToPhotoTraveledDto(List<PhotoReceiver> receivedList) {
+        return receivedList.stream().map(photo -> mapToPhotoTraveledDto(photo)).collect(Collectors.toList());
+    }
 
-            dtos.add(dto);
-        }
+    private PhotoTraveledDto mapToPhotoTraveledDto(PhotoReceiver photoReceiver) {
+        PhotoTraveledDto dto = new PhotoTraveledDto();
+        dto.setLiked(photoReceiver.getLike());
+        dto.setLocation(getLocationName(photoReceiver.getCity()));
+        dto.setTimeAgo(prettyTime.format(photoReceiver.getCreatedDate().toDate()));
+        dto.setId(photoReceiver.getId());
 
-        return dtos;
+        return dto;
     }
 
     private String getLocationName(City city) {

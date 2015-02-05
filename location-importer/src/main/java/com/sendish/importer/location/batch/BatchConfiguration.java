@@ -65,7 +65,7 @@ public class BatchConfiguration {
     public Step cityStep1(StepBuilderFactory stepBuilderFactory, ItemReader<FieldSet> cityItemReader,
                              ItemWriter<City> cityItemWriter, ItemProcessor<FieldSet, City> cityItemProcessor) {
         return stepBuilderFactory.get("cityStep1")
-                .<FieldSet, City> chunk(10)
+                .<FieldSet, City> chunk(500)
                 // .faultTolerant().skipLimit(50).skip(Exception.class)
                 .reader(cityItemReader)
                 .processor(cityItemProcessor)
