@@ -92,6 +92,7 @@ create table auth_user_details (
   aud_current_city_id int8,
   aud_receive_limit_day int4 not null,
   aud_send_limit_day int4 not null,
+  aud_receive_notifications boolean not null default false,
   aud_last_received_time timestamp,
   aud_last_sent_time timestamp,
   aud_receive_allowed_time timestamp,

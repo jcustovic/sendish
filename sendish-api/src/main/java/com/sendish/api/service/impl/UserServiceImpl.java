@@ -1,6 +1,7 @@
 package com.sendish.api.service.impl;
 
 import com.sendish.api.dto.UserProfileDto;
+import com.sendish.api.dto.UserSettingsDto;
 import com.sendish.api.redis.dto.UserStatisticsDto;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.repository.UserDetailsRepository;
@@ -146,6 +147,23 @@ public class UserServiceImpl {
         if (currentCount >= userDetails.getSendLimitPerDay()) {
             userDetails.setSendAllowedTime(photoDate.withTimeAtStartOfDay().plusDays(1));
         }
+
+        userDetailsRepository.save(userDetails);
+    }
+
+    public UserSettingsDto getSettings(Long userId) {
+        UserDetails userDetails = getUserDetails(userId);
+        UserSettingsDto userSettings = new UserSettingsDto();
+        userSettings.setReceiveLimitPerDay(userDetails.getReceiveLimitPerDay());
+        userSettings.setReceiveNotifications(userDetails.getReceiveNotifications());
+
+        return userSettings;
+    }
+
+    public void updateSettings(UserSettingsDto userSettings, Long userId) {
+        UserDetails userDetails = getUserDetails(userId);
+        userDetails.setReceiveLimitPerDay(userSettings.getReceiveLimitPerDay());
+        userDetails.setReceiveNotifications(userSettings.getReceiveNotifications());
 
         userDetailsRepository.save(userDetails);
     }

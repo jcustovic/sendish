@@ -49,6 +49,9 @@ public class UserDetails implements Serializable, LocationAware {
     @Column(name = "aud_send_limit_day", nullable = false)
     private Integer sendLimitPerDay;
 
+    @Column(name = "aud_receive_notifications", nullable = false)
+    private Boolean receiveNotifications = true;
+
     @Column(name = "aud_last_received_time")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime lastReceivedTime;
@@ -132,6 +135,14 @@ public class UserDetails implements Serializable, LocationAware {
 
     public void setSendLimitPerDay(Integer sendLimitPerDay) {
         this.sendLimitPerDay = sendLimitPerDay;
+    }
+
+    public Boolean getReceiveNotifications() {
+        return receiveNotifications;
+    }
+
+    public void setReceiveNotifications(Boolean receiveNotifications) {
+        this.receiveNotifications = receiveNotifications;
     }
 
     public DateTime getLastReceivedTime() {
