@@ -19,4 +19,6 @@ public interface UserPool {
 
     void put(List<UserWithScore> users);
 
+    void remove(String userId);
+
 }

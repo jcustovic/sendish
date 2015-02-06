@@ -14,11 +14,12 @@ public class UserStatisticsDto implements Serializable {
     private long unseenPhotoCount;
     private long dailySendCount;
 
-    public UserStatisticsDto(long totalLikeCount, long totalDislikeCount, long totalReportCount, long dailySendCount) {
+    public UserStatisticsDto(long totalLikeCount, long totalDislikeCount, long totalReportCount, long dailySendCount, Long unseenPhotoCount) {
         this.totalLikeCount = totalLikeCount;
         this.totalDislikeCount = totalDislikeCount;
         this.totalReportCount = totalReportCount;
         this.dailySendCount = dailySendCount;
+        this.unseenPhotoCount = unseenPhotoCount;
     }
 
     public long getRank() {

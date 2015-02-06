@@ -1,5 +1,6 @@
 package com.sendish.api.distributor;
 
+import com.sendish.api.redis.KeyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundZSetOperations;
 import org.springframework.data.redis.core.DefaultTypedTuple;
@@ -19,7 +20,7 @@ public class RedisUserPool implements UserPool {
 
     @Autowired
     public RedisUserPool(StringRedisTemplate template) {
-        userPool = template.boundZSetOps("pool.users");
+        userPool = template.boundZSetOps(KeyUtils.usersPool());
     }
 
     @Override
@@ -66,6 +67,11 @@ public class RedisUserPool implements UserPool {
     @Override
     public void put(List<UserWithScore> users) {
         userPool.add(getTuple(users));
+    }
+
+    @Override
+    public void remove(String userId) {
+        userPool.remove(userId);
     }
 
     private Set<ZSetOperations.TypedTuple<String>> getTuple(List<UserWithScore> users) {

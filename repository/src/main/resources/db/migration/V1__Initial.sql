@@ -228,6 +228,7 @@ create table photo_sending_details (
   psd_last_photo_rec_id int8 null,
   psd_photo_status varchar(9) not null,
   psd_send_status varchar(7) null,
+  psd_version int4,
 
   primary key (psd_photo_id),
   constraint photo_sending_details_photo_id_fk foreign key (psd_photo_id) references photo,

@@ -1,10 +1,10 @@
 package com.sendish.api.service.impl;
 
 import com.sendish.api.dto.*;
+import com.sendish.api.redis.KeyUtils;
 import com.sendish.api.redis.dto.PhotoStatisticsDto;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.api.store.FileStore;
-import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.util.ImageUtils;
 import com.sendish.repository.*;
 import com.sendish.repository.model.jpa.*;
@@ -14,6 +14,8 @@ import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.redis.core.BoundSetOperations;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,6 +62,12 @@ public class PhotoServiceImpl {
     @Autowired
     private RedisStatisticsRepository statisticsRepository;
 
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private AsyncPhotoSenderServiceImpl photoSenderService;
+
     private static PrettyTime prettyTime = new PrettyTime();
 
     public Photo findOne(Long photoId) {
@@ -96,7 +104,7 @@ public class PhotoServiceImpl {
         photo = photoRepository.save(photo);
         createPhotoStatistics(photo);
         userService.updateStatisticsForNewSentPhoto(p_userId, receivedDate, location, city);
-        // TODO: Distribute new image and create PhotoSendingDetails
+        photoSenderService.sendNewPhoto(photo.getId());
 
         return photo.getId();
     }
@@ -139,7 +147,7 @@ public class PhotoServiceImpl {
         return photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
     }
 
-    public ReceivedPhotoDetailsDto findReceivedByPhotoIdAndUserId(Long photoId, Long userId, BigDecimal longitude, BigDecimal latitude) {
+    public ReceivedPhotoDetailsDto openReceivedByPhotoIdAndUserId(Long photoId, Long userId, BigDecimal longitude, BigDecimal latitude) {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
         if (photoReceiver == null) {
             return null;
@@ -151,6 +159,7 @@ public class PhotoServiceImpl {
             photoReceiver.setOpenedLocation(location);
             photoReceiver.setCity(cityService.findNearest(location.getLatitude(), location.getLongitude()));
             photoReceiverRepository.save(photoReceiver);
+            statisticsRepository.decrementUnseenCount(userId);
         }
 
         ReceivedPhotoDetailsDto photoDetailsDto = new ReceivedPhotoDetailsDto();
@@ -168,6 +177,7 @@ public class PhotoServiceImpl {
             photoReceiver.setLike(true);
             photoReceiverRepository.save(photoReceiver);
 
+            photoSenderService.resendPhoto(photoId);
             statisticsRepository.likePhoto(photoId, photoReceiver.getPhoto().getUser().getId());
         }
     }
@@ -177,9 +187,11 @@ public class PhotoServiceImpl {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
         if (photoReceiver.getLike() == null) {
             photoReceiver.setLike(false);
+            photoReceiver.setDeleted(true);
             photoReceiverRepository.save(photoReceiver);
 
             statisticsRepository.dislikePhoto(photoId, photoReceiver.getPhoto().getUser().getId());
+            // TODO: Logic when to stop photo from traveling
         }
     }
 
@@ -189,6 +201,7 @@ public class PhotoServiceImpl {
             photoReceiver.setReport(true);
             photoReceiver.setReportType(reason);
             photoReceiver.setReportText(reasonText);
+            photoReceiver.setDeleted(true);
             photoReceiverRepository.save(photoReceiver);
 
             statisticsRepository.reportPhoto(photoId, photoReceiver.getPhoto().getUser().getId());
@@ -213,6 +226,29 @@ public class PhotoServiceImpl {
         photo.setDeleted(true);
 
         photoRepository.save(photo);
+    }
+
+    public boolean hasAlreadyReceivedPhoto(Long photoId, Long userId) {
+        return usersReceivedPhotos(userId).isMember(photoId.toString());
+    }
+
+    public PhotoReceiver sendPhotoToUser(Long photoId, Long userId) {
+        UserDetails userDetails = userService.getUserDetails(userId);
+        Photo photo = photoRepository.findOne(photoId);
+
+        PhotoReceiver photoReceiver = new PhotoReceiver();
+        photoReceiver.setUser(userDetails.getUser());
+        photoReceiver.setPhoto(photo);
+        photoReceiverRepository.save(photoReceiver);
+
+        userDetails.setLastReceivedTime(DateTime.now());
+        userService.saveUserDetails(userDetails);
+
+        // TODO: Send notification
+        usersReceivedPhotos(userId).add(photoId.toString());
+        statisticsRepository.incrementUnseenCount(userId);
+
+        return photoReceiver;
     }
 
     private Photo mapToPhoto(LocationBasedFileUpload p_upload, Long p_userId, MultipartFile file) {
@@ -309,6 +345,10 @@ public class PhotoServiceImpl {
 
     private String getLocationName(City city) {
         return city.getName() + ", " + city.getCountry().getName();
+    }
+
+    public BoundSetOperations<String, String> usersReceivedPhotos(long userId) {
+        return redisTemplate.boundSetOps(KeyUtils.userReceivedPhotos(userId));
     }
 
 }

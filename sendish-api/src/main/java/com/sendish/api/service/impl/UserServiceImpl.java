@@ -23,6 +23,7 @@ public class UserServiceImpl {
 
     public static final int DEFAULT_SEND_LIMIT_PER_DAY = 20;
     public static final int DEFAULT_RECEIVE_LIMIT_PER_DAY = 50;
+    public static final int MINUTES_BETWEEN_RECEIVED_PHOTOS = 15;
 
     @Autowired
     private UserRepository userRepository;
@@ -44,6 +45,10 @@ public class UserServiceImpl {
 
     public UserDetails getUserDetails(Long userId) {
         return userDetailsRepository.findOne(userId);
+    }
+
+    public UserDetails saveUserDetails(UserDetails userDetails) {
+        return userDetailsRepository.save(userDetails);
     }
 
     public User createUser(String username, String email, String password, String nickname, boolean emailRegistration) {
@@ -166,6 +171,13 @@ public class UserServiceImpl {
         userDetails.setReceiveNotifications(userSettings.getReceiveNotifications());
 
         userDetailsRepository.save(userDetails);
+    }
+
+    public boolean canReceivePhoto(Long userId) {
+        UserDetails userDetails = getUserDetails(userId);
+
+        return userDetails.getLastReceivedTime().isAfter(DateTime.now().minusMinutes(MINUTES_BETWEEN_RECEIVED_PHOTOS))
+                && userDetails.getReceiveAllowedTime().isAfterNow();
     }
 
 }

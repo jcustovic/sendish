@@ -10,6 +10,7 @@ public final class KeyUtils {
     private static final String PHOTO = "photo:";
     private static final String PHOTO_COMMENT = "photo:comment:";
     private static final String RANK = "rank:";
+    private static final String USERS_POOL = "pool:users";
 
     /**
      * Hash holding stat properties for photo
@@ -58,6 +59,14 @@ public final class KeyUtils {
      */
     public static String globalRanking() {
         return RANK + ":global";
+    }
+
+    public static String usersPool() {
+        return USERS_POOL;
+    }
+
+    public static String usersPoolLock(long userId) {
+        return USERS_POOL + ":" + userId + ":lock";
     }
 
 }

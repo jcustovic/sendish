@@ -82,7 +82,7 @@ public class PhotosController {
             }
         }
 
-        ReceivedPhotoDetailsDto photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId(), location.getLongitude(), location.getLatitude());
+        ReceivedPhotoDetailsDto photo = photoService.openReceivedByPhotoIdAndUserId(photoId, user.getUserId(), location.getLongitude(), location.getLatitude());
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {

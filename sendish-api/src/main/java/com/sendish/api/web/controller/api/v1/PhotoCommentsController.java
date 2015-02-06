@@ -39,15 +39,17 @@ public class PhotoCommentsController {
     @RequestMapping(value = "/{photoId}/comments", method = RequestMethod.GET)
     @ApiOperation(value = "Get comments for a specific photo")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Photo not found")
     })
-    public List<CommentDto> list(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page) {
+    public ResponseEntity<List<CommentDto>> list(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page) {
         Photo photo = photoService.findOne(photoId);
         if (photo == null) {
-            new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        List<CommentDto> comments = photoCommentService.findByPhotoId(photoId, page);
 
-    	return photoCommentService.findByPhotoId(photoId, page);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
     }
     
 	@RequestMapping(value = "/{photoId}", method = RequestMethod.POST)
@@ -56,10 +58,14 @@ public class PhotoCommentsController {
     	@ApiResponse(code = 200, message = "NOT USED! 201 will be returned", response = Void.class),
         @ApiResponse(code = 201, message = "Comment created")
     })
-    public ResponseEntity<Void> newComment(@PathVariable Long photoId, @RequestParam String comment, AuthUser user) {
+    public ResponseEntity<String> newComment(@PathVariable Long photoId, @RequestParam String comment, AuthUser user) {
         Photo photo = photoService.findOne(photoId);
         if (photo == null) {
-            new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (comment.length() > 128) {
+            return new ResponseEntity<>("Comment to long. Max 128 characters allowed", HttpStatus.BAD_REQUEST);
         }
 
         PhotoComment photoComment = photoCommentService.save(photoId, comment, user.getUserId());

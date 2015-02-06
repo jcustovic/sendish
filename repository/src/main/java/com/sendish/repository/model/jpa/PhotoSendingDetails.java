@@ -29,6 +29,10 @@ public class PhotoSendingDetails implements Serializable {
     @JoinColumn(name = "psd_last_photo_rec_id")
     private PhotoReceiver lastReceiver;
 
+    @Version
+    @Column(name = "psd_version")
+    private Integer version;
+
     public Long getPhotoId() {
         return photoId;
     }
@@ -67,6 +71,10 @@ public class PhotoSendingDetails implements Serializable {
 
     public void setLastReceiver(PhotoReceiver lastReceiver) {
         this.lastReceiver = lastReceiver;
+    }
+
+    public Integer getVersion() {
+        return version;
     }
 
 }

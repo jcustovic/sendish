@@ -1,7 +1,9 @@
 package com.sendish.api.distributor;
 
+import com.sendish.repository.model.jpa.PhotoReceiver;
+
 public interface PhotoDistributor {
 
-    boolean sendPhoto(Long photoId);
+    PhotoReceiver sendPhoto(Long photoId);
 
 }

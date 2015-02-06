@@ -26,14 +26,14 @@ public class RedisStatisticsRepository {
     // or photo stops traveling etc. ... UserStatisticsRepository.java, PhotoStatisticsRepository.java
     // TODO: Photo & User keep track of all the cities
 
-    public void likePhoto(Long photoId, Long userId) {
+    public Long likePhoto(Long photoId, Long userId) {
         photoStatistics(photoId).increment("likeCount", 1);
-        userStatistics(userId).increment("total.likeCount", 1);
+        return userStatistics(userId).increment("total.likeCount", 1);
     }
 
-    public void dislikePhoto(Long photoId, Long userId) {
+    public Long dislikePhoto(Long photoId, Long userId) {
         photoStatistics(photoId).increment("dislikeCount", 1);
-        userStatistics(userId).increment("total.dislikeCount", 1);
+        return userStatistics(userId).increment("total.dislikeCount", 1);
     }
 
     public void reportPhoto(Long photoId, Long userId) {
@@ -59,7 +59,7 @@ public class RedisStatisticsRepository {
     }
 
     public UserStatisticsDto getUserStatistics(Long userId) {
-        List<String> fields = Arrays.asList("total.likeCount", "total.dislikeCount", "total.reportCount", "daily.sentCount");
+        List<String> fields = Arrays.asList("total.likeCount", "total.dislikeCount", "total.reportCount", "daily.sentCount", "total.unseenPhotoCount");
         HashOperations<String, String, String> hashOp = template.opsForHash();
         List<String> values = hashOp.multiGet(KeyUtils.userStatistics(userId), fields);
 
@@ -67,8 +67,9 @@ public class RedisStatisticsRepository {
         Long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
         Long reportCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
         Long dailySentCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
+        Long unseenPhotoCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(4), "0"));
 
-        return new UserStatisticsDto(likeCount, dislikeCount, reportCount, dailySentCount);
+        return new UserStatisticsDto(likeCount, dislikeCount, reportCount, dailySentCount, unseenPhotoCount);
     }
 
     public Long increaseDailySentPhotoCount(Long userId, LocalDate date) {
@@ -126,6 +127,14 @@ public class RedisStatisticsRepository {
         Long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
 
         return new CommentStatisticsDto(likeCount, dislikeCount);
+    }
+
+    public void incrementUnseenCount(Long userId) {
+        userStatistics(userId).increment("total.unseenPhotoCount", 1);
+    }
+
+    public void decrementUnseenCount(Long userId) {
+        userStatistics(userId).increment("total.unseenPhotoCount", -1);
     }
 
     // Redis objects
