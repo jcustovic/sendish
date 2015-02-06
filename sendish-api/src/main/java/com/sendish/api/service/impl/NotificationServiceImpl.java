@@ -34,6 +34,10 @@ public class NotificationServiceImpl {
         return notificationMessageRepository.save(p_notification);
     }
 
+    public ApnsPushToken findApnsToken(String p_token, Long p_userId) {
+        return apnsPushTokenRepository.findByTokenAndUserId(p_token, p_userId);
+    }
+
     public void registerApns(String p_token, Long p_userId, boolean p_devToken) {
         ApnsPushToken token = apnsPushTokenRepository.findByToken(p_token);
 
@@ -51,6 +55,10 @@ public class NotificationServiceImpl {
 
     private User getUser(Long p_userId) {
         return userRepository.findOne(p_userId);
+    }
+
+    public GcmPushToken findGcmToken(String p_token, Long p_userId) {
+        return gcmPushTokenRepository.findByTokenAndUserId(p_token, p_userId);
     }
 
     public void registerGcm(String p_token, Long p_userId) {

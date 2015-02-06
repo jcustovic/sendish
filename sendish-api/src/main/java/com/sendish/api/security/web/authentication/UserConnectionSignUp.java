@@ -1,7 +1,5 @@
 package com.sendish.api.security.web.authentication;
 
-import java.util.UUID;
-
 import com.sendish.api.service.impl.UserServiceImpl;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.User;
@@ -13,9 +11,11 @@ import org.springframework.social.connect.ConnectionSignUp;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
+
 public class UserConnectionSignUp implements ConnectionSignUp {
 
-    private static final Logger          LOG = LoggerFactory.getLogger(UserConnectionSignUp.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UserConnectionSignUp.class);
 
     @Autowired
     private UserServiceImpl userService;

@@ -12,21 +12,21 @@ public interface GcmPushTokenRepository extends PushTokenRepository<GcmPushToken
 
     GcmPushToken findByToken(String p_token);
 
-    GcmPushToken findByTokenAndUserId(String p_token, Long p_user);
+    GcmPushToken findByTokenAndUserId(String token, Long userId);
 
     @Modifying
     @Transactional
     @Query("DELETE GcmPushToken gcm WHERE gcm.token IN ?1")
-    void deleteByTokens(Collection<String> p_tokens);
+    void deleteByTokens(Collection<String> tokens);
 
     @Modifying
     @Transactional
     @Query("DELETE GcmPushToken gcm WHERE gcm.token = ?1")
-    void deleteByToken(String p_token);
+    void deleteByToken(String token);
 
     @Modifying
     @Transactional
     @Query("UPDATE GcmPushToken gcm SET gcm.token = ?2 WHERE gcm.token = ?1")
-    void updateToken(String p_oldToken, String p_newToken);
+    void updateToken(String oldToken, String newToken);
 
 }

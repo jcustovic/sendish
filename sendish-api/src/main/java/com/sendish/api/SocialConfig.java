@@ -1,5 +1,6 @@
 package com.sendish.api;
 
+import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.security.web.authentication.UserConnectionSignUp;
 import com.sendish.api.social.connect.JpaUsersConnectionRepository;
 
@@ -50,10 +51,9 @@ public class SocialConfig {
             SecurityContext context = SecurityContextHolder.getContext();
             Authentication authentication = context.getAuthentication();
             Assert.state(authentication != null, "Unable to get a " + "ConnectionRepository: no user signed in");
+            AuthUser authUser = (AuthUser) authentication.getPrincipal();
 
-            // TODO: get Principal User id
-            //return authentication.getName();
-            return "1";
+            return authUser.getUserId().toString();
         }
 
     }
