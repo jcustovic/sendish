@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 @Configuration
-@EnableScheduling
+//@EnableScheduling
 public class SchedulingConfig implements SchedulingConfigurer {
     
 	@Override

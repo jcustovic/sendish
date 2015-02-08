@@ -59,15 +59,16 @@ public class RedisStatisticsRepository {
     }
 
     public UserStatisticsDto getUserStatistics(Long userId) {
-        List<String> fields = Arrays.asList("total.likeCount", "total.dislikeCount", "total.reportCount", "daily.sentCount", "total.unseenPhotoCount");
+        List<String> fields = Arrays.asList("total.likeCount", "total.dislikeCount", "total.reportCount", "total.unseenPhotoCount");
         HashOperations<String, String, String> hashOp = template.opsForHash();
         List<String> values = hashOp.multiGet(KeyUtils.userStatistics(userId), fields);
 
         Long likeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(0), "0"));
         Long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
         Long reportCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
-        Long dailySentCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
-        Long unseenPhotoCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(4), "0"));
+        Long unseenPhotoCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
+        
+        Long dailySentCount = getDailySentCount(userId, LocalDate.now());
 
         return new UserStatisticsDto(likeCount, dislikeCount, reportCount, dailySentCount, unseenPhotoCount);
     }

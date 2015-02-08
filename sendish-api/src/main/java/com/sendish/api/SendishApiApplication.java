@@ -10,15 +10,13 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableConfigurationProperties
 @EntityScan(basePackages = "com.sendish.repository.model.jpa")
 @EnableJpaRepositories(basePackages = "com.sendish.repository")
-@EnableConfigurationProperties
 @EnableCaching
 @EnableAsync
-@EnableScheduling
 public class SendishApiApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendishApiApplication.class);
