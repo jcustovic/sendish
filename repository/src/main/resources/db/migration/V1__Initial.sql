@@ -79,8 +79,8 @@ create table user_social_connection (
   constraint user_social_connection_upr_uq unique (usc_user_id, usc_provider_id, usc_rank)
 );
 
-create INDEX oauth2_search_idx on user_social_connection (usc_provider_id, usc_access_token, usc_refresh_token);
-create INDEX oauth1_search_idx on user_social_connection (usc_provider_id, usc_access_token, usc_secret);
+create index oauth2_search_idx on user_social_connection (usc_provider_id, usc_access_token, usc_refresh_token);
+create index oauth1_search_idx on user_social_connection (usc_provider_id, usc_access_token, usc_secret);
 
 -- UserDetails table
 create table auth_user_details (
@@ -104,6 +104,9 @@ create table auth_user_details (
   constraint auth_user_status_city_id_fk foreign key (aud_current_city_id) references city
 );
 
+create index auth_user_details_user_idx on auth_user_details (aud_user_id);
+create index auth_user_details_current_city_idx on auth_user_details (aud_current_city_id);
+
 -- UserStatistics table
 create table auth_user_statistics (
   aus_user_id int8 not null,
@@ -117,6 +120,8 @@ create table auth_user_statistics (
   primary key (aus_user_id),
   constraint auth_user_statistics_user_id_fk foreign key (aus_user_id) references auth_user
 );
+
+create index auth_user_statistics_user_idx on auth_user_statistics (aus_user_id);
 
 -- Photo table
 create sequence photo_seq;
@@ -166,6 +171,9 @@ create table resized_photo (
   constraint resized_photo_photo_key_uq unique (rp_photo_id, rp_key)
 );
 
+create index resized_photo_photo_idx on resized_photo (rp_photo_id);
+create index resized_photo_photo_key_idx on resized_photo (rp_photo_id, rp_key);
+
 -- PhotoComment table
 create sequence photo_comment_seq;
 
@@ -185,6 +193,9 @@ create table photo_comment (
   constraint photo_comment_photo_id_fk foreign key (pc_photo_id) references photo
 );
 
+create index photo_comment_user_idx on photo_comment (pc_user_id);
+create index photo_comment_photo_idx on photo_comment (pc_photo_id);
+
 -- PhotoCommentVote table
 create table photo_comment_vote (
   pcv_pc_id int8 not null,
@@ -196,6 +207,9 @@ create table photo_comment_vote (
   constraint photo_comment_vote_user_id_fk foreign key (pcv_user_id) references auth_user,
   constraint photo_comment_vote_photo_comment_id_fk foreign key (pcv_pc_id) references photo_comment
 );
+
+create index photo_comment_vote_user_idx on photo_comment_vote (pcv_user_id);
+create index photo_comment_vote_photo_comment_idx on photo_comment_vote (pcv_pc_id);
 
 -- PhotoReceiver table
 create sequence photo_receiver_seq;
@@ -222,6 +236,10 @@ create table photo_receiver (
   constraint photo_receiver_city_id_fk foreign key (pr_city_id) references city
 );
 
+create index photo_receiver_user_idx on photo_receiver (pr_user_id);
+create index photo_receiver_photo_idx on photo_receiver (pr_photo_id);
+create index photo_receiver_city_idx on photo_receiver (pr_city_id);
+
 -- PhotoSendingDetails table
 create table photo_sending_details (
   psd_photo_id int8 not null,
@@ -234,6 +252,8 @@ create table photo_sending_details (
   constraint photo_sending_details_photo_id_fk foreign key (psd_photo_id) references photo,
   constraint photo_sending_details_photo_receiver_id_fk foreign key (psd_last_photo_rec_id) references photo_receiver
 );
+
+create index photo_sending_details_photo_idx on photo_sending_details (psd_photo_id);
 
 -- PhotoStatistics table
 create table photo_statistics (
@@ -250,6 +270,8 @@ create table photo_statistics (
   primary key (pst_photo_id),
   constraint photo_statistics_photo_id_fk foreign key (pst_photo_id) references photo
 );
+
+create index photo_statistics_photo_idx on photo_statistics (pst_photo_id);
 
 -- Push notifications related tables
 create sequence notification_message_seq;
@@ -339,6 +361,8 @@ create table resized_image (
   constraint resized_image_image_key_uq unique (ri_image_id, ri_key)
 );
 
+create index resized_image_image_idx on resized_image (ri_image_id);
+create index resized_image_image_key_idx on resized_image (ri_image_id, ri_key);
 
 -- InboxMessage table
 create sequence inbox_message_seq;
@@ -372,3 +396,5 @@ create table user_inbox_item (
   constraint user_inbox_item_user_id_fk foreign key (uii_user_id) references auth_user,
   constraint user_inbox_item_inbox_message_id_fk foreign key (uii_inbox_message_id) references inbox_message
 );
+
+create index user_inbox_item_user_idx on user_inbox_item (uii_user_id);

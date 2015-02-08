@@ -15,7 +15,7 @@ public interface PhotoReceiverRepository extends JpaRepository<PhotoReceiver, Lo
     @Query("SELECT pr.photo FROM PhotoReceiver pr WHERE pr.user.id = ?1 AND pr.photo.uuid = ?2 AND pr.deleted = false")
     Photo findPhotoByUserIdAndPhotoUUID(Long userId, String photoUUID);
 
-    @Query("SELECT pr FROM PhotoReceiver pr WHERE pr.user.id = ?1 AND pr.deleted = false")
+    @Query("SELECT pr FROM PhotoReceiver pr LEFT JOIN FETCH pr.photo LEFT JOIN FETCH pr.city WHERE pr.user.id = ?1 AND pr.deleted = false")
     List<PhotoReceiver> findByUserId(Long userId, Pageable pageRequest);
 
     @Query("SELECT pr FROM PhotoReceiver pr WHERE pr.photo.id = ?1 AND pr.user.id = ?2 AND pr.deleted = false")
