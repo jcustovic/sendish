@@ -30,7 +30,7 @@ public class PhotoSenderServiceImpl {
 
         Photo photo = photoRepository.findOne(photoId);
         photoSendingDetails = new PhotoSendingDetails();
-        photoSendingDetails.setPhoto(photo);
+        photoSendingDetails.setPhotoId(photo.getId());
 
         PhotoReceiver result = photoDistributor.sendPhoto(photoId);
         if (result == null) {

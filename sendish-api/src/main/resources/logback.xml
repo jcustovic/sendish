@@ -47,8 +47,8 @@
     <logger name="com.notnoop.apns" level="warn" />
 
     <logger name="org.hibernate.SQL" level="trace" />
-    <logger name="org.hibernate.stat.Statistics" level="trace" />
     <!--
+    <logger name="org.hibernate.stat.Statistics" level="trace" />
     <logger name="org.hibernate.cache" level="trace" />
     <logger name="net.sf.ehcache" level="trace" />
     -->
