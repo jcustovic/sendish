@@ -116,7 +116,7 @@ public class UserServiceImpl {
     }
 
     private Long getSentLimitLeft(UserDetails userDetails, UserStatisticsDto userStatistics) {
-        return userDetails.getReceiveLimitPerDay() - userStatistics.getDailySendCount();
+        return userDetails.getSendLimitPerDay() - userStatistics.getDailySendCount();
     }
 
     public Location getLastLocation(Long userId) {

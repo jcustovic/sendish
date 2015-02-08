@@ -1,6 +1,9 @@
 package com.sendish.repository.model.jpa;
 
 import com.sendish.repository.model.jpa.listener.LocationListener;
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
@@ -17,6 +20,7 @@ public class PhotoReceiver extends BaseEntity {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "pr_photo_id")
+    @Fetch(FetchMode.JOIN)
     private Photo photo;
 
     @ManyToOne(optional = false)
