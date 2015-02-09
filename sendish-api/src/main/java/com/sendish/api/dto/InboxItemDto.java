@@ -9,6 +9,7 @@ public class InboxItemDto extends BaseEntityDto {
     private String message;
     private String imageUuid;
     private String url;
+    private String urlText;
     private Boolean read;
     private String timeAgo;
 
@@ -53,8 +54,16 @@ public class InboxItemDto extends BaseEntityDto {
     public void setUrl(String url) {
         this.url = url;
     }
+    
+    public String getUrlText() {
+		return urlText;
+	}
 
-    public Boolean getRead() {
+	public void setUrlText(String urlText) {
+		this.urlText = urlText;
+	}
+
+	public Boolean getRead() {
         return read;
     }
 
