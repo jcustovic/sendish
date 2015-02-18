@@ -3,6 +3,7 @@ package com.sendish.api.service.impl;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.thumbnailator.filter.GaussianBlurFilter;
+import com.sendish.api.util.RetryUtils;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.ResizedPhotoRepository;
 import com.sendish.repository.model.jpa.Photo;
@@ -14,6 +15,7 @@ import net.coobird.thumbnailator.filters.ImageFilter;
 import net.coobird.thumbnailator.geometry.Positions;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -37,6 +39,8 @@ public class ResizedPhotoServiceImpl {
         KEY_SIZE_MAP.put("list_small", new int[] { 160, 80 }); // Aspect 2:1 (4x smaller)
         KEY_SIZE_MAP.put("list_medium_blur", new int[] { 320, 160 }); // Aspect 2:1 (2x smaller) blur effect
         KEY_SIZE_MAP.put("list_small_blur", new int[] { 160, 80 }); // Aspect 2:1 (4x smaller) blur effect
+        KEY_SIZE_MAP.put("list_square_small", new int[] { 80, 80 });
+        KEY_SIZE_MAP.put("list_square_small_blur", new int[] { 80, 80 });
     }
 
     private final ImageFilter blurFilter = new GaussianBlurFilter(20);
@@ -51,15 +55,17 @@ public class ResizedPhotoServiceImpl {
     private FileStore fileStore;
 
     public ResizedPhoto getResizedPhoto(Long photoId, String sizeKey) {
-        ResizedPhoto resizedPhoto = resizedPhotoRepository.findByUuidAndKey(photoId, sizeKey);
-        if (resizedPhoto == null) {
-            resizedPhoto = resize(photoId, sizeKey);
-        }
-
-        return resizedPhoto;
+    	return RetryUtils.retry(() -> {
+    		ResizedPhoto resizedPhoto = resizedPhotoRepository.findByUuidAndKey(photoId, sizeKey);
+            if (resizedPhoto == null) {
+            	resizedPhoto = resize(photoId, sizeKey);	
+            }
+            
+            return resizedPhoto;
+    	}, 3, 10);
     }
 
-    private ResizedPhoto resize(Long photoId, String sizeKey) {
+    private ResizedPhoto resize(Long photoId, String sizeKey) throws DataIntegrityViolationException {
         Photo photo = photoRepository.findOne(photoId);
         InputStream originalIS = null;
         try {

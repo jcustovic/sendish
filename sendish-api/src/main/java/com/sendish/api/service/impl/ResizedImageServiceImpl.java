@@ -2,16 +2,20 @@ package com.sendish.api.service.impl;
 
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
+import com.sendish.api.util.RetryUtils;
 import com.sendish.repository.ImageRepository;
 import com.sendish.repository.ResizedImageRepository;
 import com.sendish.repository.model.jpa.Image;
 import com.sendish.repository.model.jpa.ResizedImage;
+
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.Thumbnails.Builder;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,7 +31,7 @@ public class ResizedImageServiceImpl {
 
     static {
         KEY_SIZE_MAP = new HashMap<>();
-        KEY_SIZE_MAP.put("square_small", new int[] {60, 60 });
+        KEY_SIZE_MAP.put("square_small", new int[] { 60, 60 });
     }
 
     @Autowired
@@ -40,14 +44,16 @@ public class ResizedImageServiceImpl {
     private FileStore fileStore;
 
     public ResizedImage getResizedImage(Long imageId, String sizeKey) {
-        ResizedImage resizedImage = resizedImageRepository.findByUuidAndKey(imageId, sizeKey);
-        if (resizedImage == null) {
-            resizedImage = resize(imageId, sizeKey);
-        }
-
-        return resizedImage;
+    	return RetryUtils.retry(() -> {
+    		ResizedImage resizedImage = resizedImageRepository.findByUuidAndKey(imageId, sizeKey);
+	        if (resizedImage == null) {
+	            resizedImage = resize(imageId, sizeKey);
+	        }
+	
+	        return resizedImage;
+    	}, 3, 10);
     }
-
+    
     private ResizedImage resize(Long imageId, String sizeKey) {
         Image image = imageRepository.findOne(imageId);
         InputStream originalIS = null;

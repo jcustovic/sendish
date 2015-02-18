@@ -34,6 +34,8 @@ public class PhotoSenderServiceImpl {
 
         PhotoReceiver result = photoDistributor.sendPhoto(photoId);
         if (result == null) {
+        	result = new PhotoReceiver();
+        	result.setPhoto(photoSendingDetails.getPhoto());
             photoSendingDetails.setPhotoStatus(PhotoStatus.NEW);
             photoSendingDetails.setSendStatus(PhotoSendStatus.NO_USER);
         } else {
@@ -53,6 +55,8 @@ public class PhotoSenderServiceImpl {
 
         PhotoReceiver result = photoDistributor.sendPhoto(photoId);
         if (result == null) {
+        	result = new PhotoReceiver();
+        	result.setPhoto(photoSendingDetails.getPhoto());
             photoSendingDetails.setSendStatus(PhotoSendStatus.NO_USER);
         } else {
             photoSendingDetails.setSendStatus(PhotoSendStatus.SENT);
