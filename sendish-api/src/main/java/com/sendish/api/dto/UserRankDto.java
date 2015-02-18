@@ -6,15 +6,27 @@ public class UserRankDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Long userId;
     private String name;
     private String rank;
     private Long points;
     
-    public UserRankDto(String name, String rank, Long points) {
+    public UserRankDto(Long userId, String name, String rank, Long points) {
 		super();
+		this.userId = userId;
 		this.name = name;
 		this.rank = rank;
 		this.points = points;
+	}
+    
+    // Getters & setters
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 
 	public String getName() {

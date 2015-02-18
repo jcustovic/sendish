@@ -193,7 +193,7 @@ public class UserServiceImpl {
     }
 
 	public List<UserRankDto> getTopRank() {
-		// TODO: Implement real ranking from redis
+		// TODO: Implement real ranking from Redis
 		Page<User> users = userRepository.findAll(new PageRequest(0, 100, Sort.Direction.DESC, "createdDate"));
 		List<UserRankDto> topUsers = new ArrayList<UserRankDto>();
 		int i = 0;
@@ -204,7 +204,7 @@ public class UserServiceImpl {
 			} else {
 				username = getUserPlaceName(user.getDetails().getCurrentCity());
 			}
-			topUsers.add(new UserRankDto(username, String.valueOf(++i), user.getId()));
+			topUsers.add(new UserRankDto(user.getId(), username, String.valueOf(++i), user.getId()));
 		}
 		
 		return topUsers;
