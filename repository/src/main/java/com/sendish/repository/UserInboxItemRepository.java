@@ -1,6 +1,5 @@
 package com.sendish.repository;
 
-import com.sendish.repository.model.jpa.InboxMessage;
 import com.sendish.repository.model.jpa.UserInboxItem;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

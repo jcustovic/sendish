@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 
@@ -22,8 +21,7 @@ public class SendishApiApplication {
     private static final Logger LOGGER = LoggerFactory.getLogger(SendishApiApplication.class);
 
     public static void main(String args[]) {
-        ConfigurableApplicationContext context = SpringApplication.run(SendishApiApplication.class, args);
-
+        SpringApplication.run(SendishApiApplication.class, args);
         LOGGER.info("------------------ App started ------------------");
     }
 

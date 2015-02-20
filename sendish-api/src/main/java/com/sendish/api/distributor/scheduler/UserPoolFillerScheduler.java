@@ -34,17 +34,18 @@ public class UserPoolFillerScheduler {
     public void fillUsersPool() {
         Long poolSize = userPool.getPoolSize();
         if (poolSize < MAX_USER_POOL_SIZE - 100) {
-            long neededSize = MAX_USER_POOL_SIZE - userPool.getPoolSize();
+            long neededSize = MAX_USER_POOL_SIZE - poolSize;
             int fetchSize = (int) Math.min(MAX_FETCH_SIZE, neededSize);
-            LOGGER.info("Fetching {} users for user pool. Pool size: {}", fetchSize, poolSize);
+            LOGGER.info("Fetching {} (needed: {}) users for user pool. Current users in pool: {}.", fetchSize, neededSize, poolSize);
+            
             DateTime lastUserPhotoReceivedDate = getLastUserPhotoReceivedDate();
-
             LOGGER.info("Last user received photo timestamp in pool is {}", lastUserPhotoReceivedDate);
 
+            // TODO: Only return userId and lastReceivedTime! Save all the joins and hibernate city and what not selections!
             Page<UserDetails> userDetails = userDetailsRepository.searchUsersForSendingPool(lastUserPhotoReceivedDate, fetchSize);
             if (userDetails.hasContent()) {
                 List<UserWithScore> usersWithScore = userDetails.getContent().stream()
-                        .map(user -> new UserWithScore(user.getUserId().toString(), user.getLastReceivedTime().getMillis()))
+                        .map(user -> new UserWithScore(user.getUserId().toString(), (user.getLastReceivedTime() == null) ? 0 : user.getLastReceivedTime().getMillis()))
                         .collect(Collectors.toList());
 
                 userPool.put(usersWithScore);
@@ -58,7 +59,7 @@ public class UserPoolFillerScheduler {
 
     private DateTime getLastUserPhotoReceivedDate() {
         UserWithScore lastUser = userPool.getLastWithScore();
-        if (lastUser == null) {
+        if (lastUser == null || lastUser.getScore() == 0) {
             return null;
         } else {
             return new DateTime(lastUser.getScore());

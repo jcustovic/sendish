@@ -59,6 +59,7 @@ public class PhotoSenderServiceImpl {
         	result.setPhoto(photoSendingDetails.getPhoto());
             photoSendingDetails.setSendStatus(PhotoSendStatus.NO_USER);
         } else {
+        	photoSendingDetails.setPhotoStatus(PhotoStatus.TRAVELING);
             photoSendingDetails.setSendStatus(PhotoSendStatus.SENT);
             photoSendingDetails.setLastReceiver(result);
         }

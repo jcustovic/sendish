@@ -7,7 +7,9 @@ import java.util.Collection;
 
 public class AuthUser extends User {
 
-    private Long userId;
+	private static final long serialVersionUID = 1L;
+	
+	private Long userId;
 
     public AuthUser(Long p_userId, String p_username, String p_password, Collection<? extends GrantedAuthority> p_authorities) {
         super(p_username, p_password, p_authorities);

@@ -10,16 +10,16 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 @Configuration
-//@EnableScheduling
+@EnableScheduling
 public class SchedulingConfig implements SchedulingConfigurer {
     
 	@Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-        taskRegistrar.setScheduler(taskExecutor());
+        taskRegistrar.setScheduler(schedulerExecutor());
     }
 
     @Bean(destroyMethod="shutdown")
-    public Executor taskExecutor() {
+    public Executor schedulerExecutor() {
         return Executors.newScheduledThreadPool(100);
     }
 

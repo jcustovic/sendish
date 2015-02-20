@@ -2,7 +2,6 @@ package com.sendish.api.notification;
 
 import com.sendish.repository.model.jpa.ApnsPushToken;
 import com.sendish.repository.model.jpa.GcmPushToken;
-import com.sendish.repository.model.jpa.User;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -11,7 +11,9 @@ import javax.persistence.*;
 @AttributeOverride(name = "id", column = @Column(name = "uii_id"))
 public class UserInboxItem extends BaseEntity {
 
-    @ManyToOne(optional = false)
+	private static final long serialVersionUID = 1L;
+
+	@ManyToOne(optional = false)
     @JoinColumn(name = "uii_user_id")
     private User user;
 

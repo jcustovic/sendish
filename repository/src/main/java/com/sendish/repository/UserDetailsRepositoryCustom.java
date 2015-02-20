@@ -6,6 +6,6 @@ import org.springframework.data.domain.Page;
 
 public interface UserDetailsRepositoryCustom {
 
-    Page<UserDetails> searchUsersForSendingPool(DateTime lastCheckDate, int size);
+    Page<UserDetails> searchUsersForSendingPool(DateTime lastUserPhotoReceivedDate, int size);
 
 }

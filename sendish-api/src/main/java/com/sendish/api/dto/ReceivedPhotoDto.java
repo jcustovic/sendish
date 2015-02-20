@@ -2,7 +2,9 @@ package com.sendish.api.dto;
 
 public class ReceivedPhotoDto extends PhotoDto {
 
-    private Boolean like;
+	private static final long serialVersionUID = 1L;
+	
+	private Boolean like;
     private Boolean report;
     private Boolean opened;
 
