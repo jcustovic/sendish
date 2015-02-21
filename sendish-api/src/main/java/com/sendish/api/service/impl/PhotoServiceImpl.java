@@ -1,6 +1,7 @@
 package com.sendish.api.service.impl;
 
 import com.sendish.api.dto.*;
+import com.sendish.api.notification.AsyncNotificationProvider;
 import com.sendish.api.redis.KeyUtils;
 import com.sendish.api.redis.dto.PhotoStatisticsDto;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
@@ -67,6 +68,9 @@ public class PhotoServiceImpl {
 
     @Autowired
     private AsyncPhotoSenderServiceImpl photoSenderService;
+    
+    @Autowired
+    private AsyncNotificationProvider notificationProvider;
 
     private static PrettyTime prettyTime = new PrettyTime();
 
@@ -244,9 +248,13 @@ public class PhotoServiceImpl {
         userDetails.setLastReceivedTime(DateTime.now());
         userService.saveUserDetails(userDetails);
 
-        // TODO: Send notification
         usersReceivedPhotos(userId).add(photoId.toString());
         statisticsRepository.incrementUnseenCount(userId);
+        
+        Map<String, Object> photoReceivedFields = new HashMap<>();
+        photoReceivedFields.put("TYPE", "RECEIVED_PHOTO");
+        photoReceivedFields.put("REFERENCE_ID", photoReceiver.getId());
+        notificationProvider.sendPlainTextNotification("New sendish from " + getLocationName(photo.getCity()), photoReceivedFields, userId);
 
         return photoReceiver;
     }

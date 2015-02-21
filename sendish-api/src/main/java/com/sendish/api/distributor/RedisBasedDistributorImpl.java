@@ -3,7 +3,9 @@ package com.sendish.api.distributor;
 import com.sendish.api.redis.KeyUtils;
 import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.api.service.impl.UserServiceImpl;
+import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoReceiver;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -48,13 +50,17 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
      */
     @Override
     public PhotoReceiver sendPhoto(Long photoId) {
-        // TODO: Implement smart offset
+        // TODO: Implement smart offset and grab next 'n' if we don't find a matching user in the first 'n'
         Collection<String> users = userPool.getNext(10);
         Iterator<String> iterator = users.iterator();
         while (iterator.hasNext()) {
             String userIdString = iterator.next();
             Long userId = Long.valueOf(userIdString);
-            if (lockUser(userId)) {
+            Photo photo = photoService.findOne(photoId);
+            
+            if (photo.getUser().getId().equals(userId)) {
+            	continue;
+            } else if (lockUser(userId)) {
                 if (photoService.hasAlreadyReceivedPhoto(photoId, userId)) {
                     unlockUser(userId);
                 } else if (userService.canReceivePhoto(userId)) {

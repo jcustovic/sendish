@@ -188,8 +188,9 @@ public class UserServiceImpl {
     public boolean canReceivePhoto(Long userId) {
         UserDetails userDetails = getUserDetails(userId);
 
-        return userDetails.getLastReceivedTime().isAfter(DateTime.now().minusMinutes(MINUTES_BETWEEN_RECEIVED_PHOTOS))
-                && userDetails.getReceiveAllowedTime().isAfterNow();
+        return userDetails.getLastReceivedTime() == null || 
+        		userDetails.getLastReceivedTime().isAfter(DateTime.now().minusMinutes(MINUTES_BETWEEN_RECEIVED_PHOTOS))
+                	&& userDetails.getReceiveAllowedTime().isAfterNow();
     }
 
 	public List<UserRankDto> getTopRank() {

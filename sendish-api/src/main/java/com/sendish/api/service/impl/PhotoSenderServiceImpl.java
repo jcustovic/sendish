@@ -28,9 +28,8 @@ public class PhotoSenderServiceImpl {
             throw new IllegalStateException("Photo with id " + photoId + " is not a new photo. New photos don't have PhotoSendingDetails entry.");
         }
 
-        Photo photo = photoRepository.findOne(photoId);
         photoSendingDetails = new PhotoSendingDetails();
-        photoSendingDetails.setPhotoId(photo.getId());
+        photoSendingDetails.setPhotoId(photoId);
 
         PhotoReceiver result = photoDistributor.sendPhoto(photoId);
         if (result == null) {

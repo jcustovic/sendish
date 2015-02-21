@@ -26,10 +26,6 @@ public class UserDetailsRepositoryImpl implements UserDetailsRepositoryCustom {
     @Override
     public Page<UserDetails> searchUsersForSendingPool(DateTime lastUserPhotoReceivedDate, int size) {
         final Specification<UserDetails> spec = (p_root, p_criteriaQuery, p_criteriaBuilder) -> {
-            // TODO: Implement
-            // UserDetails: (lastInteractionTime not null AND lastInteractionTime > today - 10days) AND (receiveAllowedTime IS NULL OR receiveAllowedTime >= now)
-            // AND (lastReceivedTime >= redis (max lastReceivedTime) or lastReceivedTime IS NULL) order by lastReceivedTime ASC
-            // User:
         	final List<Predicate> andPredicates = new LinkedList<>();
         	DateTime now = DateTime.now();
         	
