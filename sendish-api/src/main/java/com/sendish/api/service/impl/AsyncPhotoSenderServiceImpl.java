@@ -15,15 +15,6 @@ public class AsyncPhotoSenderServiceImpl {
     private PhotoSenderServiceImpl photoSenderService;
 
     @Async
-    public void sendNewPhoto(Long photoId) {
-        try {
-            photoSenderService.sendNewPhoto(photoId);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
-
-    @Async
     public void resendPhoto(Long photoId) {
         try {
             photoSenderService.resendPhoto(photoId);
@@ -31,5 +22,14 @@ public class AsyncPhotoSenderServiceImpl {
             LOGGER.error(e.getMessage(), e);
         }
     }
+
+    @Async
+	public void resendPhotoOnLike(Long photoId, Long photoReceiverId) {
+		try {
+            photoSenderService.resendPhotoOnLike(photoId, photoReceiverId);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+	}
 
 }

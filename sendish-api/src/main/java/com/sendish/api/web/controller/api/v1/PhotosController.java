@@ -11,8 +11,10 @@ import com.sendish.api.web.controller.validator.LocationBasedFileUploadValidator
 import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoReceiver;
+import com.sendish.repository.model.jpa.PhotoSendingDetails;
 import com.sendish.repository.model.jpa.ResizedPhoto;
 import com.wordnik.swagger.annotations.*;
+
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -29,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+
 import java.net.URI;
 import java.util.List;
 
@@ -306,11 +309,12 @@ public class PhotosController {
         if (userService.getSentLimitLeft(user.getUserId()) <= 0) {
             return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
         }
-        Long photoId = photoService.processNewImage(locationBasedFileUpload, user.getUserId());
+        PhotoSendingDetails photoSendingDetails = photoService.processNewImage(locationBasedFileUpload, user.getUserId());
 
+        // TODO: Maybe return also the locations where the image was sent if available!
         final URI location = ServletUriComponentsBuilder
                 .fromCurrentServletMapping().path("/api/v1.0/photos/{id}").build()
-                .expand(photoId).toUri();
+                .expand(photoSendingDetails.getPhotoId()).toUri();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(location);

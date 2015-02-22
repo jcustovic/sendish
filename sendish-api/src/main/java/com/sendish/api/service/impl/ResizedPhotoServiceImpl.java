@@ -35,12 +35,12 @@ public class ResizedPhotoServiceImpl {
 
     static {
         KEY_SIZE_MAP = new HashMap<>();
-        KEY_SIZE_MAP.put("list_medium", new int[] { 320, 160 }); // Aspect 2:1 (2x smaller)
         KEY_SIZE_MAP.put("list_small", new int[] { 160, 80 }); // Aspect 2:1 (4x smaller)
+        KEY_SIZE_MAP.put("list_small_blur", new int[] { 160, 80 }); // Aspect 2:1 (4x smaller) blur effect        
+        KEY_SIZE_MAP.put("list_medium", new int[] { 320, 160 }); // Aspect 2:1 (2x smaller)
         KEY_SIZE_MAP.put("list_medium_blur", new int[] { 320, 160 }); // Aspect 2:1 (2x smaller) blur effect
-        KEY_SIZE_MAP.put("list_small_blur", new int[] { 160, 80 }); // Aspect 2:1 (4x smaller) blur effect
-        KEY_SIZE_MAP.put("list_square_small", new int[] { 80, 80 });
-        KEY_SIZE_MAP.put("list_square_small_blur", new int[] { 80, 80 });
+        KEY_SIZE_MAP.put("list_square_small", new int[] { 160, 160 });
+        KEY_SIZE_MAP.put("list_square_small_blur", new int[] { 160, 160 });
     }
 
     private final ImageFilter blurFilter = new GaussianBlurFilter(20);

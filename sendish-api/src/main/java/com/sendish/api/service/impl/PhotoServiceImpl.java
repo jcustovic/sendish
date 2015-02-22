@@ -67,7 +67,10 @@ public class PhotoServiceImpl {
     private StringRedisTemplate redisTemplate;
 
     @Autowired
-    private AsyncPhotoSenderServiceImpl photoSenderService;
+    private AsyncPhotoSenderServiceImpl asyncPhotoSenderService;
+    
+    @Autowired
+    private PhotoSenderServiceImpl photoSenderService;
     
     @Autowired
     private AsyncNotificationProvider notificationProvider;
@@ -78,7 +81,7 @@ public class PhotoServiceImpl {
         return photoRepository.findOne(photoId);
     }
 
-    public Long processNewImage(LocationBasedFileUpload p_upload, Long p_userId) {
+    public PhotoSendingDetails processNewImage(LocationBasedFileUpload p_upload, Long p_userId) {
         DateTime receivedDate = DateTime.now();
         MultipartFile file = p_upload.getImage();
         Photo photo = mapToPhoto(p_upload, p_userId, file);
@@ -108,9 +111,8 @@ public class PhotoServiceImpl {
         photo = photoRepository.save(photo);
         createPhotoStatistics(photo);
         userService.updateStatisticsForNewSentPhoto(p_userId, receivedDate, location, city);
-        photoSenderService.sendNewPhoto(photo.getId());
-
-        return photo.getId();
+        
+        return photoSenderService.sendNewPhoto(photo.getId());
     }
 
     public Photo findReceivedByPhotoUuid(String photoUUID, Long userId) {
@@ -181,7 +183,7 @@ public class PhotoServiceImpl {
             photoReceiver.setLike(true);
             photoReceiverRepository.save(photoReceiver);
 
-            photoSenderService.resendPhoto(photoId);
+            asyncPhotoSenderService.resendPhotoOnLike(photoId, photoReceiver.getId());
             statisticsRepository.likePhoto(photoId, photoReceiver.getPhoto().getUser().getId());
         }
     }
