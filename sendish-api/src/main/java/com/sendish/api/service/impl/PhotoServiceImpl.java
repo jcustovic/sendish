@@ -215,7 +215,7 @@ public class PhotoServiceImpl {
     }
 
     public List<PhotoTraveledDto> getTraveledLocations(Long photoId, Integer page) {
-        List<PhotoReceiver> receivedList = photoReceiverRepository.findByPhotoId(photoId, new PageRequest(page, PHOTO_LOCATION_PAGE_SIZE, Direction.DESC, "createdDate"));
+        List<PhotoReceiver> receivedList = photoReceiverRepository.findByPhotoIdAndOpenedDateNotNull(photoId, new PageRequest(page, PHOTO_LOCATION_PAGE_SIZE, Direction.DESC, "createdDate"));
 
         return mapToPhotoTraveledDto(receivedList);
     }
@@ -256,7 +256,7 @@ public class PhotoServiceImpl {
         Map<String, Object> photoReceivedFields = new HashMap<>();
         photoReceivedFields.put("TYPE", "RECEIVED_PHOTO");
         photoReceivedFields.put("REFERENCE_ID", photoReceiver.getId());
-        notificationProvider.sendPlainTextNotification("New sendish from " + getLocationName(photo.getCity()), photoReceivedFields, userId);
+        notificationProvider.sendPlainTextNotification(getLocationName(photo.getCity()), photoReceivedFields, userId);
 
         return photoReceiver;
     }

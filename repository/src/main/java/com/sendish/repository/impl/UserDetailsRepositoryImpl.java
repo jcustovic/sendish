@@ -24,7 +24,7 @@ public class UserDetailsRepositoryImpl implements UserDetailsRepositoryCustom {
     private UserDetailsRepository userDetailsRepository;
 
     @Override
-    public Page<UserDetails> searchUsersForSendingPool(DateTime lastUserPhotoReceivedDate, int size) {
+    public Page<UserDetails> searchUsersForSendingPool(DateTime latestUserPhotoReceivedDate, int size) {
         final Specification<UserDetails> spec = (p_root, p_criteriaQuery, p_criteriaBuilder) -> {
         	final List<Predicate> andPredicates = new LinkedList<>();
         	DateTime now = DateTime.now();
@@ -43,12 +43,12 @@ public class UserDetailsRepositoryImpl implements UserDetailsRepositoryCustom {
         			p_criteriaBuilder.greaterThanOrEqualTo(receiveAllowedTime, now)
         	));
         	
-        	if (lastUserPhotoReceivedDate != null)  {
+        	if (latestUserPhotoReceivedDate != null)  {
 	        	// (lastReceivedTime IS NULL OR lastReceivedTime >= lastUserPhotoReceivedDate)
 	        	Path<DateTime> lastReceivedTime = p_root.get("lastReceivedTime");
 	        	andPredicates.add(p_criteriaBuilder.or(
 	        			p_criteriaBuilder.isNull(lastReceivedTime), 
-	        			p_criteriaBuilder.greaterThanOrEqualTo(lastReceivedTime, lastUserPhotoReceivedDate)
+	        			p_criteriaBuilder.greaterThanOrEqualTo(lastReceivedTime, latestUserPhotoReceivedDate)
 	        	));
         	}
         	

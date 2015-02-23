@@ -231,6 +231,7 @@ create table photo_receiver (
   pr_opened_date timestamp null,
 
   primary key (pr_id),
+  constraint photo_receiver_user_photo_id_uq unique (pr_photo_id, pr_user_id)
   constraint photo_receiver_user_id_fk foreign key (pr_user_id) references auth_user,
   constraint photo_receiver_photo_id_fk foreign key (pr_photo_id) references photo,
   constraint photo_receiver_city_id_fk foreign key (pr_city_id) references city
@@ -312,14 +313,14 @@ create index notification_partial_result_msg_id_idx on notification_partial_resu
 create sequence push_notification_token_seq;
 
 create table push_notification_token (
-	pt_id int8 not null default nextval('push_notification_token_seq'),
-	pt_token varchar(200) not null,
-	pt_platform_type varchar(4) not null,
-	pt_modified_date timestamp not null,
-	pt_user_id int8 not null,
-	pt_dev_token boolean not null default false,
+  pt_id int8 not null default nextval('push_notification_token_seq'),
+  pt_token varchar(200) not null,
+  pt_platform_type varchar(4) not null,
+  pt_modified_date timestamp not null,
+  pt_user_id int8 not null,
+  pt_dev_token boolean not null default false,
 
-	primary key (pt_id),
+  primary key (pt_id),
   constraint push_notification_token_user_id_fk foreign key (pt_user_id) references auth_user,
   constraint push_notification_token_uq unique (pt_token, pt_platform_type)
 );

@@ -189,7 +189,7 @@ public class UserServiceImpl {
         UserDetails userDetails = getUserDetails(userId);
 
         return (userDetails.getLastReceivedTime() == null || userDetails.getLastReceivedTime().isAfter(DateTime.now().minusMinutes(MINUTES_BETWEEN_RECEIVED_PHOTOS)))
-        		&& (userDetails.getReceiveAllowedTime() == null || userDetails.getReceiveAllowedTime().isAfterNow());
+        		&& (userDetails.getReceiveAllowedTime() == null || userDetails.getReceiveAllowedTime().isBeforeNow());
     }
 
 	public List<UserRankDto> getTopRank() {

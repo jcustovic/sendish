@@ -69,7 +69,7 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 
                     return photoReceiver;
                 } else {
-                    userPool.remove(userIdString);
+                	unlockUser(userId);
                 }
             }
         }

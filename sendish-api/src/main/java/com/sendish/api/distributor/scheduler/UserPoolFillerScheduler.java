@@ -38,11 +38,11 @@ public class UserPoolFillerScheduler {
             int fetchSize = (int) Math.min(MAX_FETCH_SIZE, neededSize);
             LOGGER.info("Fetching {} (needed: {}) users for user pool. Current users in pool: {}.", fetchSize, neededSize, poolSize);
             
-            DateTime lastUserPhotoReceivedDate = getLastUserPhotoReceivedDate();
-            LOGGER.info("Last user received photo timestamp in pool is {}", lastUserPhotoReceivedDate);
+            DateTime latestUserPhotoReceivedDate = getLatestUserPhotoReceivedDate();
+            LOGGER.info("Last user received photo timestamp in pool is {}", latestUserPhotoReceivedDate);
 
             // TODO: Only return userId and lastReceivedTime! Save all the joins and hibernate city and what not selections!
-            Page<UserDetails> userDetails = userDetailsRepository.searchUsersForSendingPool(lastUserPhotoReceivedDate, fetchSize);
+            Page<UserDetails> userDetails = userDetailsRepository.searchUsersForSendingPool(latestUserPhotoReceivedDate, fetchSize);
             if (userDetails.hasContent()) {
                 List<UserWithScore> usersWithScore = userDetails.getContent().stream()
                         .map(user -> new UserWithScore(user.getUserId().toString(), (user.getLastReceivedTime() == null) ? 0 : user.getLastReceivedTime().getMillis()))
@@ -58,7 +58,7 @@ public class UserPoolFillerScheduler {
         }
     }
 
-    private DateTime getLastUserPhotoReceivedDate() {
+    private DateTime getLatestUserPhotoReceivedDate() {
         UserWithScore lastUser = userPool.getLastWithScore();
         if (lastUser == null || lastUser.getScore() == 0) {
             return null;
