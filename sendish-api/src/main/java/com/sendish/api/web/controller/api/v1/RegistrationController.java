@@ -62,7 +62,7 @@ public class RegistrationController {
         @ApiResponse(code = 200, message = "Reset password email is sent (NOTE: Only if a user exists in the system).", response = Void.class)
     })
     public void resetPassword(@PathVariable String username) {
-        // TODO: Implement me
+        // TODO: Implement me, send email with reset link
     }
 
 }

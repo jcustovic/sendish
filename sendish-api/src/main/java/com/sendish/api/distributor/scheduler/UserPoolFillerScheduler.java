@@ -48,9 +48,10 @@ public class UserPoolFillerScheduler {
                         .map(user -> new UserWithScore(user.getUserId().toString(), (user.getLastReceivedTime() == null) ? 0 : user.getLastReceivedTime().getMillis()))
                         .collect(Collectors.toList());
 
+                LOGGER.info("Putting {} users to pool...", userDetails.getNumberOfElements());
                 userPool.put(usersWithScore);
             } else {
-                LOGGER.info("No users found for for user poll");
+                LOGGER.info("No users found for for user pool");
             }
         } else {
             LOGGER.info("Skipping user pool fetching because pool is full");
