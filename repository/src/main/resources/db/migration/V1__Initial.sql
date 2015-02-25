@@ -27,6 +27,7 @@ create table city (
   ct_country_id int8 not null,
   ct_population int4,
   ct_timezone varchar(32) not null,
+  ct_deleted boolean not null default false,
   ct_created_date timestamp not null,
 
   primary key (ct_id),

@@ -7,16 +7,15 @@ import org.springframework.dao.DataIntegrityViolationException;
 public class RetryUtils {
 	
 	public static <T> T retry(Supplier<T> logic, int retryCount, int sleepMillis) {
-    	int retryCounter = 3;
     	while (true) {
     		try {
 		        return logic.get();
     		} catch (DataIntegrityViolationException e) {
-    			if (--retryCounter == 0) {
-    				throw e;
+    			if (--retryCount == 0) {
+    				throw new DataIntegrityViolationException("Retry limit reached", e);
     			} else {
     				try {
-						Thread.sleep(10L);
+						Thread.sleep(sleepMillis);
 					} catch (InterruptedException e1) {
 						// Nothing to do
 					}

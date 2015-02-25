@@ -2,6 +2,7 @@ package com.sendish.repository.model.jpa;
 
 import com.sendish.repository.model.jpa.listener.LocationAware;
 import com.sendish.repository.model.jpa.listener.LocationListener;
+
 import org.hibernate.annotations.*;
 import org.joda.time.DateTime;
 
@@ -42,6 +43,9 @@ public class City extends BaseEntity implements LocationAware {
 
     @Column(name = "ct_timezone", nullable = false)
     private String timezone;
+    
+    @Column(name = "ct_deleted", nullable = false)
+    private Boolean deleted = false;
 
     @Column(name = "ct_created_date", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -109,7 +113,15 @@ public class City extends BaseEntity implements LocationAware {
         this.timezone = timezone;
     }
 
-    public DateTime getCreatedDate() {
+    public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public DateTime getCreatedDate() {
         return createdDate;
     }
 

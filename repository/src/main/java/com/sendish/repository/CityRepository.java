@@ -14,7 +14,7 @@ public interface CityRepository extends JpaRepository<City, Long> {
 
     City findByExternalId(Integer externalId);
 
-    @Query("FROM City c ORDER BY ST_Distance(c.location.location, ST_SetSRID(ST_MakePoint(?1, ?2), 4326))")
+    @Query("FROM City c WHERE c.deleted = false ORDER BY ST_Distance(c.location.location, ST_SetSRID(ST_MakePoint(?1, ?2), 4326))")
     List<City> findNearest(BigDecimal longitude, BigDecimal latitude, Pageable pageable);
 
 }

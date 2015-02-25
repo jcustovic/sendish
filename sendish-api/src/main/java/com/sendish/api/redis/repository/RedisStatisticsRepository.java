@@ -1,20 +1,22 @@
 package com.sendish.api.redis.repository;
 
-import com.sendish.api.redis.KeyUtils;
-import com.sendish.api.redis.dto.CommentStatisticsDto;
-import com.sendish.api.redis.dto.PhotoStatisticsDto;
-import com.sendish.api.redis.dto.UserStatisticsDto;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.BoundSetOperations;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.support.collections.DefaultRedisMap;
 import org.springframework.data.redis.support.collections.RedisMap;
 import org.springframework.stereotype.Repository;
 
-import java.util.Arrays;
-import java.util.List;
+import com.sendish.api.redis.KeyUtils;
+import com.sendish.api.redis.dto.CommentStatisticsDto;
+import com.sendish.api.redis.dto.PhotoStatisticsDto;
+import com.sendish.api.redis.dto.UserStatisticsDto;
 
 @Repository
 public class RedisStatisticsRepository {
@@ -24,7 +26,6 @@ public class RedisStatisticsRepository {
 
     // TODO: At some point of time also save stats to DB (User & Photo). Example when one hour elapsed from last update
     // or photo stops traveling etc. ... UserStatisticsRepository.java, PhotoStatisticsRepository.java
-    // TODO: Photo & User keep track of all the cities
 
     public Long likePhoto(Long photoId, Long userId) {
         photoStatistics(photoId).increment("likeCount", 1);
@@ -46,14 +47,14 @@ public class RedisStatisticsRepository {
     }
 
     public PhotoStatisticsDto getPhotoStatistics(Long photoId) {
-        List<String> fields = Arrays.asList("likeCount", "dislikeCount", "cityCount", "commentCount");
+        List<String> fields = Arrays.asList("likeCount", "dislikeCount", "commentCount");
         HashOperations<String, String, String> hashOp = template.opsForHash();
         List<String> values = hashOp.multiGet(KeyUtils.photoStatistics(photoId), fields);
 
         Long likeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(0), "0"));
         Long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
-        Long cityCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
-        Long commentCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
+        Long commentCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
+        Long cityCount = photoCities(photoId).size(); 
 
         return new PhotoStatisticsDto(likeCount, dislikeCount, cityCount, commentCount);
     }
@@ -69,8 +70,9 @@ public class RedisStatisticsRepository {
         Long unseenPhotoCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
         
         Long dailySentCount = getDailySentCount(userId, LocalDate.now());
+        Long totalCityCount = userCities(userId).size();
 
-        return new UserStatisticsDto(likeCount, dislikeCount, reportCount, dailySentCount, unseenPhotoCount);
+        return new UserStatisticsDto(likeCount, dislikeCount, reportCount, dailySentCount, unseenPhotoCount, totalCityCount);
     }
 
     public Long increaseDailySentPhotoCount(Long userId, LocalDate date) {
@@ -137,7 +139,12 @@ public class RedisStatisticsRepository {
     public void decrementUnseenCount(Long userId) {
         userStatistics(userId).increment("total.unseenPhotoCount", -1);
     }
-
+    
+    public void trackCity(Long photoId, Long userId, Long cityId) {
+    	String cityString = cityId.toString();
+    	photoCities(photoId).add(cityString);
+    	userCities(userId).add(cityString);
+	}
     // Redis objects
 
     private RedisMap<String, String> photoStatistics(Long photoId) {
@@ -147,9 +154,17 @@ public class RedisStatisticsRepository {
     private RedisMap<String, String> userStatistics(Long userId) {
         return new DefaultRedisMap<>(KeyUtils.userStatistics(userId), template);
     }
-
+    
     private RedisMap<String, String> photoCommentStatistics(Long photoCommentId) {
         return new DefaultRedisMap<>(KeyUtils.photoCommentStatistics(photoCommentId), template);
+    }
+
+    private BoundSetOperations<String, String> photoCities(Long photoId) {
+    	return template.boundSetOps(KeyUtils.photoCities(photoId));
+    }
+    
+    private BoundSetOperations<String, String> userCities(Long userId) {
+    	return template.boundSetOps(KeyUtils.userCities(userId));
     }
 
 }

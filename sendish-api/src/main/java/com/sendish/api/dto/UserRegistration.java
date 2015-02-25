@@ -5,6 +5,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.Size;
+
 public class UserRegistration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -13,6 +15,7 @@ public class UserRegistration implements Serializable {
 	@Email
 	private String email;
 
+	@Size(max = 8)
 	private String nickname;
 
 	@NotEmpty

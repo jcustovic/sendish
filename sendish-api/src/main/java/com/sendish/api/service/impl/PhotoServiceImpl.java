@@ -163,9 +163,11 @@ public class PhotoServiceImpl {
             photoReceiver.setOpenedDate(DateTime.now());
             Location location = getUserLocation(userId, longitude, latitude);
             photoReceiver.setOpenedLocation(location);
-            photoReceiver.setCity(cityService.findNearest(location.getLatitude(), location.getLongitude()));
+            City city = cityService.findNearest(location.getLatitude(), location.getLongitude());
+            photoReceiver.setCity(city);
             photoReceiverRepository.save(photoReceiver);
             statisticsRepository.decrementUnseenCount(userId);
+            statisticsRepository.trackCity(photoId, userId, city.getId());
         }
 
         ReceivedPhotoDetailsDto photoDetailsDto = new ReceivedPhotoDetailsDto();
@@ -250,6 +252,7 @@ public class PhotoServiceImpl {
         userDetails.setLastReceivedTime(DateTime.now());
         userService.saveUserDetails(userDetails);
 
+        // TODO: Move to separate method after PhotoReceiver has been saved and committed!
         usersReceivedPhotos(userId).add(photoId.toString());
         statisticsRepository.incrementUnseenCount(userId);
         

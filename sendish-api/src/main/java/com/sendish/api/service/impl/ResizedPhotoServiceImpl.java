@@ -62,7 +62,7 @@ public class ResizedPhotoServiceImpl {
             }
             
             return resizedPhoto;
-    	}, 3, 10);
+    	}, 3, 20);
     }
 
     private ResizedPhoto resize(Long photoId, String sizeKey) throws DataIntegrityViolationException {

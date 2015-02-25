@@ -51,7 +51,7 @@ public class ResizedImageServiceImpl {
 	        }
 	
 	        return resizedImage;
-    	}, 3, 10);
+    	}, 3, 20);
     }
     
     private ResizedImage resize(Long imageId, String sizeKey) {
