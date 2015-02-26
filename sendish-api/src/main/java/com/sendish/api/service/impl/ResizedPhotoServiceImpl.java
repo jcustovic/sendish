@@ -56,7 +56,7 @@ public class ResizedPhotoServiceImpl {
 
     public ResizedPhoto getResizedPhoto(Long photoId, String sizeKey) {
     	return RetryUtils.retry(() -> {
-    		ResizedPhoto resizedPhoto = resizedPhotoRepository.findByUuidAndKey(photoId, sizeKey);
+    		ResizedPhoto resizedPhoto = resizedPhotoRepository.findByPhotoIdAndKey(photoId, sizeKey);
             if (resizedPhoto == null) {
             	resizedPhoto = resize(photoId, sizeKey);	
             }

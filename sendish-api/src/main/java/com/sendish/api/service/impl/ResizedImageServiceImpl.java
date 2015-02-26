@@ -45,7 +45,7 @@ public class ResizedImageServiceImpl {
 
     public ResizedImage getResizedImage(Long imageId, String sizeKey) {
     	return RetryUtils.retry(() -> {
-    		ResizedImage resizedImage = resizedImageRepository.findByUuidAndKey(imageId, sizeKey);
+    		ResizedImage resizedImage = resizedImageRepository.findByImageIdAndKey(imageId, sizeKey);
 	        if (resizedImage == null) {
 	            resizedImage = resize(imageId, sizeKey);
 	        }
