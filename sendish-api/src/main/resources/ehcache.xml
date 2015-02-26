@@ -28,6 +28,13 @@
            timeToLiveSeconds="3600"
            timeToIdleSeconds="3600"
            overflowToDisk="true" />
+           
+    <cache name="com.sendish.repository.HotPhotoRepository.findAllActive"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToLiveSeconds="3600"
+           timeToIdleSeconds="3600"
+           overflowToDisk="true" />
 
     <cache name="com.sendish.repository.model.jpa.UserStatistics"
            maxElementsInMemory="10000"

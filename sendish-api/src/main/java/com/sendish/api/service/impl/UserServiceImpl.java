@@ -5,6 +5,7 @@ import com.sendish.api.dto.UserRankDto;
 import com.sendish.api.dto.UserSettingsDto;
 import com.sendish.api.redis.dto.UserStatisticsDto;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
+import com.sendish.api.util.CityUtils;
 import com.sendish.repository.UserDetailsRepository;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.UserStatisticsRepository;
@@ -90,7 +91,7 @@ public class UserServiceImpl {
 
         UserProfileDto userProfileDto = new UserProfileDto();
         if (userDetails.getLastLocationTime() != null) {
-            userProfileDto.setLastPlace(getUserPlaceName(userDetails.getCurrentCity()));
+            userProfileDto.setLastPlace(CityUtils.getLocationName(userDetails.getCurrentCity()));
             userProfileDto.setLastLat(userDetails.getLocation().getLatitude());
             userProfileDto.setLastLng(userDetails.getLocation().getLongitude());
             userProfileDto.setLastLocationTime(userDetails.getLastInteractionTime().toDate());
@@ -115,10 +116,6 @@ public class UserServiceImpl {
 
         return userProfileDto;
     }
-
-	private String getUserPlaceName(City city) {
-		return city.getName() + ", " + city.getCountry().getName();
-	}
 
     public Long getSentLimitLeft(Long userId) {
         UserDetails userDetails = getUserDetails(userId);
@@ -202,7 +199,7 @@ public class UserServiceImpl {
 			if (user.getDetails().getCurrentCity() == null) {
 				username = "Noname";
 			} else {
-				username = getUserPlaceName(user.getDetails().getCurrentCity());
+				username = CityUtils.getLocationName(user.getDetails().getCurrentCity());
 			}
 			topUsers.add(new UserRankDto(user.getId(), username, String.valueOf(++i), user.getId()));
 		}

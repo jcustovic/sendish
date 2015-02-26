@@ -400,3 +400,13 @@ create table user_inbox_item (
 );
 
 create index user_inbox_item_user_idx on user_inbox_item (uii_user_id);
+
+-- HotPhoto table
+create table hot_photo (
+  hp_photo_id int8 not null,
+  hp_selected_time timestamp not null,
+  hp_removed_time timestamp,
+
+  primary key (hp_photo_id),
+  constraint hot_photo_photo_id_fk foreign key (hp_photo_id) references photo
+);

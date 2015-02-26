@@ -1,13 +1,18 @@
 package com.sendish.api.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.sendish.api.dto.CommentDto;
+import com.sendish.api.notification.AsyncNotificationProvider;
 import com.sendish.api.redis.dto.CommentStatisticsDto;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
+import com.sendish.api.util.CityUtils;
 import com.sendish.repository.PhotoCommentVoteRepository;
 import com.sendish.repository.model.jpa.*;
+
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +46,9 @@ public class PhotoCommentServiceImpl {
 
     @Autowired
     private RedisStatisticsRepository statisticsRepository;
+    
+    @Autowired
+    private AsyncNotificationProvider notificationProvider;
 
 	public PhotoComment save(Long photoId, String comment, Long userId) {
         // TODO: Maybe restrict only to my photos or received photos?
@@ -54,6 +62,7 @@ public class PhotoCommentServiceImpl {
 
         photoComment = photoCommentRepository.save(photoComment);
         statisticsRepository.increasePhotoCommentCount(photoId);
+        sendNewCommentNotification(user, photo);
 
 		return photoComment;
 	}
@@ -93,13 +102,20 @@ public class PhotoCommentServiceImpl {
     private List<CommentDto> mapToCommentDto(List<PhotoComment> comments) {
         return comments.stream().map(comment -> mapToCommentDto(comment)).collect(Collectors.toList());
     }
+    
+    private void sendNewCommentNotification(User user, Photo photo) {
+		Map<String, Object> newCommentFields = new HashMap<>();
+        newCommentFields.put("TYPE", "NEW_COMMENT");
+        newCommentFields.put("REFERENCE_ID", photo.getId());
+        notificationProvider.sendPlainTextNotification("New comment from " + CityUtils.getLocationName(photo.getCity()), newCommentFields, photo.getUser().getId());
+	}
 
     private CommentDto mapToCommentDto(PhotoComment comment) {
         CommentDto commentDto = new CommentDto();
         UserDetails userDetails = comment.getUser().getDetails();
         commentDto.setId(comment.getId());
         commentDto.setUserId(userDetails.getUserId());
-        commentDto.setUserName(userDetails.getCurrentCity().getName() + ", " + userDetails.getCurrentCity().getCountry().getName());
+        commentDto.setUserName(CityUtils.getLocationName(userDetails.getCurrentCity()));
         commentDto.setComment(comment.getComment());
         commentDto.setTimeAgo(prettyTime.format(comment.getCreatedDate().toDate()));
 

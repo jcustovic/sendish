@@ -36,6 +36,7 @@
 		<scala-library.version>2.10.4</scala-library.version>
 		<apns.version>0.2.3</apns.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
+		<querydsl.version>3.6.1</querydsl.version>
 	</properties>
 
 	<dependencies>
@@ -138,6 +139,12 @@
 				<groupId>net.coobird</groupId>
 				<artifactId>thumbnailator</artifactId>
 				<version>${thumbnailator.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>com.mysema.querydsl</groupId>
+				<artifactId>querydsl-jpa</artifactId>
+				<version>${querydsl.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
