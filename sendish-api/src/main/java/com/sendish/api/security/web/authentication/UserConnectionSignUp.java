@@ -3,6 +3,7 @@ package com.sendish.api.security.web.authentication;
 import com.sendish.api.service.impl.UserServiceImpl;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.User;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +34,15 @@ public class UserConnectionSignUp implements ConnectionSignUp {
             final String randomPassword = UUID.randomUUID().toString();
             User newUser = userService.createUser(username, userProfile.getEmail(), randomPassword, null, false);
 
-            newUser.setFirstName(userProfile.getFirstName());
-            newUser.setLastName(userProfile.getLastName());
             if (StringUtils.hasText(userProfile.getEmail())) {
                 newUser.setEmailConfirmed(true);
             }
+            if (StringUtils.hasText(userProfile.getFirstName())) {
+            	newUser.setFirstName(userProfile.getFirstName());
+            	String nickname = org.apache.commons.lang3.StringUtils.left(userProfile.getFirstName(), 20);
+                newUser.setNickname(nickname);
+            }
+            newUser.setLastName(userProfile.getLastName());
 
             LOG.info("Creating user {} with connectionKey {}", username, p_connection.getKey().toString());
             user = userRepository.save(newUser);

@@ -10,7 +10,7 @@ public class RetryUtils {
     	while (true) {
     		try {
 		        return logic.get();
-    		} catch (DataIntegrityViolationException e) {
+    		} catch (Exception e) {
     			if (--retryCount == 0) {
     				throw new DataIntegrityViolationException("Retry limit reached", e);
     			} else {

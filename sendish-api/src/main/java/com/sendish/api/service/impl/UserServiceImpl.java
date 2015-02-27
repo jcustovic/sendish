@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 
@@ -178,6 +179,11 @@ public class UserServiceImpl {
         UserDetails userDetails = getUserDetails(userId);
         userDetails.setReceiveLimitPerDay(userSettings.getReceiveLimitPerDay());
         userDetails.setReceiveNotifications(userSettings.getReceiveNotifications());
+        
+        if (StringUtils.hasText(userSettings.getNickname())) {
+        	userDetails.getUser().setNickname(userSettings.getNickname());
+        	userRepository.save(userDetails.getUser());
+        }
 
         userDetailsRepository.save(userDetails);
     }

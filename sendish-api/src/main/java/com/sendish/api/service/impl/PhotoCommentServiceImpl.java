@@ -9,10 +9,11 @@ import com.sendish.api.dto.CommentDto;
 import com.sendish.api.notification.AsyncNotificationProvider;
 import com.sendish.api.redis.dto.CommentStatisticsDto;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
-import com.sendish.api.util.CityUtils;
+import com.sendish.api.util.UserUtils;
 import com.sendish.repository.PhotoCommentVoteRepository;
 import com.sendish.repository.model.jpa.*;
 
+import org.apache.commons.lang3.StringUtils;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -62,7 +63,7 @@ public class PhotoCommentServiceImpl {
 
         photoComment = photoCommentRepository.save(photoComment);
         statisticsRepository.increasePhotoCommentCount(photoId);
-        sendNewCommentNotification(user, photo);
+        sendNewCommentNotification(user, photo, comment);
 
 		return photoComment;
 	}
@@ -103,11 +104,25 @@ public class PhotoCommentServiceImpl {
         return comments.stream().map(comment -> mapToCommentDto(comment)).collect(Collectors.toList());
     }
     
-    private void sendNewCommentNotification(User user, Photo photo) {
+    private void sendNewCommentNotification(User user, Photo photo, String comment) {
 		Map<String, Object> newCommentFields = new HashMap<>();
         newCommentFields.put("TYPE", "NEW_COMMENT");
         newCommentFields.put("REFERENCE_ID", photo.getId());
-        notificationProvider.sendPlainTextNotification("New comment from " + CityUtils.getLocationName(photo.getCity()), newCommentFields, photo.getUser().getId());
+        
+        String notText = getNotificationText(user, comment);
+        
+        notificationProvider.sendPlainTextNotification(notText, newCommentFields, photo.getUser().getId());
+	}
+
+	private String getNotificationText(User user, String comment) {
+		String prefix = UserUtils.getDisplayName(user) + " said: ";
+		int charsLeftForComment = 50 - prefix.length();
+		
+		if (comment.length() > charsLeftForComment) {
+			return prefix + StringUtils.left(comment, charsLeftForComment - 3) + "...";
+		} else {
+			return prefix + comment;
+		}
 	}
 
     private CommentDto mapToCommentDto(PhotoComment comment) {
@@ -115,7 +130,7 @@ public class PhotoCommentServiceImpl {
         UserDetails userDetails = comment.getUser().getDetails();
         commentDto.setId(comment.getId());
         commentDto.setUserId(userDetails.getUserId());
-        commentDto.setUserName(CityUtils.getLocationName(userDetails.getCurrentCity()));
+        commentDto.setUserName(UserUtils.getDisplayName(comment.getUser()));
         commentDto.setComment(comment.getComment());
         commentDto.setTimeAgo(prettyTime.format(comment.getCreatedDate().toDate()));
 

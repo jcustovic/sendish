@@ -45,7 +45,7 @@ create table auth_user (
   au_username varchar(100) not null unique,
   au_email varchar(80) unique,
   au_password varchar(65) not null,
-  au_nickname varchar(8),
+  au_nickname varchar(20),
   au_firstname varchar(128),
   au_lastname varchar(128),
   au_gender varchar(6),
