@@ -63,7 +63,9 @@ public class PhotoCommentServiceImpl {
 
         photoComment = photoCommentRepository.save(photoComment);
         statisticsRepository.increasePhotoCommentCount(photoId);
-        sendNewCommentNotification(user, photo, comment);
+        if (!photo.getDeleted()) {
+        	sendCommentNotificationToPhotoOwner(user, photo, comment);	
+        }
 
 		return photoComment;
 	}
@@ -104,7 +106,7 @@ public class PhotoCommentServiceImpl {
         return comments.stream().map(comment -> mapToCommentDto(comment)).collect(Collectors.toList());
     }
     
-    private void sendNewCommentNotification(User user, Photo photo, String comment) {
+    private void sendCommentNotificationToPhotoOwner(User user, Photo photo, String comment) {
 		Map<String, Object> newCommentFields = new HashMap<>();
         newCommentFields.put("TYPE", "NEW_COMMENT");
         newCommentFields.put("REFERENCE_ID", photo.getId());

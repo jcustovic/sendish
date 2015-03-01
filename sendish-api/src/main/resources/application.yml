@@ -11,11 +11,14 @@ spring:
     database-platform: org.hibernate.spatial.dialect.h2geodb.GeoDBDialect
     properties:
       hibernate:
-         cache:
-            use_second_level_cache: true
-            use_query_cache: true
-            region:
-               factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+        show_sql: true
+        format_sql: true
+        generate_statistics: true
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
   social:
     facebook:
       app-id: 364597623699443
@@ -52,7 +55,7 @@ app:
   baseUrl: http://api.sendish.com
   store:
     data:
-      path: C:\Users\janc\sendish\data
+      path: C:\Users\chus\sendish\data
   ios:
     cert:
       dev:
