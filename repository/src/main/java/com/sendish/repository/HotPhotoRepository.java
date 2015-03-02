@@ -22,4 +22,6 @@ public interface HotPhotoRepository extends JpaRepository<HotPhoto, Long> {
 	@Query("SELECT hp FROM HotPhoto hp WHERE hp.removedTime IS NULL")
 	List<HotPhoto> findAllActive(Pageable page);
 
+	HotPhoto findByPhotoUuid(String photoUUID);
+
 }

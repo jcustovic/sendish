@@ -199,31 +199,39 @@ public class PhotoServiceImpl {
     }
 
     // TODO: Maybe allow changing dislike to like?
-    public void like(Long photoId, Long userId) {
+    public void likeReceived(Long photoId, Long userId) {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
         if (photoReceiver.getLike() == null) {
             photoReceiver.setLike(true);
             photoReceiverRepository.save(photoReceiver);
 
             asyncPhotoSenderService.resendPhotoOnLike(photoId, photoReceiver.getId());
-            statisticsRepository.likePhoto(photoId, photoReceiver.getPhoto().getUser().getId());
+            likePhoto(photoId, photoReceiver.getPhoto().getUser().getId());
         }
     }
+    
+    public void likePhoto(Long photoId, Long userId) {
+    	statisticsRepository.likePhoto(photoId, userId);
+	}
 
     // TODO: Maybe allow changing like to dislike?
-    public void dislike(Long photoId, Long userId) {
+    public void dislikeReceived(Long photoId, Long userId) {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
         if (photoReceiver.getLike() == null) {
             photoReceiver.setLike(false);
             photoReceiver.setDeleted(true);
             photoReceiverRepository.save(photoReceiver);
 
-            statisticsRepository.dislikePhoto(photoId, photoReceiver.getPhoto().getUser().getId());
+            dislikePhoto(photoId, photoReceiver.getPhoto().getUser().getId());
             // TODO: Logic when to stop photo from traveling
         }
     }
 
-    public void report(Long photoId, String reason, String reasonText, Long userId) {
+	public void dislikePhoto(Long photoId, Long userId) {
+		statisticsRepository.dislikePhoto(photoId, userId);
+	}
+
+    public void reportReceived(Long photoId, String reason, String reasonText, Long userId) {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
         if (photoReceiver.getReport() == null) {
             photoReceiver.setReport(true);

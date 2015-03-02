@@ -37,6 +37,7 @@
 		<apns.version>0.2.3</apns.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
 		<querydsl.version>3.6.1</querydsl.version>
+		<postgresql.jdbc.version>9.4-1201-jdbc41</postgresql.jdbc.version>
 	</properties>
 
 	<dependencies>
@@ -85,6 +86,20 @@
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-spatial</artifactId>
 				<version>${hibernate-spatial.version}</version>
+				<exclusions>
+	                <exclusion>
+	                    <groupId>postgresql</groupId>
+	                    <artifactId>postgresql</artifactId>
+	                </exclusion>
+	                <exclusion>
+	                    <groupId>org.postgis</groupId>
+	                    <artifactId>postgis-jdbc</artifactId>
+	                </exclusion>
+	                <exclusion>
+	                    <groupId>org.hibernate</groupId>
+	                    <artifactId>hibernate-core</artifactId>
+	                </exclusion>
+            </exclusions>
 			</dependency>
 
 			<dependency>
@@ -172,6 +187,16 @@
 					<groupId>net.sourceforge</groupId>
 					<artifactId>hatbox</artifactId>
 					<version>1.0.b7</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>postgresql</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.postgresql</groupId>
+					<artifactId>postgresql</artifactId>
+					<version>${postgresql.jdbc.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>

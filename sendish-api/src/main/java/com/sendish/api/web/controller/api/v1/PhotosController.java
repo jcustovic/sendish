@@ -170,7 +170,7 @@ public class PhotosController {
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            photoService.like(photoId, user.getUserId());
+            photoService.likeReceived(photoId, user.getUserId());
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }
@@ -185,7 +185,7 @@ public class PhotosController {
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            photoService.dislike(photoId, user.getUserId());
+            photoService.dislikeReceived(photoId, user.getUserId());
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }
@@ -200,7 +200,7 @@ public class PhotosController {
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            photoService.report(photoId, reason, reasonText, user.getUserId());
+            photoService.reportReceived(photoId, reason, reasonText, user.getUserId());
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }
