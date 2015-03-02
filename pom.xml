@@ -38,6 +38,7 @@
 		<thumbnailator.version>0.4.8</thumbnailator.version>
 		<querydsl.version>3.6.1</querydsl.version>
 		<postgresql.jdbc.version>9.4-1201-jdbc41</postgresql.jdbc.version>
+		<postgis-jdbc.version>1.3.3</postgis-jdbc.version>
 	</properties>
 
 	<dependencies>
@@ -197,6 +198,11 @@
 					<groupId>org.postgresql</groupId>
 					<artifactId>postgresql</artifactId>
 					<version>${postgresql.jdbc.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>org.postgis</groupId>
+					<artifactId>postgis-jdbc</artifactId>
+					<version>${postgis-jdbc.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
