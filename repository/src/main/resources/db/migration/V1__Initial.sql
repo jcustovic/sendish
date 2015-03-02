@@ -232,7 +232,7 @@ create table photo_receiver (
   pr_opened_date timestamp null,
 
   primary key (pr_id),
-  constraint photo_receiver_user_photo_id_uq unique (pr_photo_id, pr_user_id)
+  constraint photo_receiver_user_photo_id_uq unique (pr_photo_id, pr_user_id),
   constraint photo_receiver_user_id_fk foreign key (pr_user_id) references auth_user,
   constraint photo_receiver_photo_id_fk foreign key (pr_photo_id) references photo,
   constraint photo_receiver_city_id_fk foreign key (pr_city_id) references city
