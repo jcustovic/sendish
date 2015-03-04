@@ -158,9 +158,21 @@
 			</dependency>
 			
 			<dependency>
-				<groupId>com.mysema.querydsl</groupId>
-				<artifactId>querydsl-jpa</artifactId>
-				<version>${querydsl.version}</version>
+			    <groupId>com.mysema.querydsl</groupId>
+			    <artifactId>querydsl-core</artifactId>
+			    <version>${querydsl.version}</version>
+			</dependency>
+			 
+			<dependency>
+			    <groupId>com.mysema.querydsl</groupId>
+			    <artifactId>querydsl-apt</artifactId>
+			    <version>${querydsl.version}</version>
+			</dependency>
+			 
+			<dependency>
+			    <groupId>com.mysema.querydsl</groupId>
+			    <artifactId>querydsl-jpa</artifactId>
+			    <version>${querydsl.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

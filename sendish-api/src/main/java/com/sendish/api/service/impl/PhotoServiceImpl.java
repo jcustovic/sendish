@@ -292,7 +292,7 @@ public class PhotoServiceImpl {
     private void sendNewPhotoNotification(Long userId, Photo photo, PhotoReceiver photoReceiver) {
 		Map<String, Object> photoReceivedFields = new HashMap<>();
         photoReceivedFields.put("TYPE", "RECEIVED_PHOTO");
-        photoReceivedFields.put("REFERENCE_ID", photoReceiver.getId());
+        photoReceivedFields.put("REFERENCE_ID", photo.getId());
         notificationProvider.sendPlainTextNotification(CityUtils.getLocationName(photo.getCity()), photoReceivedFields, userId);
 	}
 
