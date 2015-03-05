@@ -8,4 +8,6 @@ public interface UserDetailsRepositoryCustom {
 
     Page<UserDetails> searchUsersForSendingPool(DateTime lastUserPhotoReceivedDate, int size);
 
+	Page<UserDetails> searchOldUsersForSendingPool(DateTime oldestUserPhotoReceivedDate, int size);
+
 }

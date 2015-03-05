@@ -65,5 +65,48 @@ public class UserDetailsRepositoryImpl implements UserDetailsRepositoryCustom {
         // ORDER BY lastReceivedTime ASC
         return userDetailsRepository.findAll(spec, new PageRequest(0, size, Direction.ASC, "lastReceivedTime"));
     }
+    
+    @Override
+    public Page<UserDetails> searchOldUsersForSendingPool(DateTime oldestUserPhotoReceivedDate, int size) {
+        final Specification<UserDetails> spec = (p_root, p_criteriaQuery, p_criteriaBuilder) -> {
+        	final List<Predicate> andPredicates = new LinkedList<>();
+        	DateTime now = DateTime.now();
+        	
+        	// (lastInteractionTime IS NOT NULL AND lastInteractionTime > today - 10days)
+        	Path<DateTime> lastInteractionTime = p_root.get("lastInteractionTime");
+        	andPredicates.add(p_criteriaBuilder.and(
+        			p_criteriaBuilder.isNotNull(lastInteractionTime), 
+        			p_criteriaBuilder.greaterThan(lastInteractionTime, now.minusDays(10))
+        	));
+        	
+        	// (receiveAllowedTime IS NULL OR receiveAllowedTime >= now)
+        	Path<DateTime> receiveAllowedTime = p_root.get("receiveAllowedTime");
+        	andPredicates.add(p_criteriaBuilder.or(
+        			p_criteriaBuilder.isNull(receiveAllowedTime), 
+        			p_criteriaBuilder.greaterThanOrEqualTo(receiveAllowedTime, now)
+        	));
+        	
+        	if (oldestUserPhotoReceivedDate != null)  {
+	        	// (lastReceivedTime IS NULL OR lastReceivedTime < oldestUserPhotoReceivedDate)
+	        	Path<DateTime> lastReceivedTime = p_root.get("lastReceivedTime");
+	        	andPredicates.add(p_criteriaBuilder.or(
+	        			p_criteriaBuilder.isNull(lastReceivedTime), 
+	        			p_criteriaBuilder.lessThan(lastReceivedTime, oldestUserPhotoReceivedDate)
+	        	));
+        	}
+        	
+        	// disabled == false AND deleted = false
+        	final Path<User> user = p_root.get("user");
+        	andPredicates.add(p_criteriaBuilder.isFalse(user.get("deleted")));
+        	andPredicates.add(p_criteriaBuilder.isFalse(user.get("disabled")));
+        	
+            final Predicate andPredicate = p_criteriaBuilder.and(andPredicates.toArray(new Predicate[andPredicates.size()]));
+            
+            return andPredicate;
+        };
+
+        // ORDER BY lastReceivedTime ASC
+        return userDetailsRepository.findAll(spec, new PageRequest(0, size, Direction.ASC, "lastReceivedTime"));
+    }
 
 }

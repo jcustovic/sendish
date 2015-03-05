@@ -284,12 +284,12 @@ public class PhotoServiceImpl {
         usersReceivedPhotos(userId).add(photoId.toString());
         statisticsRepository.incrementUnseenCount(userId);
         
-        sendNewPhotoNotification(userId, photo, photoReceiver);
+        sendNewPhotoNotification(userId, photo);
 
         return photoReceiver;
     }
     
-    private void sendNewPhotoNotification(Long userId, Photo photo, PhotoReceiver photoReceiver) {
+    private void sendNewPhotoNotification(Long userId, Photo photo) {
 		Map<String, Object> photoReceivedFields = new HashMap<>();
         photoReceivedFields.put("TYPE", "RECEIVED_PHOTO");
         photoReceivedFields.put("REFERENCE_ID", photo.getId());

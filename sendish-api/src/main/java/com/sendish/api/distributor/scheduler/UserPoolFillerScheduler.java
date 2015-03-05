@@ -51,19 +51,47 @@ public class UserPoolFillerScheduler {
                 LOGGER.info("Putting {} users to pool...", userDetails.getNumberOfElements());
                 userPool.put(usersWithScore);
             } else {
-                LOGGER.info("No users found for for user pool");
+                LOGGER.info("No users found for user pool");
             }
+            
+            checkIfWeHaveSomeOldUsers();
         } else {
             LOGGER.info("Skipping user pool fetching because pool is full");
         }
     }
 
-    private DateTime getLatestUserPhotoReceivedDate() {
+    private void checkIfWeHaveSomeOldUsers() {
+    	DateTime oldestUserPhotoReceivedDate = getOldest();
+        LOGGER.info("Oldest user received photo timestamp in pool is {}", oldestUserPhotoReceivedDate);
+        
+        Page<UserDetails> userDetails = userDetailsRepository.searchOldUsersForSendingPool(oldestUserPhotoReceivedDate, 100);
+        if (userDetails.hasContent()) {
+            List<UserWithScore> usersWithScore = userDetails.getContent().stream()
+                    .map(user -> new UserWithScore(user.getUserId().toString(), (user.getLastReceivedTime() == null) ? 0 : user.getLastReceivedTime().getMillis()))
+                    .collect(Collectors.toList());
+
+            LOGGER.error("Putting {} old users to pool...", userDetails.getNumberOfElements());
+            userPool.put(usersWithScore);
+        } else {
+            LOGGER.info("No old users found for user pool");
+        }
+	}
+
+	private DateTime getLatestUserPhotoReceivedDate() {
         UserWithScore lastUser = userPool.getLastWithScore();
         if (lastUser == null || lastUser.getScore() == 0) {
             return null;
         } else {
             return new DateTime(lastUser.getScore());
+        }
+    }
+	
+	private DateTime getOldest() {
+        UserWithScore firstUser = userPool.getFirstWithScore();
+        if (firstUser == null || firstUser.getScore() == 0) {
+            return null;
+        } else {
+            return new DateTime(firstUser.getScore());
         }
     }
 

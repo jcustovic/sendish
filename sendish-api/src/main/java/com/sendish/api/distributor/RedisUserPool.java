@@ -58,6 +58,17 @@ public class RedisUserPool implements UserPool {
             return new UserWithScore(lastOne.getValue(), lastOne.getScore().longValue());
         }
     }
+    
+    @Override
+    public UserWithScore getFirstWithScore() {
+        Set<ZSetOperations.TypedTuple<String>> results = userPool.rangeWithScores(0, 0);
+        if (results.isEmpty()) {
+            return null;
+        } else {
+            ZSetOperations.TypedTuple<String> lastOne = results.iterator().next();
+            return new UserWithScore(lastOne.getValue(), lastOne.getScore().longValue());
+        }
+    }
 
     @Override
     public void put(UserWithScore user) {

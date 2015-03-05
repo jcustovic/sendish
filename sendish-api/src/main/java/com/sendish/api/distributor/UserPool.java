@@ -14,6 +14,8 @@ public interface UserPool {
     Collection<String> getNextWithOffset(int offset, int n);
 
     UserWithScore getLastWithScore();
+    
+    UserWithScore getFirstWithScore();
 
     void put(UserWithScore user);
 
