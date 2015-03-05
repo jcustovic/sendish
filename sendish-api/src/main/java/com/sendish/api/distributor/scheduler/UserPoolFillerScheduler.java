@@ -39,7 +39,9 @@ public class UserPoolFillerScheduler {
             LOGGER.info("Fetching {} (needed: {}) users for user pool. Current users in pool: {}.", fetchSize, neededSize, poolSize);
             
             DateTime latestUserPhotoReceivedDate = getLatestUserPhotoReceivedDate();
-            LOGGER.info("Last user received photo timestamp in pool is {}", latestUserPhotoReceivedDate);
+            LOGGER.info("Newset user received photo timestamp in pool is {}", latestUserPhotoReceivedDate);
+            DateTime oldestUserPhotoReceivedDate = getOldestUserPhotoReceivedDate();
+            LOGGER.info("Oldest user received photo timestamp in pool is {}", oldestUserPhotoReceivedDate);
 
             // TODO: Only return userId and lastReceivedTime! Save all the joins and hibernate city and what not selections!
             Page<UserDetails> userDetails = userDetailsRepository.searchUsersForSendingPool(latestUserPhotoReceivedDate, fetchSize);
@@ -54,16 +56,15 @@ public class UserPoolFillerScheduler {
                 LOGGER.info("No users found for user pool");
             }
             
-            checkIfWeHaveSomeOldUsers();
+            if (oldestUserPhotoReceivedDate != null) {
+            	checkIfWeHaveSomeOldUsers(oldestUserPhotoReceivedDate);	
+            }
         } else {
             LOGGER.info("Skipping user pool fetching because pool is full");
         }
     }
 
-    private void checkIfWeHaveSomeOldUsers() {
-    	DateTime oldestUserPhotoReceivedDate = getOldest();
-        LOGGER.info("Oldest user received photo timestamp in pool is {}", oldestUserPhotoReceivedDate);
-        
+    private void checkIfWeHaveSomeOldUsers(DateTime oldestUserPhotoReceivedDate) {
         Page<UserDetails> userDetails = userDetailsRepository.searchOldUsersForSendingPool(oldestUserPhotoReceivedDate, 100);
         if (userDetails.hasContent()) {
             List<UserWithScore> usersWithScore = userDetails.getContent().stream()
@@ -86,7 +87,7 @@ public class UserPoolFillerScheduler {
         }
     }
 	
-	private DateTime getOldest() {
+	private DateTime getOldestUserPhotoReceivedDate() {
         UserWithScore firstUser = userPool.getFirstWithScore();
         if (firstUser == null || firstUser.getScore() == 0) {
             return null;

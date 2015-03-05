@@ -64,8 +64,8 @@ public class PhotoCommentsController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        if (comment.length() > 128) {
-            return new ResponseEntity<>("Comment to long. Max 128 characters allowed", HttpStatus.BAD_REQUEST);
+        if (comment.length() > 200) {
+            return new ResponseEntity<>("Comment to long. Max 200 characters allowed", HttpStatus.BAD_REQUEST);
         }
 
         PhotoComment photoComment = photoCommentService.save(photoId, comment, user.getUserId());

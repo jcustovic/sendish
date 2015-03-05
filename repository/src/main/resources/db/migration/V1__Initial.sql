@@ -182,7 +182,7 @@ create table photo_comment (
   pc_id int8 not null default nextval('photo_comment_seq'),
   pc_photo_id int8 not null,
   pc_user_id int8 not null,
-  pc_comment varchar(128),
+  pc_comment varchar(200),
   pc_likes_count int4 not null default 0,
   pc_dislikes_count int4 not null default 0,
   pc_reports_count int4 not null default 0,

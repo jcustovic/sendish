@@ -35,7 +35,7 @@ public class PhotoComment extends BaseEntity {
 	@Column(name = "pc_deleted", nullable = false)
 	private Boolean deleted = false;
 
-	@Column(name = "pc_comment", nullable = false, length = 128)
+	@Column(name = "pc_comment", nullable = false, length = 200)
 	private String comment;
 
 	@Column(name = "pc_created_date", nullable = false)

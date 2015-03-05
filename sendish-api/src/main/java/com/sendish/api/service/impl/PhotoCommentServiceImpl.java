@@ -117,7 +117,7 @@ public class PhotoCommentServiceImpl {
 	}
 
 	private String getNotificationText(User user, String comment) {
-		String prefix = UserUtils.getDisplayName(user) + " said: ";
+		String prefix = UserUtils.getDisplayNameWithCity(user) + " said: ";
 		int charsLeftForComment = 50 - prefix.length();
 		
 		if (comment.length() > charsLeftForComment) {
@@ -132,7 +132,7 @@ public class PhotoCommentServiceImpl {
         UserDetails userDetails = comment.getUser().getDetails();
         commentDto.setId(comment.getId());
         commentDto.setUserId(userDetails.getUserId());
-        commentDto.setUserName(UserUtils.getDisplayName(comment.getUser()));
+        commentDto.setUserName(UserUtils.getDisplayNameWithCity(comment.getUser()));
         commentDto.setComment(comment.getComment());
         commentDto.setTimeAgo(prettyTime.format(comment.getCreatedDate().toDate()));
 
