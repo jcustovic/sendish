@@ -94,6 +94,9 @@ public class PhotoServiceImpl {
     
     @Autowired
     private PhotoDtoMapper photoDtoMapper;
+    
+    @Autowired
+    private RankingServiceImpl rankingService;
 
     private static PrettyTime prettyTime = new PrettyTime();
 
@@ -101,10 +104,10 @@ public class PhotoServiceImpl {
         return photoRepository.findOne(photoId);
     }
 
-    public PhotoSendingDetails processNewImage(LocationBasedFileUpload p_upload, Long p_userId) {
+    public PhotoSendingDetails processNewImage(LocationBasedFileUpload upload, Long userId) {
         DateTime receivedDate = DateTime.now();
-        MultipartFile file = p_upload.getImage();
-        Photo photo = mapToPhoto(p_upload, p_userId, file);
+        MultipartFile file = upload.getImage();
+        Photo photo = mapToPhoto(upload, userId, file);
 
         Dimension dimension;
         try {
@@ -123,14 +126,15 @@ public class PhotoServiceImpl {
         }
         photo.setStorageId(fileStoreId);
 
-        Location location = new Location(p_upload.getLatitude(), p_upload.getLongitude());
-        City city = cityService.findNearest(p_upload.getLatitude(), p_upload.getLongitude());
+        Location location = new Location(upload.getLatitude(), upload.getLongitude());
+        City city = cityService.findNearest(upload.getLatitude(), upload.getLongitude());
         photo.setOriginLocation(location);
         photo.setCity(city);
 
         photo = photoRepository.save(photo);
         createPhotoStatistics(photo);
-        userService.updateStatisticsForNewSentPhoto(p_userId, receivedDate, location, city);
+        userService.updateStatisticsForNewSentPhoto(userId, receivedDate, location, city);
+        rankingService.addPointsForNewSendish(userId);
         
         return photoSenderService.sendNewPhoto(photo.getId());
     }
@@ -212,6 +216,8 @@ public class PhotoServiceImpl {
     
     public void likePhoto(Long photoId, Long userId) {
     	statisticsRepository.likePhoto(photoId, userId);
+    	Photo photo = photoRepository.findOne(photoId);
+    	rankingService.addPointsForLikedPhoto(photo.getUser().getId());
 	}
 
     // TODO: Maybe allow changing like to dislike?
@@ -229,6 +235,8 @@ public class PhotoServiceImpl {
 
 	public void dislikePhoto(Long photoId, Long userId) {
 		statisticsRepository.dislikePhoto(photoId, userId);
+		Photo photo = photoRepository.findOne(photoId);
+    	rankingService.removePointsForDislikedPhoto(photo.getUser().getId());
 	}
 
     public void reportReceived(Long photoId, String reason, String reasonText, Long userId) {
@@ -240,7 +248,9 @@ public class PhotoServiceImpl {
             photoReceiver.setDeleted(true);
             photoReceiverRepository.save(photoReceiver);
 
-            statisticsRepository.reportPhoto(photoId, photoReceiver.getPhoto().getUser().getId());
+            Long photoUserId = photoReceiver.getPhoto().getUser().getId();
+            statisticsRepository.reportPhoto(photoId, photoUserId);
+            rankingService.removePointsForReportedPhoto(photoUserId);
         }
     }
 
@@ -284,7 +294,9 @@ public class PhotoServiceImpl {
         usersReceivedPhotos(userId).add(photoId.toString());
         statisticsRepository.incrementUnseenCount(userId);
         
-        sendNewPhotoNotification(userId, photo);
+        if (userDetails.getReceiveNotifications()) {
+        	sendNewPhotoNotification(userId, photo);	
+        }
 
         return photoReceiver;
     }

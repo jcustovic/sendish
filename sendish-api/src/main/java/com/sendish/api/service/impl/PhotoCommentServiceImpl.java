@@ -50,6 +50,9 @@ public class PhotoCommentServiceImpl {
     
     @Autowired
     private AsyncNotificationProvider notificationProvider;
+    
+    @Autowired
+    private RankingServiceImpl rankingService;
 
 	public PhotoComment save(Long photoId, String comment, Long userId) {
         // TODO: Maybe restrict only to my photos or received photos?
@@ -107,13 +110,15 @@ public class PhotoCommentServiceImpl {
     }
     
     private void sendCommentNotificationToPhotoOwner(User user, Photo photo, String comment) {
-		Map<String, Object> newCommentFields = new HashMap<>();
-        newCommentFields.put("TYPE", "NEW_COMMENT");
-        newCommentFields.put("REFERENCE_ID", photo.getId());
-        
-        String notText = getNotificationText(user, comment);
-        
-        notificationProvider.sendPlainTextNotification(notText, newCommentFields, photo.getUser().getId());
+        if (user.getDetails().getReceiveNotifications()) {
+        	Map<String, Object> newCommentFields = new HashMap<>();
+            newCommentFields.put("TYPE", "NEW_COMMENT");
+            newCommentFields.put("REFERENCE_ID", photo.getId());
+            
+            String notText = getNotificationText(user, comment);
+            
+        	notificationProvider.sendPlainTextNotification(notText, newCommentFields, photo.getUser().getId());	
+        }
 	}
 
 	private String getNotificationText(User user, String comment) {
@@ -148,16 +153,19 @@ public class PhotoCommentServiceImpl {
         PhotoCommentVote photoCommentVote = photoCommentVoteRepository.findOne(new PhotoCommentVoteId(userId, photoCommentId));
         if (photoCommentVote == null) {
             // TODO: Maybe allow vote change?
+        	PhotoComment comment = photoCommentRepository.findOne(photoCommentId);
             PhotoCommentVote newVote = new PhotoCommentVote();
             newVote.setLike(like);
             newVote.setUser(userRepository.findOne(userId));
-            newVote.setComment(photoCommentRepository.findOne(photoCommentId));
+            newVote.setComment(comment);
             photoCommentVoteRepository.save(newVote);
 
             if (like) {
                 statisticsRepository.likeComment(photoCommentId);
+                rankingService.addPointsForLikedComment(comment.getUser().getId());
             } else {
                 statisticsRepository.dislikeComment(photoCommentId);
+                rankingService.removePointsForDislikedComment(comment.getUser().getId());
             }
         }
     }
