@@ -70,8 +70,9 @@ public class UserPoolFillerScheduler {
             List<UserWithScore> usersWithScore = userDetails.getContent().stream()
                     .map(user -> new UserWithScore(user.getUserId().toString(), (user.getLastReceivedTime() == null) ? 0 : user.getLastReceivedTime().getMillis()))
                     .collect(Collectors.toList());
-
+            
             LOGGER.error("Putting {} old users to pool...", userDetails.getNumberOfElements());
+            usersWithScore.stream().forEach(uws -> LOGGER.info("Old user is {} with time {}", uws.getUserId(), new DateTime(uws.getScore())));
             userPool.put(usersWithScore);
         } else {
             LOGGER.info("No old users found for user pool");
