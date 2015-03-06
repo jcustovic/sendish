@@ -58,7 +58,7 @@ public final class KeyUtils {
      * Sorted set of users sorted by points.
      */
     public static String globalRanking() {
-        return RANK + ":global";
+        return RANK + "global";
     }
 
     public static String usersPool() {

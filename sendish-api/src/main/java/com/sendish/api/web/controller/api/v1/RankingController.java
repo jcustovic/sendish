@@ -28,7 +28,7 @@ public class RankingController {
         @ApiResponse(code = 200, message = "OK")
     })
     public List<UserRankDto> getTopRank() {
-        return userService.getTopRank();
+        return userService.getTop100();
     }
 
 }

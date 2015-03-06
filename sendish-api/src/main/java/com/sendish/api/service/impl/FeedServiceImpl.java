@@ -53,7 +53,7 @@ public class FeedServiceImpl {
 			List<PhotoComment> photoComments = photoCommentRepository.findByPhotoId(photo.getId(), new PageRequest(page, 3, Direction.DESC, "createdDate"));
 			photoComments.stream().forEach(pc -> feeds.add(mapToPhotoCommentFeed(pc)));
 			
-			List<PhotoReceiver> photoReceivers = photoReceiverRepository.findByPhotoIdAndOpenedDateNotNull(userId, 
+			List<PhotoReceiver> photoReceivers = photoReceiverRepository.findByPhotoIdAndOpenedDateNotNull(photo.getId(), 
 					new PageRequest(page, 3, Direction.DESC, "createdDate"));
 			
 			photoReceivers.stream().filter(pr -> pr.getLike() != null && pr.getLike()).forEach(pr -> feeds.add(mapToPhotoLikedFeed(pr)));

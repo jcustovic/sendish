@@ -9,9 +9,9 @@ public class UserRankDto implements Serializable {
     private Long userId;
     private String name;
     private String rank;
-    private Long points;
+    private String points;
     
-    public UserRankDto(Long userId, String name, String rank, Long points) {
+    public UserRankDto(Long userId, String name, String rank, String points) {
 		super();
 		this.userId = userId;
 		this.name = name;
@@ -45,11 +45,11 @@ public class UserRankDto implements Serializable {
         this.rank = rank;
     }
 
-    public Long getPoints() {
+    public String getPoints() {
         return points;
     }
 
-    public void setPoints(Long points) {
+    public void setPoints(String points) {
         this.points = points;
     }
 

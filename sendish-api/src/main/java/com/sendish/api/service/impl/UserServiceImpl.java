@@ -1,5 +1,17 @@
 package com.sendish.api.service.impl;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+
+import javax.transaction.Transactional;
+
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import com.sendish.api.dto.UserProfileDto;
 import com.sendish.api.dto.UserRankDto;
 import com.sendish.api.dto.UserSettingsDto;
@@ -9,23 +21,11 @@ import com.sendish.api.util.CityUtils;
 import com.sendish.repository.UserDetailsRepository;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.UserStatisticsRepository;
-import com.sendish.repository.model.jpa.*;
-
-import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import javax.transaction.Transactional;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.sendish.repository.model.jpa.City;
+import com.sendish.repository.model.jpa.Location;
+import com.sendish.repository.model.jpa.User;
+import com.sendish.repository.model.jpa.UserDetails;
+import com.sendish.repository.model.jpa.UserStatistics;
 
 @Service
 @Transactional
@@ -33,7 +33,7 @@ public class UserServiceImpl {
 
     public static final int DEFAULT_SEND_LIMIT_PER_DAY = 20;
     public static final int DEFAULT_RECEIVE_LIMIT_PER_DAY = 50;
-    public static final int MINUTES_BETWEEN_RECEIVED_PHOTOS = 15;
+    public static final int MINUTES_BETWEEN_RECEIVED_PHOTOS = 10;
 
     @Autowired
     private UserRepository userRepository;
@@ -52,6 +52,9 @@ public class UserServiceImpl {
 
     @Autowired
     private RedisStatisticsRepository statisticsRepository;
+    
+    @Autowired
+    private RankingServiceImpl rankingService;
 
     public UserDetails getUserDetails(Long userId) {
         return userDetailsRepository.findOne(userId);
@@ -102,12 +105,14 @@ public class UserServiceImpl {
         userProfileDto.setEmailRegistration(user.getEmailRegistration());
         userProfileDto.setNick(user.getNickname());
 
-        UserStatisticsDto userStatistics = statisticsRepository.getUserStatistics(userId);
-        if (userStatistics.getRank() == 0L) {
+        Long userRank = rankingService.getRank(userId);
+        if (userRank == null) {
             userProfileDto.setRank("No rank");
         } else {
-            userProfileDto.setRank(String.valueOf(userStatistics.getRank()));
+            userProfileDto.setRank(userRank.toString());
         }
+        
+        UserStatisticsDto userStatistics = statisticsRepository.getUserStatistics(userId);
         userProfileDto.setTotalDislikes(userStatistics.getTotalDislikeCount());
         userProfileDto.setTotalLikes(userStatistics.getTotalLikeCount());
         userProfileDto.setCitiesCount(userStatistics.getTotalCityCount());
@@ -195,22 +200,8 @@ public class UserServiceImpl {
         		&& (userDetails.getReceiveAllowedTime() == null || userDetails.getReceiveAllowedTime().isBeforeNow());
     }
 
-	public List<UserRankDto> getTopRank() {
-		// TODO: Implement real ranking from Redis
-		Page<User> users = userRepository.findAll(new PageRequest(0, 100, Sort.Direction.DESC, "createdDate"));
-		List<UserRankDto> topUsers = new ArrayList<UserRankDto>();
-		int i = 0;
-		for (User user : users) {
-			String username;
-			if (user.getDetails().getCurrentCity() == null) {
-				username = "Noname";
-			} else {
-				username = CityUtils.getLocationName(user.getDetails().getCurrentCity());
-			}
-			topUsers.add(new UserRankDto(user.getId(), username, String.valueOf(++i), user.getId()));
-		}
-		
-		return topUsers;
+	public List<UserRankDto> getTop100() {
+		return rankingService.getFromTop(0, 99);
 	}
 
 }
