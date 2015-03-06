@@ -57,7 +57,7 @@ public class UserPoolFillerScheduler {
             }
             
             if (oldestUserPhotoReceivedDate != null) {
-            	checkIfWeHaveSomeOldUsers(oldestUserPhotoReceivedDate);	
+            	checkIfWeHaveSomeOldUsers(oldestUserPhotoReceivedDate.minusMinutes(10));	
             }
         } else {
             LOGGER.info("Skipping user pool fetching because pool is full");
