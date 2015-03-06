@@ -44,7 +44,7 @@ public class RankingServiceImpl {
     
     @Cacheable("com.sendish.api.service.impl.RankingServiceImpl.getFromTop")
     public List<UserRankDto> getFromTop(long start, int end) {
-    	Set<TypedTuple<String>> topUsers = globalLeaderboard.rangeWithScores(start, end);
+    	Set<TypedTuple<String>> topUsers = globalLeaderboard.reverseRangeWithScores(start, end);
     	List<UserRankDto> usersRank = new ArrayList<>(topUsers.size());
     	
     	int i = 0;
@@ -63,7 +63,7 @@ public class RankingServiceImpl {
     }
     
     public Long getRank(Long userId) {
-    	Long rank = globalLeaderboard.rank(userId.toString());
+    	Long rank = globalLeaderboard.reverseRank(userId.toString());
     	if (rank == null) {
     		return null;
     	} else {
