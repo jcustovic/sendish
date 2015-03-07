@@ -40,12 +40,7 @@ public class FeedServiceImpl {
 	public List<FeedItemDto> getMyFeed(Long userId, Integer page) {
 		// TODO: Redis impl
 		List<FeedItemDto> feeds = new LinkedList<>();
-		
-		List<PhotoReceiver> receivedPhotos = photoReceiverRepository.findByUserId(userId, 
-        		new PageRequest(page, 3, Direction.DESC, "createdDate"));
-		
-		receivedPhotos.stream().forEach(rp -> feeds.add(mapToReceivedPhotoFeed(rp)));
-		
+
 		List<Photo> photos = photoRepository.findByUserId(userId, 
         		new PageRequest(page, 3, Direction.DESC, "createdDate"));
 		
@@ -84,19 +79,6 @@ public class FeedServiceImpl {
 		feedItem.setPhotoType(PhotoType.SENT);
 		feedItem.setPhotoUuid(photo.getUuid());
 		feedItem.setTimeAgo(prettyTime.format(photoComment.getCreatedDate().toDate()));
-
-		return feedItem;
-	}
-
-	private FeedItemDto mapToReceivedPhotoFeed(PhotoReceiver photoReceiver) {
-		Photo photo = photoReceiver.getPhoto();
-		
-		FeedItemDto feedItem = new FeedItemDto();
-		feedItem.setDescription("New sendish from " + CityUtils.getLocationName(photo.getCity()));
-		feedItem.setPhotoId(photo.getId());
-		feedItem.setPhotoType(PhotoType.RECEIVED);
-		feedItem.setPhotoUuid(photo.getUuid());
-		feedItem.setTimeAgo(prettyTime.format(photoReceiver.getCreatedDate().toDate()));
 
 		return feedItem;
 	}

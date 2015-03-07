@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.sendish.api.dto.UserRankDto;
 import com.sendish.api.redis.KeyUtils;
-import com.sendish.api.util.CityUtils;
+import com.sendish.api.util.UserUtils;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.User;
 
@@ -54,9 +54,9 @@ public class RankingServiceImpl {
 			if (user.getDetails().getCurrentCity() == null) {
 				username = "Noname";
 			} else {
-				username = CityUtils.getLocationName(user.getDetails().getCurrentCity());
+				username = UserUtils.getDisplayNameWithCity(user);
 			}
-			usersRank.add(new UserRankDto(user.getId(), username, String.valueOf(++i), topUser.getScore().toString()));
+			usersRank.add(new UserRankDto(user.getId(), username, String.valueOf(++i), String.valueOf(topUser.getScore().longValue())));
 		}
 
     	return usersRank;
