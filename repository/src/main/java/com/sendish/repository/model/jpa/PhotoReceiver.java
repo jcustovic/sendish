@@ -15,7 +15,7 @@ import javax.persistence.*;
 @SequenceGenerator(name = "idSequence", sequenceName = "photo_receiver_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "pr_id"))
 @EntityListeners(LocationListener.class)
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class PhotoReceiver extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

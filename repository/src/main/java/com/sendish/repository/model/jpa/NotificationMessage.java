@@ -18,7 +18,7 @@ import org.joda.time.DateTime;
 @Table(name = "notification_message")
 @SequenceGenerator(name = "idSequence", sequenceName = "notification_message_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name="nm_id"))
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class NotificationMessage extends BaseEntity {
 
     private static final long  serialVersionUID = 1L;

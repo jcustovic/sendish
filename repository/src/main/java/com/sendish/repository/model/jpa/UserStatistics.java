@@ -17,7 +17,7 @@ import org.joda.time.DateTime;
 
 @Entity
 @Table(name = "auth_user_statistics")
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class UserStatistics implements Serializable {
 
     private static final long serialVersionUID = 1L;

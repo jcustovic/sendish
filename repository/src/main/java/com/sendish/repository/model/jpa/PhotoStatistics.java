@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "photo_statistics")
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class PhotoStatistics implements Serializable {
 
     private static final long serialVersionUID = 1L;

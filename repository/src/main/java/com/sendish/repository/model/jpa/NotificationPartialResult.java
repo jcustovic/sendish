@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Table(name = "notification_partial_result")
 @SequenceGenerator(name = "idSequence", sequenceName = "notification_partial_result_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name="npr_id"))
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class NotificationPartialResult extends BaseEntity {
 
     private static final long        serialVersionUID = 1L;

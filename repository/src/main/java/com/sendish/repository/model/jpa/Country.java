@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @Table(name = "country")
 @SequenceGenerator(name = "idSequence", sequenceName = "country_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name="c_id"))
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Country extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

@@ -15,7 +15,7 @@ import javax.persistence.Table;
 @SequenceGenerator(name = "idSequence", sequenceName = "photo_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "p_id"))
 @EntityListeners(LocationListener.class)
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Photo extends BaseEntity implements LocationAware {
 
     private static final long serialVersionUID = 1L;
