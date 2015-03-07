@@ -76,7 +76,9 @@ public class UserActivityServiceImpl {
 	}
 
 	private void addActivityToUserTimeline(Long userId, Long activityId) {
-		userTimeline(userId).leftPush(activityId.toString());
+		BoundListOperations<String, String> userTimeline = userTimeline(userId);
+		userTimeline.leftPush(activityId.toString());
+		userTimeline.trim(0, 49);
 	}
 	
 	private BoundListOperations<String, String> userTimeline(Long userId) {
