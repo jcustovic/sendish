@@ -53,6 +53,13 @@ public final class KeyUtils {
     public static String userReceivedPhotos(long userId) {
         return USER + userId + ":photo:received";
     }
+    
+    /**
+     * List holding timeline
+     */
+    public static String userTimeline(long userId) {
+        return USER + userId + ":timeline";
+    }
 
     /**
      * Sorted set of users sorted by points.

@@ -6,6 +6,7 @@ public class FeedItemDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private String displayName;
 	private String description;
 	private String timeAgo;
 	private String photoUuid;
@@ -13,6 +14,14 @@ public class FeedItemDto implements Serializable {
 	private PhotoType photoType;
 	
 	// Getters & setters
+	
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}	
 
 	public String getDescription() {
 		return description;

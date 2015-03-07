@@ -77,6 +77,13 @@
            timeToLiveSeconds="600"
            timeToIdleSeconds="600"
            overflowToDisk="true" />
+           
+    <cache name="com.sendish.repository.model.jpa.UserActivity"
+           maxElementsInMemory="10000"
+           eternal="false"
+           timeToLiveSeconds="600"
+           timeToIdleSeconds="600"
+           overflowToDisk="true" />
 
     <cache name="com.sendish.repository.model.jpa.UserSocialConnection"
            maxElementsInMemory="10000"

@@ -10,6 +10,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
@@ -17,17 +18,18 @@ import org.joda.time.DateTime;
 @Table(name = "user_activity")
 @SequenceGenerator(name = "idSequence", sequenceName = "user_activity_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "ua_id"))
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class UserActivity extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "ua_user_id")
-	private User userId;
+	private User user;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "ua_from_user_id")
-	private User fromUserId;
+	private User fromUser;
 
 	@Column(name = "ua_text", nullable = false, length = 200)
 	private String text;
@@ -52,20 +54,20 @@ public class UserActivity extends BaseEntity {
 	
 	// Getters & setters
 
-	public User getUserId() {
-		return userId;
+	public User getUser() {
+		return user;
 	}
 
-	public void setUserId(User userId) {
-		this.userId = userId;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
-	public User getFromUserId() {
-		return fromUserId;
+	public User getFromUser() {
+		return fromUser;
 	}
 
-	public void setFromUserId(User fromUserId) {
-		this.fromUserId = fromUserId;
+	public void setFromUser(User fromUser) {
+		this.fromUser = fromUser;
 	}
 
 	public String getText() {

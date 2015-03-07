@@ -44,6 +44,7 @@ import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoReceiver;
 import com.sendish.repository.model.jpa.PhotoSendingDetails;
 import com.sendish.repository.model.jpa.PhotoStatistics;
+import com.sendish.repository.model.jpa.User;
 import com.sendish.repository.model.jpa.UserDetails;
 
 @Service
@@ -97,6 +98,9 @@ public class PhotoServiceImpl {
     
     @Autowired
     private RankingServiceImpl rankingService;
+    
+    @Autowired
+    private UserActivityServiceImpl userActivityService;
 
     private static PrettyTime prettyTime = new PrettyTime();
 
@@ -215,9 +219,12 @@ public class PhotoServiceImpl {
     }
     
     public void likePhoto(Long photoId, Long userId) {
+    	// TODO: Implement checking if user voted already
     	statisticsRepository.likePhoto(photoId, userId);
     	Photo photo = photoRepository.findOne(photoId);
+    	User user = userRepository.findOne(userId);
     	rankingService.addPointsForLikedPhoto(photo.getUser().getId());
+    	userActivityService.addPhotoLikedActivity(photo, user);
 	}
 
     // TODO: Maybe allow changing like to dislike?
@@ -234,6 +241,7 @@ public class PhotoServiceImpl {
     }
 
 	public void dislikePhoto(Long photoId, Long userId) {
+		// TODO: Implement checking if user voted already
 		statisticsRepository.dislikePhoto(photoId, userId);
 		Photo photo = photoRepository.findOne(photoId);
     	rankingService.removePointsForDislikedPhoto(photo.getUser().getId());

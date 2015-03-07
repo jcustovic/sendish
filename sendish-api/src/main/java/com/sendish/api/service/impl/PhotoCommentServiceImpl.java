@@ -53,6 +53,9 @@ public class PhotoCommentServiceImpl {
     
     @Autowired
     private RankingServiceImpl rankingService;
+    
+    @Autowired
+    private UserActivityServiceImpl userActivityService;
 
 	public PhotoComment save(Long photoId, String comment, Long userId) {
         // TODO: Maybe restrict only to my photos or received photos?
@@ -67,7 +70,8 @@ public class PhotoCommentServiceImpl {
         photoComment = photoCommentRepository.save(photoComment);
         statisticsRepository.increasePhotoCommentCount(photoId);
         if (!photo.getDeleted()) {
-        	sendCommentNotificationToPhotoOwner(user, photo, comment);	
+        	sendCommentNotificationToPhotoOwner(user, photo, comment);
+        	userActivityService.addPhotoCommentActivity(photoComment);
         }
 
 		return photoComment;
