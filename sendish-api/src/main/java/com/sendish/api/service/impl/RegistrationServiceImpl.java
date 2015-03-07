@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.mail.MessagingException;
-import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.UserRegistration;
 import com.sendish.api.service.MailSenderService;

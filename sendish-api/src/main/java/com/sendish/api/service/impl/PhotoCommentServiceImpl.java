@@ -19,12 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.repository.PhotoCommentRepository;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.UserRepository;
-
-import javax.transaction.Transactional;
 
 @Service
 @Transactional

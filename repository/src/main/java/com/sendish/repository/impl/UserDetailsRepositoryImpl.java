@@ -86,10 +86,10 @@ public class UserDetailsRepositoryImpl implements UserDetailsRepositoryCustom {
     			p_criteriaBuilder.greaterThanOrEqualTo(receiveAllowedTime, now)
         	));
         	
-        	// (lastReceivedTime IS NULL OR lastReceivedTime < oldestUserPhotoReceivedDate)
+        	// (lastReceivedTime IS NOT NULL OR lastReceivedTime < oldestUserPhotoReceivedDate)
         	Path<DateTime> lastReceivedTime = p_root.get("lastReceivedTime");
-        	andPredicates.add(p_criteriaBuilder.or(
-    			p_criteriaBuilder.isNull(lastReceivedTime), 
+        	andPredicates.add(p_criteriaBuilder.and(
+    			p_criteriaBuilder.isNotNull(lastReceivedTime), 
     			p_criteriaBuilder.lessThan(lastReceivedTime, oldestUserPhotoReceivedDate)
         	));
         	

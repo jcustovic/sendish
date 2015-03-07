@@ -2,12 +2,11 @@ package com.sendish.api.service.impl;
 
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
