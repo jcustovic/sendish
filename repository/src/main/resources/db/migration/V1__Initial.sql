@@ -410,3 +410,23 @@ create table hot_photo (
   primary key (hp_photo_id),
   constraint hot_photo_photo_id_fk foreign key (hp_photo_id) references photo
 );
+
+-- UserActivity table
+create sequence user_activity_seq;
+
+create table user_activity (
+  ua_id int8 not null default nextval('user_activity'),
+  ua_user_id int8 not null,
+  ua_from_user_id int8,
+  ua_text varchar(200) not null,
+  ua_photo_uuid varchar(36),
+  ua_reference_type varchar(32) not null,
+  ua_reference_id varchar(32),
+  ua_created_date timestamp,
+
+  primary key (ua_id),
+  constraint user_activity_user_id_fk foreign key (ua_user_id) references auth_user,
+  constraint user_activity_from_user_id_fk foreign key (ua_from_user_id) references auth_user
+);
+
+create index user_activity_user_idx on user_activity (ua_user_id);
