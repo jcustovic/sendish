@@ -1,5 +1,6 @@
 package com.sendish.repository.model.jpa;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 @Table(name = "user_inbox_item")
 @SequenceGenerator(name = "idSequence", sequenceName = "user_inbox_item_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "uii_id"))
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class UserInboxItem extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;

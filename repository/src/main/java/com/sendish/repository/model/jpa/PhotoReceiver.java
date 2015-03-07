@@ -2,6 +2,7 @@ package com.sendish.repository.model.jpa;
 
 import com.sendish.repository.model.jpa.listener.LocationListener;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Type;
@@ -14,6 +15,7 @@ import javax.persistence.*;
 @SequenceGenerator(name = "idSequence", sequenceName = "photo_receiver_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "pr_id"))
 @EntityListeners(LocationListener.class)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class PhotoReceiver extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

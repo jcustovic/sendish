@@ -29,11 +29,11 @@ public class UserDetailsRepositoryImpl implements UserDetailsRepositoryCustom {
         	final List<Predicate> andPredicates = new LinkedList<>();
         	DateTime now = DateTime.now();
         	
-        	// (lastInteractionTime IS NOT NULL AND lastInteractionTime > today - 10days)
+        	// (lastInteractionTime IS NOT NULL AND lastInteractionTime > today - 1days)
         	Path<DateTime> lastInteractionTime = p_root.get("lastInteractionTime");
         	andPredicates.add(p_criteriaBuilder.and(
     			p_criteriaBuilder.isNotNull(lastInteractionTime), 
-    			p_criteriaBuilder.greaterThan(lastInteractionTime, now.minusDays(10))
+    			p_criteriaBuilder.greaterThan(lastInteractionTime, now.minusDays(1))
         	));
         	
         	// (receiveAllowedTime IS NULL OR receiveAllowedTime >= now)
@@ -72,11 +72,11 @@ public class UserDetailsRepositoryImpl implements UserDetailsRepositoryCustom {
         	final List<Predicate> andPredicates = new LinkedList<>();
         	DateTime now = DateTime.now();
         	
-        	// (lastInteractionTime IS NOT NULL AND lastInteractionTime > today - 10days)
+        	// (lastInteractionTime IS NOT NULL AND lastInteractionTime > today - 1days)
         	Path<DateTime> lastInteractionTime = p_root.get("lastInteractionTime");
         	andPredicates.add(p_criteriaBuilder.and(
     			p_criteriaBuilder.isNotNull(lastInteractionTime), 
-    			p_criteriaBuilder.greaterThan(lastInteractionTime, now.minusDays(10))
+    			p_criteriaBuilder.greaterThan(lastInteractionTime, now.minusDays(1))
         	));
         	
         	// (receiveAllowedTime IS NULL OR receiveAllowedTime >= now)

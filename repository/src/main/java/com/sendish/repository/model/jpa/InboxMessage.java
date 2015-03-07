@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Table(name = "inbox_message")
 @SequenceGenerator(name = "idSequence", sequenceName = "inbox_message_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "im_id"))
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class InboxMessage extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

@@ -1,13 +1,16 @@
 package com.sendish.repository.model.jpa;
 
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 
 @Entity
 @Table(name = "photo_statistics")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class PhotoStatistics implements Serializable {
 
     private static final long serialVersionUID = 1L;

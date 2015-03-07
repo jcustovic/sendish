@@ -1,18 +1,27 @@
 package com.sendish.repository.model.jpa;
 
-import org.hibernate.annotations.Cache;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import javax.persistence.*;
-
 @Entity
 @Table(name = "auth_user")
 @SequenceGenerator(name = "idSequence", sequenceName = "auth_user_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "au_id"))
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User extends BaseEntity {
 
 	private static final long serialVersionUID = 1L;

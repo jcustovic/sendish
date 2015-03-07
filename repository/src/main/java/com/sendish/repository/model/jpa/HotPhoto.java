@@ -13,7 +13,7 @@ import org.joda.time.DateTime;
 
 @Entity
 @Table(name = "hot_photo")
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class HotPhoto {
 
 	@Id

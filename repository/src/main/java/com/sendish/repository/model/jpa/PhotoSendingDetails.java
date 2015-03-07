@@ -1,10 +1,14 @@
 package com.sendish.repository.model.jpa;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import java.io.Serializable;
 
 @Entity
 @Table(name = "photo_sending_details")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class PhotoSendingDetails implements Serializable {
 
     private static final long serialVersionUID = 1L;

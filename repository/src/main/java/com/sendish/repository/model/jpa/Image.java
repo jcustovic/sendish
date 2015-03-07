@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Table(name = "image")
 @SequenceGenerator(name = "idSequence", sequenceName = "image_seq", allocationSize = 1)
 @AttributeOverride(name = "id", column = @Column(name = "i_id"))
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Image extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

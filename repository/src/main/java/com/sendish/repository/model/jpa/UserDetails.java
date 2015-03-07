@@ -1,20 +1,31 @@
 package com.sendish.repository.model.jpa;
 
-import com.sendish.repository.model.jpa.listener.LocationAware;
-import com.sendish.repository.model.jpa.listener.LocationListener;
-import org.hibernate.annotations.*;
-import org.hibernate.annotations.Cache;
+import java.io.Serializable;
+
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
-import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import java.io.Serializable;
+import com.sendish.repository.model.jpa.listener.LocationAware;
+import com.sendish.repository.model.jpa.listener.LocationListener;
 
 @Entity
 @Table(name = "auth_user_details")
 @EntityListeners(LocationListener.class)
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class UserDetails implements Serializable, LocationAware {
 
     private static final long serialVersionUID = 1L;

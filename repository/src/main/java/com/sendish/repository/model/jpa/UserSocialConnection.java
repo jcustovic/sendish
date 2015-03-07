@@ -1,19 +1,25 @@
 package com.sendish.repository.model.jpa;
 
-import org.hibernate.annotations.Cache;
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
-
-import javax.persistence.*;
-
-import java.io.Serializable;
 
 @Entity
 @IdClass(UserSocialConnectionId.class)
 @Table(name = "user_social_connection", uniqueConstraints = { @UniqueConstraint(name = "accountId_providerId_accessToken_UNIQUE", columnNames = { "usc_user_id",
         "usc_provider_id", "usc_rank" }) })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class UserSocialConnection implements Serializable {
 
     private static final long serialVersionUID = 1L;
