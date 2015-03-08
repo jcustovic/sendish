@@ -10,18 +10,18 @@ public class ActivityItemDto implements Serializable {
 	private String description;
 	private String timeAgo;
 	private String photoUuid;
-	private Long photoId;
-	private PhotoType photoType;
-	
+	private String referenceId;
+	private String referenceType;
+
 	// Getters & setters
-	
+
 	public String getDisplayName() {
 		return displayName;
 	}
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
-	}	
+	}
 
 	public String getDescription() {
 		return description;
@@ -47,20 +47,20 @@ public class ActivityItemDto implements Serializable {
 		this.photoUuid = photoUuid;
 	}
 
-	public Long getPhotoId() {
-		return photoId;
+	public String getReferenceId() {
+		return referenceId;
 	}
 
-	public void setPhotoId(Long photoId) {
-		this.photoId = photoId;
+	public void setReferenceId(String referenceId) {
+		this.referenceId = referenceId;
 	}
 
-	public PhotoType getPhotoType() {
-		return photoType;
+	public String getReferenceType() {
+		return referenceType;
 	}
 
-	public void setPhotoType(PhotoType photoType) {
-		this.photoType = photoType;
+	public void setReferenceType(String referenceType) {
+		this.referenceType = referenceType;
 	}
 
 }

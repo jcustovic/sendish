@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
+import com.sendish.api.dto.HotPhotoDetailsDto;
 import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.HotPhotoServiceImpl;
@@ -55,6 +57,21 @@ public class HotPhotosController {
     })
     public List<PhotoDto> list(@RequestParam(defaultValue = "0") Integer page) {
         return hotPhotoService.findAllActive(page);
+    }
+	
+	@RequestMapping(value = "/{photoId}", method = RequestMethod.GET)
+    @ApiOperation(value = "Get photo details")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
+    })
+    public ResponseEntity<HotPhotoDetailsDto> photoDetails(@PathVariable Long photoId, AuthUser user) throws BindException {
+		HotPhotoDetailsDto photo = hotPhotoService.findByPhotoIdForUser(photoId, user.getUserId());
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(photo, HttpStatus.OK);
+        }
     }
 	
     @RequestMapping(value = "/{photoUUID}/view", method = RequestMethod.GET)

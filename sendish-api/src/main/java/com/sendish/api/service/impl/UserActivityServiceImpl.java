@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.ActivityItemDto;
-import com.sendish.api.dto.PhotoType;
 import com.sendish.api.redis.KeyUtils;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.api.util.CityUtils;
@@ -47,19 +46,32 @@ public class UserActivityServiceImpl {
 			statisticsRepository.markActivitiesAsRead(userId);
 		}
 		
-		return activity.stream().map(a -> mapToFeedItemDto(a)).collect(Collectors.toList());
+		return activity.stream().map(a -> mapToActivityItemDto(a)).collect(Collectors.toList());
 	}
 
-	private ActivityItemDto mapToFeedItemDto(UserActivity userActivity) {
-		ActivityItemDto feedItem = new ActivityItemDto();
-		feedItem.setDisplayName(getDisplayName(userActivity.getReferenceType(), userActivity.getFromUser()));
-		feedItem.setDescription(userActivity.getText());
-		feedItem.setPhotoId(Long.valueOf(userActivity.getReferenceId()));
-		feedItem.setPhotoType(PhotoType.SENT);
-		feedItem.setPhotoUuid(userActivity.getPhotoUuid());
-		feedItem.setTimeAgo(prettyTime.format(userActivity.getCreatedDate().toDate()));
+	private ActivityItemDto mapToActivityItemDto(UserActivity userActivity) {
+		ActivityItemDto activityItem = new ActivityItemDto();
+		activityItem.setDisplayName(getDisplayName(userActivity.getReferenceType(), userActivity.getFromUser()));
+		activityItem.setDescription(userActivity.getText());
+		activityItem.setReferenceId(userActivity.getReferenceId());
+		activityItem.setReferenceType(getDtoReferenceType(userActivity.getReferenceType()));
+		activityItem.setPhotoUuid(userActivity.getPhotoUuid());
+		activityItem.setTimeAgo(prettyTime.format(userActivity.getCreatedDate().toDate()));
 
-		return feedItem;
+		return activityItem;
+	}
+
+	private String getDtoReferenceType(String referenceType) {
+		if ("PHOTO_COMMENT".equals(referenceType) || "PHOTO_LIKED".equals(referenceType)) {
+			return "PHOTO_SENT";
+		} else if ("PHOTO_SENT_COMMENT_LIKED".equals(referenceType)) {
+			return "PHOTO_SENT_COMMENT";
+		} else if ("PHOTO_RECEIVED_COMMENT_LIKED".equals(referenceType)) {
+			return "PHOTO_RECEIVED_COMMENT";
+		}
+		
+		// TODO: Maybe log warn/error
+		return "UNKNOWN";
 	}
 
 	private String getDisplayName(String referenceType, User user) {
@@ -95,6 +107,27 @@ public class UserActivityServiceImpl {
 		
 		activity = userActivityRepository.save(activity);
 		addActivityToUserTimeline(photo.getUser().getId(), activity.getId());
+	}
+	
+	public void addCommentLikedActivity(PhotoComment comment, User user) {
+		User photoOwner = comment.getPhoto().getUser();
+		String referenceType;
+		if  (photoOwner.getId().equals(user.getId())) {
+			referenceType = "PHOTO_SENT_COMMENT_LIKED";
+		} else {
+			referenceType = "PHOTO_RECEIVED_COMMENT_LIKED";
+		}
+		
+		UserActivity activity = new UserActivity();
+		activity.setFromUser(user);
+		activity.setUser(photoOwner);
+		activity.setPhotoUuid(comment.getPhoto().getUuid());
+		activity.setReferenceType(referenceType);
+		activity.setReferenceId(comment.getPhoto().getId().toString());
+		activity.setText(" liked your comment");
+		
+		activity = userActivityRepository.save(activity);
+		addActivityToUserTimeline(photoOwner.getId(), activity.getId());
 	}
 	
 	public List<UserActivity> findUserActivity(Long userId, int page) {

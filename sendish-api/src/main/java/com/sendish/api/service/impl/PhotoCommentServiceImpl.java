@@ -155,17 +155,19 @@ public class PhotoCommentServiceImpl {
     private void voteOnComment(Long photoCommentId, Long userId, boolean like) {
         PhotoCommentVote photoCommentVote = photoCommentVoteRepository.findOne(new PhotoCommentVoteId(userId, photoCommentId));
         if (photoCommentVote == null) {
+        	User user = userRepository.findOne(userId);
             // TODO: Maybe allow vote change?
         	PhotoComment comment = photoCommentRepository.findOne(photoCommentId);
             PhotoCommentVote newVote = new PhotoCommentVote();
             newVote.setLike(like);
-            newVote.setUser(userRepository.findOne(userId));
+            newVote.setUser(user);
             newVote.setComment(comment);
             photoCommentVoteRepository.save(newVote);
 
             if (like) {
                 statisticsRepository.likeComment(photoCommentId);
                 rankingService.addPointsForLikedComment(comment.getUser().getId());
+                userActivityService.addCommentLikedActivity(comment, user);
             } else {
                 statisticsRepository.dislikeComment(photoCommentId);
                 rankingService.removePointsForDislikedComment(comment.getUser().getId());

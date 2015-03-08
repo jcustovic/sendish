@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sendish.api.dto.HotPhotoDetailsDto;
 import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
 import com.sendish.repository.HotPhotoRepository;
@@ -40,6 +41,18 @@ public class HotPhotoServiceImpl {
 
 	public HotPhoto findByPhotoId(Long photoId) {
 		return hotPhotoRepository.findOne(photoId);
+	}
+
+	public HotPhotoDetailsDto findByPhotoIdForUser(Long photoId, Long userId) {
+		HotPhoto hotPhoto = findByPhotoId(photoId);
+		if (hotPhoto == null) {
+			return null;
+		}
+		HotPhotoDetailsDto photoDetails = new HotPhotoDetailsDto();
+		photoDtoMapper.mapToPhotoDto(hotPhoto.getPhoto(), photoDetails);
+		// TODO: Implement like flag on HotPhotoDetailsDto
+		
+		return photoDetails;
 	}
 
 }
