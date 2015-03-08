@@ -22,7 +22,7 @@ public class InboxMessage extends BaseEntity {
     private String title;
 
     @Lob
-    @Column(name = "im_message", nullable = false)
+    @Column(name = "im_message", nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @Column(name = "im_url", length = 256)

@@ -117,6 +117,7 @@ public class UserServiceImpl {
         userProfileDto.setCitiesCount(userStatistics.getTotalCityCount());
         userProfileDto.setUnseenPhotoCount(userStatistics.getUnseenPhotoCount());
         userProfileDto.setDailySendLimitLeft(getSentLimitLeft(userDetails, userStatistics));
+        userProfileDto.setNewActivities(userProfileDto.getNewActivities());
         userProfileDto.setId(userId);
 
         return userProfileDto;

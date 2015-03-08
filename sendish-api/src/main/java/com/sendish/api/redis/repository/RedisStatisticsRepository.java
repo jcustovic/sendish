@@ -60,19 +60,22 @@ public class RedisStatisticsRepository {
     }
 
     public UserStatisticsDto getUserStatistics(Long userId) {
-        List<String> fields = Arrays.asList("total.likeCount", "total.dislikeCount", "total.reportCount", "total.unseenPhotoCount");
+		List<String> fields = Arrays.asList("total.likeCount",
+				"total.dislikeCount", "total.reportCount",
+				"total.unseenPhotoCount", "hasNewActivities");
         HashOperations<String, String, String> hashOp = template.opsForHash();
         List<String> values = hashOp.multiGet(KeyUtils.userStatistics(userId), fields);
 
-        Long likeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(0), "0"));
-        Long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
-        Long reportCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
-        Long unseenPhotoCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
+        long likeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(0), "0"));
+        long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
+        long reportCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
+        long unseenPhotoCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
+        boolean hasNewActivities = values.get(4) != null;
         
-        Long dailySentCount = getDailySentCount(userId, LocalDate.now());
-        Long totalCityCount = userCities(userId).size();
+        long dailySentCount = getCurrentDailySentCount(userId, LocalDate.now());
+        long totalCityCount = userCities(userId).size();
 
-        return new UserStatisticsDto(likeCount, dislikeCount, reportCount, dailySentCount, unseenPhotoCount, totalCityCount);
+        return new UserStatisticsDto(likeCount, dislikeCount, reportCount, dailySentCount, unseenPhotoCount, totalCityCount, hasNewActivities);
     }
 
     public Long increaseDailySentPhotoCount(Long userId, LocalDate date) {
@@ -85,7 +88,7 @@ public class RedisStatisticsRepository {
         return userStatistics(userId).increment("daily.sentCount", 1);
     }
 
-    public Long getDailySentCount(Long userId, LocalDate date) {
+    public Long getCurrentDailySentCount(Long userId, LocalDate date) {
         String currentDate = userStatistics(userId).get("daily.currentDate");
         if (currentDate == null || !currentDate.equals(date.toString())) {
             return 0L;
@@ -145,6 +148,15 @@ public class RedisStatisticsRepository {
     	photoCities(photoId).add(cityString);
     	userCities(userId).add(cityString);
 	}
+    
+    public void newActivity(Long userId) {
+    	userStatistics(userId).putIfAbsent("hasNewActivities", "1");
+    }
+    
+    public void markActivitiesAsRead(Long userId) {
+    	userStatistics(userId).remove("hasNewActivities");
+    }
+    
     // Redis objects
 
     private RedisMap<String, String> photoStatistics(Long photoId) {
