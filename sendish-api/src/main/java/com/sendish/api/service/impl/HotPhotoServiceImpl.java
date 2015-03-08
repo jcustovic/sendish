@@ -25,6 +25,9 @@ public class HotPhotoServiceImpl {
 	
 	@Autowired
 	private PhotoDtoMapper photoDtoMapper;
+	
+	@Autowired
+	private PhotoCommentServiceImpl photoCommentService;
 
 	public List<PhotoDto> findAllActive(Integer page) {
 		List<HotPhoto> photos = hotPhotoRepository.findAllActive(new PageRequest(page, HOT_PHOTO_PAGE_SIZE, Direction.DESC, "selectedTime"));
@@ -47,6 +50,7 @@ public class HotPhotoServiceImpl {
 		}
 		HotPhotoDetailsDto photoDetails = new HotPhotoDetailsDto();
 		photoDtoMapper.mapToPhotoDto(hotPhoto.getPhoto(), photoDetails);
+		photoDetails.setComments(photoCommentService.findFirstByPhotoId(photoId, 3));
 		// TODO: Implement like flag on HotPhotoDetailsDto
 		
 		return photoDetails;

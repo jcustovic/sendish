@@ -1,13 +1,9 @@
 package com.sendish.api.service.impl;
 
-import com.sendish.api.dto.InboxItemDto;
-import com.sendish.api.redis.repository.RedisStatisticsRepository;
-import com.sendish.repository.InboxMessageRepository;
-import com.sendish.repository.UserInboxItemRepository;
-import com.sendish.repository.UserRepository;
-import com.sendish.repository.model.jpa.InboxMessage;
-import com.sendish.repository.model.jpa.User;
-import com.sendish.repository.model.jpa.UserInboxItem;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -16,8 +12,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.sendish.api.dto.InboxItemDto;
+import com.sendish.api.notification.AsyncNotificationProvider;
+import com.sendish.api.redis.repository.RedisStatisticsRepository;
+import com.sendish.repository.InboxMessageRepository;
+import com.sendish.repository.UserInboxItemRepository;
+import com.sendish.repository.UserRepository;
+import com.sendish.repository.model.jpa.InboxMessage;
+import com.sendish.repository.model.jpa.User;
+import com.sendish.repository.model.jpa.UserInboxItem;
 
 @Service
 public class UserInboxServiceImpl {
@@ -38,6 +41,9 @@ public class UserInboxServiceImpl {
     
     @Autowired
     private UserActivityServiceImpl userActivityService;
+    
+    @Autowired
+    private AsyncNotificationProvider notificationProvider;
 
     private static PrettyTime prettyTime = new PrettyTime();
 
@@ -82,6 +88,7 @@ public class UserInboxServiceImpl {
     	
     	// TODO: Move after transaction for save is done!
     	statisticsRepository.incrementUnreadInboxItemCount(userId);
+    	sendNewInboxItemNotification(userInboxItem);
     	
     	return userInboxItem;
     }
@@ -123,6 +130,13 @@ public class UserInboxServiceImpl {
 
         return mapToInboxItemDto(userInboxItem);
     }
+    
+    private void sendNewInboxItemNotification(UserInboxItem userInboxItem) {
+		Map<String, Object> customFields = new HashMap<>();
+        customFields.put("TYPE", "NEW_INBOX_ITEM");
+        customFields.put("REFERENCE_ID", userInboxItem.getId());
+        notificationProvider.sendPlainTextNotification("New inbox message", customFields, userInboxItem.getUser().getId());
+	}
 
     private List<InboxItemDto> mapToInboxItemDto(List<UserInboxItem> inboxItems) {
         return inboxItems.stream().map(item -> mapToInboxItemDto(item)).collect(Collectors.toList());
