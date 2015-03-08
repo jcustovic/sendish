@@ -13,7 +13,6 @@ import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
 import com.sendish.repository.HotPhotoRepository;
 import com.sendish.repository.model.jpa.HotPhoto;
-import com.sendish.repository.model.jpa.Photo;
 
 @Service
 @Transactional
@@ -33,10 +32,8 @@ public class HotPhotoServiceImpl {
 		return photoDtoMapper.mapHotToPhotoDto(photos);
 	}
 
-	public Photo findPhotoByPhotoUuid(String photoUUID) {
-		HotPhoto hotPhoto = hotPhotoRepository.findByPhotoUuid(photoUUID);
-		
-		return hotPhoto.getPhoto();
+	public HotPhoto findPhotoByPhotoUuid(String photoUUID) {
+		return hotPhotoRepository.findByPhotoUuid(photoUUID);
 	}
 
 	public HotPhoto findByPhotoId(Long photoId) {

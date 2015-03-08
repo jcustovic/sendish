@@ -38,8 +38,8 @@ public class UserActivity extends BaseEntity {
 	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
 	private DateTime createdDate;
 
-	@Column(name = "ua_photo_uuid", length = 36)
-	private String photoUuid;
+	@Column(name = "ua_image_uuid", length = 36)
+	private String imageUuid;
 
 	@Column(name = "ua_reference_type", length = 32, nullable = false)
 	private String referenceType;
@@ -51,7 +51,7 @@ public class UserActivity extends BaseEntity {
 	public final void markCreatedDate() {
 		createdDate = DateTime.now();
 	}
-	
+
 	// Getters & setters
 
 	public User getUser() {
@@ -82,12 +82,12 @@ public class UserActivity extends BaseEntity {
 		return createdDate;
 	}
 
-	public String getPhotoUuid() {
-		return photoUuid;
+	public String getImageUuid() {
+		return imageUuid;
 	}
 
-	public void setPhotoUuid(String photoUuid) {
-		this.photoUuid = photoUuid;
+	public void setImageUuid(String imageUuid) {
+		this.imageUuid = imageUuid;
 	}
 
 	public String getReferenceType() {

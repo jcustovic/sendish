@@ -1,9 +1,14 @@
 package com.sendish.api.service.impl;
 
 import com.sendish.api.dto.InboxItemDto;
+import com.sendish.api.redis.repository.RedisStatisticsRepository;
+import com.sendish.repository.InboxMessageRepository;
 import com.sendish.repository.UserInboxItemRepository;
+import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.InboxMessage;
+import com.sendish.repository.model.jpa.User;
 import com.sendish.repository.model.jpa.UserInboxItem;
+
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +26,18 @@ public class UserInboxServiceImpl {
 
     @Autowired
     private UserInboxItemRepository userInboxItemRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private InboxMessageRepository inboxMessageRepository;
+    
+    @Autowired
+    private RedisStatisticsRepository statisticsRepository;
+    
+    @Autowired
+    private UserActivityServiceImpl userActivityService;
 
     private static PrettyTime prettyTime = new PrettyTime();
 
@@ -52,6 +69,22 @@ public class UserInboxServiceImpl {
 
         return getAndMarkAsRead(inboxItem);
     }
+    
+    public UserInboxItem save(Long itemId, Long userId) {
+    	User user = userRepository.findOne(userId);
+    	InboxMessage inboxMsg = inboxMessageRepository.findOne(itemId);
+    	UserInboxItem userInboxItem = new UserInboxItem();
+    	userInboxItem.setInboxMessage(inboxMsg);
+    	userInboxItem.setUser(user);
+    	
+    	userInboxItem = userInboxItemRepository.save(userInboxItem);
+    	userActivityService.addUserInboxItemActivity(userInboxItem);
+    	
+    	// TODO: Move after transaction for save is done!
+    	statisticsRepository.incrementUnreadInboxItemCount(userId);
+    	
+    	return userInboxItem;
+    }
 
     public void delete(Long itemId, Long userId) {
         UserInboxItem userInboxItem = userInboxItemRepository.findByIdAndUserId(itemId, userId);
@@ -61,24 +94,34 @@ public class UserInboxServiceImpl {
 
     public void markRead(Long itemId, Long userId) {
         UserInboxItem userInboxItem = userInboxItemRepository.findByIdAndUserId(itemId, userId);
+        if (!userInboxItem.getRead()) {
+        	statisticsRepository.decrementUnreadInboxItemCount(userInboxItem.getUser().getId());
+        }
         userInboxItem.setRead(true);
         userInboxItemRepository.save(userInboxItem);
     }
 
     public void markUnread(Long itemId, Long userId) {
         UserInboxItem userInboxItem = userInboxItemRepository.findByIdAndUserId(itemId, userId);
+        if (userInboxItem.getRead()) {
+        	statisticsRepository.incrementUnreadInboxItemCount(userInboxItem.getUser().getId());
+        }
         userInboxItem.setRead(false);
         userInboxItemRepository.save(userInboxItem);
     }
 
-    private InboxItemDto getAndMarkAsRead(UserInboxItem inboxItem) {
-        if (inboxItem.getFirstOpenedDate() == null) {
-            inboxItem.setFirstOpenedDate(DateTime.now());
+    private InboxItemDto getAndMarkAsRead(UserInboxItem userInboxItem) {
+        if (userInboxItem.getFirstOpenedDate() == null) {
+            userInboxItem.setFirstOpenedDate(DateTime.now());
         }
-        inboxItem.setRead(true);
-        inboxItem = userInboxItemRepository.save(inboxItem);
+        if (!userInboxItem.getRead()) {
+        	statisticsRepository.decrementUnreadInboxItemCount(userInboxItem.getUser().getId());
+        }
+        userInboxItem.setRead(true);
+        
+        userInboxItem = userInboxItemRepository.save(userInboxItem);
 
-        return mapToInboxItemDto(inboxItem);
+        return mapToInboxItemDto(userInboxItem);
     }
 
     private List<InboxItemDto> mapToInboxItemDto(List<UserInboxItem> inboxItems) {

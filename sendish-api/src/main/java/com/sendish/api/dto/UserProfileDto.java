@@ -17,6 +17,7 @@ public class UserProfileDto extends BaseEntityDto {
 	private Long totalDislikes;
 	private Long citiesCount;
 	private Long unseenPhotoCount;
+	private Long unreadInboxItemCount;
 	private Long dailySendLimitLeft;
 	private Boolean emailRegistration;
 	private Boolean newActivities;
@@ -123,6 +124,14 @@ public class UserProfileDto extends BaseEntityDto {
 
 	public void setNewActivities(Boolean newActivities) {
 		this.newActivities = newActivities;
+	}
+
+	public Long getUnreadInboxItemCount() {
+		return unreadInboxItemCount;
+	}
+
+	public void setUnreadInboxItemCount(Long unreadInboxItemCount) {
+		this.unreadInboxItemCount = unreadInboxItemCount;
 	}
 
 }

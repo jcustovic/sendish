@@ -80,12 +80,13 @@ public class HotPhotosController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
     })
-    public ResponseEntity<InputStreamResource> viewOriginalReceived(@PathVariable String photoUUID, WebRequest webRequest) {
-        Photo photo = hotPhotoService.findPhotoByPhotoUuid(photoUUID);
+    public ResponseEntity<InputStreamResource> viewOriginal(@PathVariable String photoUUID, WebRequest webRequest) {
+        HotPhoto hotPhoto = hotPhotoService.findPhotoByPhotoUuid(photoUUID);
 
-        if (photo == null) {
+        if (hotPhoto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
+        	Photo photo = hotPhoto.getPhoto();
             return viewPhoto(webRequest, photo.getCreatedDate(), photo.getContentType(), photo.getSize(), photo.getStorageId());
         }
     }
@@ -96,16 +97,17 @@ public class HotPhotosController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
     })
-    public ResponseEntity<InputStreamResource> viewReceived(@PathVariable String photoUUID, @PathVariable String sizeKey, 
+    public ResponseEntity<InputStreamResource> view(@PathVariable String photoUUID, @PathVariable String sizeKey, 
     		WebRequest webRequest) {
-        Photo photo = hotPhotoService.findPhotoByPhotoUuid(photoUUID);
+        HotPhoto photo = hotPhotoService.findPhotoByPhotoUuid(photoUUID);
 
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            ResizedPhoto resizedPhoto = resizedPhotoService.getResizedPhoto(photo.getId(), sizeKey);
+            ResizedPhoto resizedPhoto = resizedPhotoService.getResizedPhoto(photo.getPhotoId(), sizeKey);
 
-            return viewPhoto(webRequest, resizedPhoto.getCreatedDate(), photo.getContentType(), resizedPhoto.getSize(), resizedPhoto.getStorageId());
+			return viewPhoto(webRequest, resizedPhoto.getCreatedDate(), photo.getPhoto().getContentType(), 
+					resizedPhoto.getSize(), resizedPhoto.getStorageId());
         }
     }
 

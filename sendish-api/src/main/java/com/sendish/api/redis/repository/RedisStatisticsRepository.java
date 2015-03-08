@@ -62,7 +62,8 @@ public class RedisStatisticsRepository {
     public UserStatisticsDto getUserStatistics(Long userId) {
 		List<String> fields = Arrays.asList("total.likeCount",
 				"total.dislikeCount", "total.reportCount",
-				"total.unseenPhotoCount", "hasNewActivities");
+				"total.unseenPhotoCount", "total.unreadInboxItemCount",
+				"hasNewActivities");
         HashOperations<String, String, String> hashOp = template.opsForHash();
         List<String> values = hashOp.multiGet(KeyUtils.userStatistics(userId), fields);
 
@@ -70,12 +71,15 @@ public class RedisStatisticsRepository {
         long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
         long reportCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
         long unseenPhotoCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
-        boolean hasNewActivities = values.get(4) != null;
+        long unreadInboxItemCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(4), "0"));
+        boolean hasNewActivities = values.get(5) != null;
         
         long dailySentCount = getCurrentDailySentCount(userId, LocalDate.now());
         long totalCityCount = userCities(userId).size();
 
-        return new UserStatisticsDto(likeCount, dislikeCount, reportCount, dailySentCount, unseenPhotoCount, totalCityCount, hasNewActivities);
+		return new UserStatisticsDto(likeCount, dislikeCount, reportCount,
+				dailySentCount, unseenPhotoCount, unreadInboxItemCount,
+				totalCityCount, hasNewActivities);
     }
 
     public Long increaseDailySentPhotoCount(Long userId, LocalDate date) {
@@ -141,6 +145,14 @@ public class RedisStatisticsRepository {
 
     public void decrementUnseenCount(Long userId) {
         userStatistics(userId).increment("total.unseenPhotoCount", -1);
+    }
+    
+    public void incrementUnreadInboxItemCount(Long userId) {
+        userStatistics(userId).increment("total.unreadInboxItemCount", 1);
+    }
+    
+    public void decrementUnreadInboxItemCount(Long userId) {
+        userStatistics(userId).increment("total.unreadInboxItemCount", -1);
     }
     
     public void trackCity(Long photoId, Long userId, Long cityId) {

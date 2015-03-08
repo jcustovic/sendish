@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.ocpsoft.prettytime.PrettyTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -21,10 +23,13 @@ import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoComment;
 import com.sendish.repository.model.jpa.User;
 import com.sendish.repository.model.jpa.UserActivity;
+import com.sendish.repository.model.jpa.UserInboxItem;
 
 @Service
 @Transactional
 public class UserActivityServiceImpl {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserActivityServiceImpl.class);
 	
 	private static final int PAGE_SIZE = 20;
 	private static final int MAX_ACTIVITY_PER_USER = 50;
@@ -55,7 +60,7 @@ public class UserActivityServiceImpl {
 		activityItem.setDescription(userActivity.getText());
 		activityItem.setReferenceId(userActivity.getReferenceId());
 		activityItem.setReferenceType(getDtoReferenceType(userActivity.getReferenceType()));
-		activityItem.setPhotoUuid(userActivity.getPhotoUuid());
+		activityItem.setImageUuid(userActivity.getImageUuid());
 		activityItem.setTimeAgo(prettyTime.format(userActivity.getCreatedDate().toDate()));
 
 		return activityItem;
@@ -68,9 +73,11 @@ public class UserActivityServiceImpl {
 			return "PHOTO_SENT_COMMENT";
 		} else if ("PHOTO_RECEIVED_COMMENT_LIKED".equals(referenceType)) {
 			return "PHOTO_RECEIVED_COMMENT";
+		} else if ("INBOX_ITEM".equals(referenceType)) {
+			return "INBOX_ITEM";
 		}
+		LOGGER.warn("Unknown referenceType {} so returning that name", referenceType);
 		
-		// TODO: Maybe log warn/error
 		return "UNKNOWN";
 	}
 
@@ -87,7 +94,7 @@ public class UserActivityServiceImpl {
 		UserActivity activity = new UserActivity();
 		activity.setFromUser(photoComment.getUser());
 		activity.setUser(photo.getUser());
-		activity.setPhotoUuid(photo.getUuid());
+		activity.setImageUuid(photo.getUuid());
 		activity.setReferenceType("PHOTO_COMMENT");
 		activity.setReferenceId(photo.getId().toString());
 		activity.setText(" commented your photo");
@@ -100,7 +107,7 @@ public class UserActivityServiceImpl {
 		UserActivity activity = new UserActivity();
 		activity.setFromUser(user);
 		activity.setUser(photo.getUser());
-		activity.setPhotoUuid(photo.getUuid());
+		activity.setImageUuid(photo.getUuid());
 		activity.setReferenceType("PHOTO_LIKED");
 		activity.setReferenceId(photo.getId().toString());
 		activity.setText(" liked your photo");
@@ -121,13 +128,25 @@ public class UserActivityServiceImpl {
 		UserActivity activity = new UserActivity();
 		activity.setFromUser(user);
 		activity.setUser(photoOwner);
-		activity.setPhotoUuid(comment.getPhoto().getUuid());
+		activity.setImageUuid(comment.getPhoto().getUuid());
 		activity.setReferenceType(referenceType);
 		activity.setReferenceId(comment.getPhoto().getId().toString());
 		activity.setText(" liked your comment");
 		
 		activity = userActivityRepository.save(activity);
 		addActivityToUserTimeline(photoOwner.getId(), activity.getId());
+	}
+	
+	public void addUserInboxItemActivity(UserInboxItem userInboxItem) {
+		UserActivity activity = new UserActivity();
+		activity.setUser(userInboxItem.getUser());
+		activity.setImageUuid(userInboxItem.getInboxMessage().getImage().getUuid());
+		activity.setReferenceType("INBOX_ITEM");
+		activity.setReferenceId(userInboxItem.getId().toString());
+		activity.setText("New inbox message");
+		
+		activity = userActivityRepository.save(activity);
+		addActivityToUserTimeline(userInboxItem.getUser().getId(), activity.getId());
 	}
 	
 	public List<UserActivity> findUserActivity(Long userId, int page) {

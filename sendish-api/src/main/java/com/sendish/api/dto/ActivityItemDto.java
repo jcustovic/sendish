@@ -9,7 +9,7 @@ public class ActivityItemDto implements Serializable {
 	private String displayName;
 	private String description;
 	private String timeAgo;
-	private String photoUuid;
+	private String imageUuid;
 	private String referenceId;
 	private String referenceType;
 
@@ -39,12 +39,12 @@ public class ActivityItemDto implements Serializable {
 		this.timeAgo = timeAgo;
 	}
 
-	public String getPhotoUuid() {
-		return photoUuid;
+	public String getImageUuid() {
+		return imageUuid;
 	}
 
-	public void setPhotoUuid(String photoUuid) {
-		this.photoUuid = photoUuid;
+	public void setImageUuid(String imageUuid) {
+		this.imageUuid = imageUuid;
 	}
 
 	public String getReferenceId() {
