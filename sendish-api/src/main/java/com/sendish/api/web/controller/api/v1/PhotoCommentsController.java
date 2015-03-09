@@ -42,12 +42,12 @@ public class PhotoCommentsController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Photo not found")
     })
-    public ResponseEntity<List<CommentDto>> list(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page) {
+    public ResponseEntity<List<CommentDto>> list(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page, AuthUser user) {
         Photo photo = photoService.findOne(photoId);
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        List<CommentDto> comments = photoCommentService.findByPhotoId(photoId, page);
+        List<CommentDto> comments = photoCommentService.findByPhotoId(photoId, user.getUserId(), page);
 
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }

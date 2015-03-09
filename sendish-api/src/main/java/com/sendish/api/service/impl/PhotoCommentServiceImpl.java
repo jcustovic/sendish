@@ -76,18 +76,18 @@ public class PhotoCommentServiceImpl {
 		return photoComment;
 	}
 	
-	public List<CommentDto> findByPhotoId(Long photoId, int page) {
+	public List<CommentDto> findByPhotoId(Long photoId, Long userId, int page) {
         List<PhotoComment> photoComments = photoCommentRepository.findByPhotoId(photoId, 
         		new PageRequest(page, COMMENT_PAGE_SIZE, Direction.DESC, "createdDate"));
 
-        return mapToCommentDto(photoComments);
+        return mapToCommentDto(photoComments, userId);
     }
 
-    public List<CommentDto> findFirstByPhotoId(Long photoId, int howMany) {
+    public List<CommentDto> findFirstByPhotoId(Long photoId, Long userId, int howMany) {
         List<PhotoComment> photoComments = photoCommentRepository.findByPhotoId(photoId,
                 new PageRequest(0, howMany, Direction.DESC, "createdDate"));
 
-        return mapToCommentDto(photoComments);
+        return mapToCommentDto(photoComments, userId);
     }
 
 	public void like(Long photoCommentId, Long userId) {
@@ -108,8 +108,8 @@ public class PhotoCommentServiceImpl {
         photoCommentRepository.save(photoComment);
     }
 
-    private List<CommentDto> mapToCommentDto(List<PhotoComment> comments) {
-        return comments.stream().map(comment -> mapToCommentDto(comment)).collect(Collectors.toList());
+    private List<CommentDto> mapToCommentDto(List<PhotoComment> comments, Long userId) {
+        return comments.stream().map(comment -> mapToCommentDto(comment, userId)).collect(Collectors.toList());
     }
     
     private void sendCommentNotificationToPhotoOwner(User user, Photo photo, String comment) {
@@ -135,7 +135,7 @@ public class PhotoCommentServiceImpl {
 		}
 	}
 
-    private CommentDto mapToCommentDto(PhotoComment comment) {
+    private CommentDto mapToCommentDto(PhotoComment comment, Long userId) {
         CommentDto commentDto = new CommentDto();
         UserDetails userDetails = comment.getUser().getDetails();
         commentDto.setId(comment.getId());
@@ -143,6 +143,12 @@ public class PhotoCommentServiceImpl {
         commentDto.setUserName(UserUtils.getDisplayNameWithCity(comment.getUser()));
         commentDto.setComment(comment.getComment());
         commentDto.setTimeAgo(prettyTime.format(comment.getCreatedDate().toDate()));
+        
+        // TODO: Can we somehow save a round trip to the database for each comment?
+        PhotoCommentVote photoCommentVote = photoCommentVoteRepository.findOne(new PhotoCommentVoteId(userId, comment.getId()));
+        if (photoCommentVote != null) {
+        	commentDto.setLiked(photoCommentVote.getLike());
+        }
 
         // TODO: Maybe get from database when we will store it there so we save on trip to Redis.
         CommentStatisticsDto commentStatistics = statisticsRepository.getCommentStatistics(comment.getId());

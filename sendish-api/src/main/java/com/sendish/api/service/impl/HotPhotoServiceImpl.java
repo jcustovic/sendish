@@ -50,7 +50,7 @@ public class HotPhotoServiceImpl {
 		}
 		HotPhotoDetailsDto photoDetails = new HotPhotoDetailsDto();
 		photoDtoMapper.mapToPhotoDto(hotPhoto.getPhoto(), photoDetails);
-		photoDetails.setComments(photoCommentService.findFirstByPhotoId(photoId, 3));
+		photoDetails.setComments(photoCommentService.findFirstByPhotoId(photoId, userId, 3));
 		// TODO: Implement like flag on HotPhotoDetailsDto
 		
 		return photoDetails;

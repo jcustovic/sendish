@@ -168,7 +168,7 @@ public class PhotoServiceImpl {
         Photo photo = photoRepository.findByIdAndUserId(photoId, userId);
         if (photo != null) {
             PhotoDetailsDto photoDetailsDto = new PhotoDetailsDto();
-            mapPhotoDetailsDto(photo, photoDetailsDto);
+            mapPhotoDetailsDto(photo, photoDetailsDto, userId);
 
             return photoDetailsDto;
         }
@@ -198,7 +198,7 @@ public class PhotoServiceImpl {
         }
 
         ReceivedPhotoDetailsDto photoDetailsDto = new ReceivedPhotoDetailsDto();
-        mapPhotoDetailsDto(photoReceiver.getPhoto(), photoDetailsDto);
+        mapPhotoDetailsDto(photoReceiver.getPhoto(), photoDetailsDto, userId);
         photoDetailsDto.setLike(photoReceiver.getLike());
         photoDetailsDto.setReport(photoReceiver.getReport());
 
@@ -333,10 +333,10 @@ public class PhotoServiceImpl {
         photoStatisticsRepository.save(photoStatistics);
     }
 
-    private void mapPhotoDetailsDto(Photo photo, PhotoDetailsDto photoDetailsDto) {
+    private void mapPhotoDetailsDto(Photo photo, PhotoDetailsDto photoDetailsDto, Long userId) {
     	photoDtoMapper.mapToPhotoDto(photo, photoDetailsDto);
 
-        photoDetailsDto.setComments(photoCommentService.findFirstByPhotoId(photo.getId(), 3));
+        photoDetailsDto.setComments(photoCommentService.findFirstByPhotoId(photo.getId(), userId, 3));
     }
 
     private List<ReceivedPhotoDto> mapToReceivedPhotoDto(List<PhotoReceiver> photos) {
