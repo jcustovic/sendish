@@ -68,7 +68,7 @@ public class PhotoCommentServiceImpl {
 
         photoComment = photoCommentRepository.save(photoComment);
         statisticsRepository.increasePhotoCommentCount(photoId);
-        if (!photo.getDeleted()) {
+        if (!photo.getDeleted() && !photo.getUser().getId().equals(userId)) {
         	sendCommentNotificationToPhotoOwner(user, photo, comment);
         	userActivityService.addPhotoCommentActivity(photoComment);
         }
@@ -175,7 +175,7 @@ public class PhotoCommentServiceImpl {
                 rankingService.addPointsForLikedComment(comment.getUser().getId());
                 
                 if (!comment.getPhoto().getDeleted()) {
-                	userActivityService.addCommentLikedActivity(comment, user);	
+                	userActivityService.addCommentLikedActivity(comment, user);
                 }
             } else {
                 statisticsRepository.dislikeComment(photoCommentId);
