@@ -27,19 +27,19 @@ public class RedisStatisticsRepository {
     // TODO: At some point of time also save stats to DB (User & Photo). Example when one hour elapsed from last update
     // or photo stops traveling etc. ... UserStatisticsRepository.java, PhotoStatisticsRepository.java
 
-    public Long likePhoto(Long photoId, Long userId) {
+    public Long likePhoto(Long photoId, Long photoOwnerId) {
         photoStatistics(photoId).increment("likeCount", 1);
-        return userStatistics(userId).increment("total.likeCount", 1);
+        return userStatistics(photoOwnerId).increment("total.likeCount", 1);
     }
 
-    public Long dislikePhoto(Long photoId, Long userId) {
+    public Long dislikePhoto(Long photoId, Long photoOwnerId) {
         photoStatistics(photoId).increment("dislikeCount", 1);
-        return userStatistics(userId).increment("total.dislikeCount", 1);
+        return userStatistics(photoOwnerId).increment("total.dislikeCount", 1);
     }
 
-    public void reportPhoto(Long photoId, Long userId) {
+    public void reportPhoto(Long photoId, Long photoOwnerId) {
         photoStatistics(photoId).increment("reportCount", 1);
-        userStatistics(userId).increment("total.reportCount", 1);
+        userStatistics(photoOwnerId).increment("total.reportCount", 1);
     }
 
     public void increasePhotoCommentCount(Long photoId) {

@@ -213,16 +213,18 @@ public class PhotoServiceImpl {
             photoReceiverRepository.save(photoReceiver);
 
             asyncPhotoSenderService.resendPhotoOnLike(photoId, photoReceiver.getId());
-            likePhoto(photoId, photoReceiver.getPhoto().getUser().getId());
+            likePhoto(photoId, userId);
         }
     }
     
     public void likePhoto(Long photoId, Long userId) {
     	// TODO: Implement checking if user voted already
-    	statisticsRepository.likePhoto(photoId, userId);
     	Photo photo = photoRepository.findOne(photoId);
+        Long photoOwnerId = photo.getUser().getId();
+        statisticsRepository.likePhoto(photoId, photoOwnerId);
+        rankingService.addPointsForLikedPhoto(photoOwnerId);
+
     	User user = userRepository.findOne(userId);
-    	rankingService.addPointsForLikedPhoto(photo.getUser().getId());
     	userActivityService.addPhotoLikedActivity(photo, user);
 	}
 
@@ -234,16 +236,17 @@ public class PhotoServiceImpl {
             photoReceiver.setDeleted(true);
             photoReceiverRepository.save(photoReceiver);
 
-            dislikePhoto(photoId, photoReceiver.getPhoto().getUser().getId());
+            dislikePhoto(photoId, userId);
             // TODO: Logic when to stop photo from traveling
         }
     }
 
 	public void dislikePhoto(Long photoId, Long userId) {
 		// TODO: Implement checking if user voted already
-		statisticsRepository.dislikePhoto(photoId, userId);
-		Photo photo = photoRepository.findOne(photoId);
-    	rankingService.removePointsForDislikedPhoto(photo.getUser().getId());
+        Photo photo = photoRepository.findOne(photoId);
+        Long photoOwnerId = photo.getUser().getId();
+		statisticsRepository.dislikePhoto(photoId, photoOwnerId);
+    	rankingService.removePointsForDislikedPhoto(photoOwnerId);
 	}
 
     public void reportReceived(Long photoId, String reason, String reasonText, Long userId) {
@@ -255,9 +258,9 @@ public class PhotoServiceImpl {
             photoReceiver.setDeleted(true);
             photoReceiverRepository.save(photoReceiver);
 
-            Long photoUserId = photoReceiver.getPhoto().getUser().getId();
-            statisticsRepository.reportPhoto(photoId, photoUserId);
-            rankingService.removePointsForReportedPhoto(photoUserId);
+            Long photoOwnerId = photoReceiver.getPhoto().getUser().getId();
+            statisticsRepository.reportPhoto(photoId, photoOwnerId);
+            rankingService.removePointsForReportedPhoto(photoOwnerId);
         }
     }
 
@@ -294,15 +297,17 @@ public class PhotoServiceImpl {
         photoReceiver.setPhoto(photo);
         photoReceiverRepository.save(photoReceiver);
 
-        userDetails.setLastReceivedTime(DateTime.now());
+        DateTime now = DateTime.now();
+        userDetails.setLastReceivedTime(now);
         userService.saveUserDetails(userDetails);
 
         // TODO: Move to separate method after PhotoReceiver has been saved and committed!
         usersReceivedPhotos(userId).add(photoId.toString());
         statisticsRepository.incrementUnseenCount(userId);
+        statisticsRepository.increaseDailyReceivedPhotoCount(userId, now.toLocalDate());
         
         if (userDetails.getReceiveNotifications()) {
-        	sendNewPhotoNotification(userId, photo);	
+        	sendNewPhotoNotification(userId, photo);
         }
 
         return photoReceiver;

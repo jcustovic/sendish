@@ -68,7 +68,7 @@ public class PhotoCommentServiceImpl {
 
         photoComment = photoCommentRepository.save(photoComment);
         statisticsRepository.increasePhotoCommentCount(photoId);
-        if (!photo.getDeleted()) {
+        if (!photo.getDeleted() && !photo.getUser().getId().equals(userId)) {
         	sendCommentNotificationToPhotoOwner(user, photo, comment);
         	userActivityService.addPhotoCommentActivity(photoComment);
         }
