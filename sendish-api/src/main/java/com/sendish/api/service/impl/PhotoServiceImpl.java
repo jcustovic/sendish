@@ -221,9 +221,12 @@ public class PhotoServiceImpl {
     	// TODO: Implement checking if user voted already
     	statisticsRepository.likePhoto(photoId, userId);
     	Photo photo = photoRepository.findOne(photoId);
-    	User user = userRepository.findOne(userId);
     	rankingService.addPointsForLikedPhoto(photo.getUser().getId());
-    	userActivityService.addPhotoLikedActivity(photo, user);
+    	
+    	if (!photo.getDeleted()) {
+    		User user = userRepository.findOne(userId);
+    		userActivityService.addPhotoLikedActivity(photo, user);	
+    	}
 	}
 
     // TODO: Maybe allow changing like to dislike?

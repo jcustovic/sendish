@@ -11,13 +11,15 @@ import java.util.List;
 @Transactional(readOnly = true)
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
-    @Query("SELECT p FROM Photo p WHERE p.user.id = ?1 AND p.uuid = ?2 AND p.deleted = false")
+	// TODO: deleted flag is not checked because of timeline! On timeline there could be old entries and we need to get details
+    //@Query("SELECT p FROM Photo p WHERE p.user.id = ?1 AND p.uuid = ?2 AND p.deleted = false")
     Photo findByUserIdAndUuid(Long userId, String photoUUID);
 
     @Query("SELECT p FROM Photo p WHERE p.user.id = ?1 AND p.deleted = false")
     List<Photo> findByUserId(Long userId, Pageable pageRequest);
 
-    @Query("SELECT p FROM Photo p WHERE p.id = ?1 AND p.user.id = ?2 AND p.deleted = false")
+    // TODO: deleted flag is not checked because of timeline! On timeline there could be old entries and we need to get details
+    //@Query("SELECT p FROM Photo p WHERE p.id = ?1 AND p.user.id = ?2 AND p.deleted = false")
     Photo findByIdAndUserId(Long photoId, Long userId);
 
 }

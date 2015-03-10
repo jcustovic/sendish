@@ -173,7 +173,10 @@ public class PhotoCommentServiceImpl {
             if (like) {
                 statisticsRepository.likeComment(photoCommentId);
                 rankingService.addPointsForLikedComment(comment.getUser().getId());
-                userActivityService.addCommentLikedActivity(comment, user);
+                
+                if (!comment.getPhoto().getDeleted()) {
+                	userActivityService.addCommentLikedActivity(comment, user);	
+                }
             } else {
                 statisticsRepository.dislikeComment(photoCommentId);
                 rankingService.removePointsForDislikedComment(comment.getUser().getId());
