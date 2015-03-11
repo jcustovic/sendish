@@ -67,9 +67,9 @@ public class UserActivityServiceImpl {
 	}
 
 	private String getDtoReferenceType(String referenceType) {
-		if ("PHOTO_COMMENT".equals(referenceType) || "PHOTO_LIKED".equals(referenceType)) {
+		if ("PHOTO_LIKED".equals(referenceType)) {
 			return "PHOTO_SENT";
-		} else if ("PHOTO_SENT_COMMENT_LIKED".equals(referenceType)) {
+		} else if ("PHOTO_COMMENT".equals(referenceType) || "PHOTO_SENT_COMMENT_LIKED".equals(referenceType)) {
 			return "PHOTO_SENT_COMMENT";
 		} else if ("PHOTO_RECEIVED_COMMENT_LIKED".equals(referenceType)) {
 			return "PHOTO_RECEIVED_COMMENT";
