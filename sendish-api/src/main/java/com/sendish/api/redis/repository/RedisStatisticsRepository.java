@@ -98,8 +98,10 @@ public class RedisStatisticsRepository {
         if (currentDate == null || !currentDate.equals(date.toString())) {
             return 0L;
         }
+        
+        String sentCountString = userStatistics(userId).get("daily.sentCount");
 
-        return Long.valueOf(userStatistics(userId).get("daily.sentCount"));
+        return Long.valueOf(ObjectUtils.defaultIfNull(sentCountString, "0"));
     }
 
     public void increaseDailyReceivedPhotoCount(Long userId, LocalDate date) {
@@ -118,8 +120,10 @@ public class RedisStatisticsRepository {
         if (currentDate == null || !currentDate.equals(date.toString())) {
             return 0L;
         }
+        
+        String receivedCountString = userStatistics(userId).get("daily.receivedCount");
 
-        return Long.valueOf(userStatistics(userId).get("daily.receivedCount"));
+        return Long.valueOf(ObjectUtils.defaultIfNull(receivedCountString, "0"));
     }
 
     public void likeComment(Long photoCommentId) {
