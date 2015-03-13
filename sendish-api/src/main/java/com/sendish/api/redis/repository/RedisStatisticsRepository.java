@@ -84,9 +84,10 @@ public class RedisStatisticsRepository {
 
     public Long increaseDailySentPhotoCount(Long userId, LocalDate date) {
         String currentDate = userStatistics(userId).get("daily.currentDate");
-        if (currentDate == null || !currentDate.equals(date.toString())) {
+        String stringDate = date.toString();
+        if (currentDate == null || !currentDate.equals(stringDate)) {
         	userStatistics(userId).put("daily.sentCount", "0");
-            userStatistics(userId).put("daily.currentDate", date.toString());
+            userStatistics(userId).put("daily.currentDate", stringDate);
         }
 
         return userStatistics(userId).increment("daily.sentCount", 1);
@@ -103,9 +104,10 @@ public class RedisStatisticsRepository {
 
     public void increaseDailyReceivedPhotoCount(Long userId, LocalDate date) {
         String currentDate = userStatistics(userId).get("daily.currentDate");
-        if (currentDate == null || !currentDate.equals(date.toString())) {
+        String stringDate = date.toString();
+        if (currentDate == null || !currentDate.equals(stringDate)) {
         	userStatistics(userId).put("daily.receivedCount", "0");
-            userStatistics(userId).put("daily.currentDate", currentDate);
+            userStatistics(userId).put("daily.currentDate", stringDate);
         }
 
         userStatistics(userId).increment("daily.receivedCount", 1);

@@ -119,7 +119,7 @@ public class UserActivityServiceImpl {
 	public void addCommentLikedActivity(PhotoComment comment, User user) {
 		User photoOwner = comment.getPhoto().getUser();
 		String referenceType;
-		if  (photoOwner.getId().equals(user.getId())) {
+		if  (photoOwner.getId().equals(comment.getUser().getId())) {
 			referenceType = "PHOTO_SENT_COMMENT_LIKED";
 		} else {
 			referenceType = "PHOTO_RECEIVED_COMMENT_LIKED";
@@ -127,14 +127,14 @@ public class UserActivityServiceImpl {
 		
 		UserActivity activity = new UserActivity();
 		activity.setFromUser(user);
-		activity.setUser(photoOwner);
+		activity.setUser(comment.getUser());
 		activity.setImageUuid(comment.getPhoto().getUuid());
 		activity.setReferenceType(referenceType);
 		activity.setReferenceId(comment.getPhoto().getId().toString());
 		activity.setText(" liked your comment");
 		
 		activity = userActivityRepository.save(activity);
-		addActivityToUserTimeline(photoOwner.getId(), activity.getId());
+		addActivityToUserTimeline(comment.getUser().getId(), activity.getId());
 	}
 	
 	public void addUserInboxItemActivity(UserInboxItem userInboxItem) {
