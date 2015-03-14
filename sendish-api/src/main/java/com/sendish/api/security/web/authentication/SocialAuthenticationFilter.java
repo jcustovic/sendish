@@ -47,7 +47,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
 
     private static final Logger logger = LoggerFactory.getLogger(SocialAuthenticationFilter.class);
 
-    // ~ Instance fields
+    // ~ Instance fields 
     // ================================================================================================
 
     private AuthenticationEntryPoint authenticationEntryPoint;
