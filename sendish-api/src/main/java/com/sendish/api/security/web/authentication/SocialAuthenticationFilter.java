@@ -1,19 +1,32 @@
 package com.sendish.api.security.web.authentication;
 
-import com.sendish.api.security.authentication.CustomUserDetailsService;
-import com.sendish.api.social.connect.util.ConnectionDataUtils;
-import com.sendish.repository.UserSocialConnectionRepository;
-import com.sendish.repository.model.jpa.UserSocialConnection;
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.authentication.ProviderNotFoundException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.social.NotAuthorizedException;
-import org.springframework.social.connect.*;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionData;
+import org.springframework.social.connect.ConnectionFactory;
+import org.springframework.social.connect.ConnectionFactoryLocator;
+import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.support.OAuth1ConnectionFactory;
 import org.springframework.social.connect.support.OAuth2ConnectionFactory;
 import org.springframework.social.oauth1.OAuthToken;
@@ -22,14 +35,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
+import com.sendish.api.security.authentication.CustomUserDetailsService;
+import com.sendish.api.service.impl.UserSocialConnectionServiceImpl;
+import com.sendish.api.social.connect.util.ConnectionDataUtils;
+import com.sendish.repository.model.jpa.UserSocialConnection;
 
 public class SocialAuthenticationFilter extends GenericFilterBean {
 
@@ -53,7 +62,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
     private CustomUserDetailsService userDetailsService;
 
     @Autowired
-    private UserSocialConnectionRepository userSocialConnectionRepository;
+    private UserSocialConnectionServiceImpl userSocialConnectionService;
 
     public SocialAuthenticationFilter() {
         super();
@@ -170,7 +179,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
 
         OAuthToken oAuthToken = new OAuthToken(socialAuth[1], socialAuth[2]);
 
-        UserSocialConnection userSocialConnection = userSocialConnectionRepository.findByOAuth1(socialAuth[0], oAuthToken.getValue(), oAuthToken.getSecret());
+        UserSocialConnection userSocialConnection = userSocialConnectionService.findByOAuth1(socialAuth[0], oAuthToken.getValue(), oAuthToken.getSecret());
         if (userSocialConnection == null || needsUpdate(userSocialConnection)) {
             connection = ((OAuth1ConnectionFactory<?>) connectionFactory).createConnection(oAuthToken);
         } else {
@@ -191,7 +200,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
         }
         // String scope = socialAuth[2];
         AccessGrant accessGrant = new AccessGrant(socialAuth[1], null, socialAuth[3], expiry);
-        UserSocialConnection userSocialConnection = userSocialConnectionRepository.findByOAuth2(socialAuth[0], accessGrant.getAccessToken(), accessGrant.getRefreshToken());
+        UserSocialConnection userSocialConnection = userSocialConnectionService.findByOAuth2(socialAuth[0], accessGrant.getAccessToken(), accessGrant.getRefreshToken());
         if (userSocialConnection == null || needsUpdate(userSocialConnection) || isExpired(userSocialConnection)) {
             connection = ((OAuth2ConnectionFactory<?>) connectionFactory).createConnection(accessGrant);
         } else {
@@ -230,8 +239,8 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
 		this.userDetailsService = userDetailsService;
 	}
 
-	public void setUserSocialConnectionRepository(UserSocialConnectionRepository userSocialConnectionRepository) {
-		this.userSocialConnectionRepository = userSocialConnectionRepository;
+	public void setUserSocialConnectionService(UserSocialConnectionServiceImpl userSocialConnectionService) {
+		this.userSocialConnectionService = userSocialConnectionService;
 	}
 
 }

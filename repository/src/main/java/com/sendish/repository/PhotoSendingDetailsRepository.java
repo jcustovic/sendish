@@ -22,6 +22,4 @@ public interface PhotoSendingDetailsRepository extends JpaRepository<PhotoSendin
 			+ " WHERE psd.photoStatus = 'TRAVELING' AND psd.sendStatus IN ('SENT', 'NO_USER') AND psd.lastReceiver.createdDate < ?1")
 	Page<Long> findTravelingPhotoIdsByLastSentGreatherThan(DateTime sentDate, Pageable page);
 
-	PhotoSendingDetails findByPhotoId(Long photoId);
-
 }

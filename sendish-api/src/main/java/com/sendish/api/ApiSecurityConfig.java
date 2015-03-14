@@ -19,7 +19,7 @@ import org.springframework.social.connect.UsersConnectionRepository;
 
 import com.sendish.api.security.authentication.CustomUserDetailsService;
 import com.sendish.api.security.web.authentication.SocialAuthenticationFilter;
-import com.sendish.repository.UserSocialConnectionRepository;
+import com.sendish.api.service.impl.UserSocialConnectionServiceImpl;
 
 @Configuration
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -35,7 +35,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     private ConnectionFactoryLocator connectionFactoryLocator;
 
     @Autowired
-    private UserSocialConnectionRepository userSocialConnectionRepository;
+    private UserSocialConnectionServiceImpl userSocialConnectionService;
     
     @Autowired
     private ShaPasswordEncoder shaPasswordEncoder;
@@ -64,7 +64,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
         socialAuthenticationFilter.setUserDetailsService(userDetailsService());
         socialAuthenticationFilter.setUsersConnectionRepository(usersConnectionRepository);
         socialAuthenticationFilter.setConnectionFactoryLocator(connectionFactoryLocator);
-        socialAuthenticationFilter.setUserSocialConnectionRepository(userSocialConnectionRepository);
+        socialAuthenticationFilter.setUserSocialConnectionService(userSocialConnectionService);
 
         http
             .csrf().disable()
