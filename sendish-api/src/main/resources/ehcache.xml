@@ -6,6 +6,7 @@
     <diskStore path="java.io.tmpdir"/>
 
     <defaultCache
+            maxElementsInMemory="10000"
             eternal="false"
             timeToIdleSeconds="240"
             timeToLiveSeconds="240"
@@ -14,6 +15,12 @@
             memoryStoreEvictionPolicy="LRU"
             statistics="false">
     </defaultCache>
+    
+    <cache
+        name="org.hibernate.cache.spi.UpdateTimestampsCache"
+        maxElementsInMemory="10000"
+        eternal="false">
+	</cache>
 
     <cache name="com.sendish.repository.model.jpa.User"
         maxElementsInMemory="10000"
