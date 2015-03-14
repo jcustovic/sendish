@@ -160,6 +160,10 @@ public class PhotoServiceImpl {
     public List<ReceivedPhotoDto> findReceivedByUserId(Long userId, Integer page) {
         List<PhotoReceiver> photos = photoReceiverRepository.findByUserId(userId, 
         		new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
+        
+        if (page == 0) {
+			statisticsRepository.resetUnseenCount(userId);
+		}
 
         return mapToReceivedPhotoDto(photos);
     }
@@ -193,7 +197,6 @@ public class PhotoServiceImpl {
             City city = cityService.findNearest(location.getLatitude(), location.getLongitude());
             photoReceiver.setCity(city);
             photoReceiverRepository.save(photoReceiver);
-            statisticsRepository.decrementUnseenCount(userId);
             statisticsRepository.trackCity(photoId, userId, city.getId());
         }
 

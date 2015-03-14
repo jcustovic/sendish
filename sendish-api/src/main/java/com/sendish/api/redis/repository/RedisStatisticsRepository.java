@@ -148,9 +148,9 @@ public class RedisStatisticsRepository {
     public void incrementUnseenCount(Long userId) {
         userStatistics(userId).increment("total.unseenPhotoCount", 1);
     }
-
-    public void decrementUnseenCount(Long userId) {
-        userStatistics(userId).increment("total.unseenPhotoCount", -1);
+    
+    public void resetUnseenCount(Long userId) {
+        userStatistics(userId).put("total.unseenPhotoCount", "0");
     }
     
     public void incrementUnreadInboxItemCount(Long userId) {

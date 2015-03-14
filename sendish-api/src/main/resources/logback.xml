@@ -47,6 +47,7 @@
     <logger name="com.notnoop.apns" level="warn" />
     
     <logger name="org.hibernate.jpa.spi" level="debug" />
+    <logger name="org.hibernate.event.internal" level="trace" />
 
     <logger name="net.sf.ehcache" level="trace" />
     <logger name="org.hibernate.cache" level="trace" />
