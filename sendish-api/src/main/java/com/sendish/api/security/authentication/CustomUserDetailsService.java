@@ -1,28 +1,26 @@
 package com.sendish.api.security.authentication;
 
-import com.sendish.api.security.userdetails.AuthUser;
-import com.sendish.repository.UserRepository;
-import com.sendish.repository.model.jpa.User;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import com.sendish.api.security.userdetails.AuthUser;
+import com.sendish.api.service.impl.UserServiceImpl;
+import com.sendish.repository.model.jpa.User;
 
-@Transactional
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private transient UserRepository userRepository;
+    private transient UserServiceImpl userService;
 
     @Override
     public final UserDetails loadUserByUsername(final String p_username) {
-        final User user = userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(p_username, p_username);
+        final User user = userService.findByUsernameIgnoreCaseOrEmailIgnoreCase(p_username, p_username);
         if (user == null) {
             throw new UsernameNotFoundException("Username " + p_username + " not found");
         }
@@ -31,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     public UserDetails loadUserById(Long userId) {
-        final User user = userRepository.findOne(userId);
+        final User user = userService.findOne(userId);
         if (user == null) {
             throw new UsernameNotFoundException("User with id " + userId + " not found");
         }

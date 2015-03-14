@@ -205,4 +205,12 @@ public class UserServiceImpl {
 		return rankingService.getFromTop(0, 99);
 	}
 
+	public User findByUsernameIgnoreCaseOrEmailIgnoreCase(String p_username, String p_email) {
+		return userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(p_username, p_email);
+	}
+
+	public User findOne(Long userId) {
+		return userRepository.findOne(userId);
+	}
+
 }
