@@ -4,6 +4,7 @@ import com.sendish.api.distributor.UserPool;
 import com.sendish.api.distributor.UserWithScore;
 import com.sendish.repository.UserDetailsRepository;
 import com.sendish.repository.model.jpa.UserDetails;
+
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +33,7 @@ public class UserPoolFillerScheduler {
     private UserPool userPool;
 
     @Scheduled(fixedDelay = HALF_MINUTE_DELAY)
+    @Transactional
     public void fillUsersPool() {
         Long poolSize = userPool.getPoolSize();
         if (poolSize < MAX_USER_POOL_SIZE - 100) {

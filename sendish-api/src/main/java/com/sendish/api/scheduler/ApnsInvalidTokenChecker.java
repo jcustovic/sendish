@@ -2,11 +2,13 @@ package com.sendish.api.scheduler;
 
 import com.sendish.api.notification.ApnsNotificationProvider;
 import com.sendish.repository.ApnsPushTokenRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Map;
@@ -25,6 +27,7 @@ public class ApnsInvalidTokenChecker {
     private ApnsPushTokenRepository apnsPushTokenRepository;
 
     @Scheduled(fixedDelay = FIVE_MIN_RATE)
+    @Transactional
     public void checkForInvalidTokens() {
         Map<String, Date> inactiveDevices = apnsNotificationProvider.getInactiveDevices();
         LOG.debug("Invalid prod devices --> count: {}", inactiveDevices.size());

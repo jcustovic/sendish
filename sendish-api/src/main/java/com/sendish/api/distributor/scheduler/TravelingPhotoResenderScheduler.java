@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.service.impl.AsyncPhotoSenderServiceImpl;
 import com.sendish.repository.PhotoSendingDetailsRepository;
@@ -26,6 +27,7 @@ public class TravelingPhotoResenderScheduler {
     private PhotoSendingDetailsRepository photoSendingDetailsRepository;
 
     @Scheduled(fixedDelay = ONE_MINUTE_DELAY)
+    @Transactional
     public void resendTravelingPhotos() {
     	Page<Long> photoIds = photoSendingDetailsRepository.findTravelingPhotoIdsByLastSentGreatherThan(DateTime.now().minusMinutes(15), new PageRequest(0, 1000));
     	

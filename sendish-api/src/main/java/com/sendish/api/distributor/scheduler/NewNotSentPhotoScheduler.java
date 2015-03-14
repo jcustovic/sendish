@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.service.impl.AsyncPhotoSenderServiceImpl;
 import com.sendish.repository.PhotoSendingDetailsRepository;
@@ -27,6 +28,7 @@ public class NewNotSentPhotoScheduler {
     private PhotoSendingDetailsRepository photoSendingDetailsRepository;
 
     @Scheduled(fixedDelay = HALF_MINUTE_DELAY)
+    @Transactional
     public void resendNewUnsentPhotos() {
     	Page<Long> photoIds = photoSendingDetailsRepository.findIdsByPhotoStatusAndSendStatus(PhotoStatus.NEW, PhotoSendStatus.NO_USER, new PageRequest(0, 1000));
     	
