@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -36,6 +38,7 @@ import com.sendish.api.util.ImageUtils;
 import com.sendish.repository.PhotoReceiverRepository;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.PhotoStatisticsRepository;
+import com.sendish.repository.PhotoVoteRepository;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.City;
 import com.sendish.repository.model.jpa.Location;
@@ -43,12 +46,16 @@ import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoReceiver;
 import com.sendish.repository.model.jpa.PhotoSendingDetails;
 import com.sendish.repository.model.jpa.PhotoStatistics;
+import com.sendish.repository.model.jpa.PhotoVote;
+import com.sendish.repository.model.jpa.PhotoVoteId;
 import com.sendish.repository.model.jpa.User;
 import com.sendish.repository.model.jpa.UserDetails;
 
 @Service
 @Transactional
 public class PhotoServiceImpl {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(PhotoServiceImpl.class);
 
     private static final int PHOTO_PAGE_SIZE = 20;
     private static final int PHOTO_LOCATION_PAGE_SIZE = 20;
@@ -100,6 +107,9 @@ public class PhotoServiceImpl {
     
     @Autowired
     private UserActivityServiceImpl userActivityService;
+    
+    @Autowired
+    private PhotoVoteRepository photoVoteRepository;
 
     private static PrettyTime prettyTime = new PrettyTime();
 
@@ -190,6 +200,7 @@ public class PhotoServiceImpl {
             return null;
         }
 
+        ReceivedPhotoDetailsDto photoDetailsDto = new ReceivedPhotoDetailsDto();
         if (photoReceiver.getOpenedDate() == null) {
             photoReceiver.setOpenedDate(DateTime.now());
             Location location = getUserLocation(userId, longitude, latitude);
@@ -198,75 +209,113 @@ public class PhotoServiceImpl {
             photoReceiver.setCity(city);
             photoReceiverRepository.save(photoReceiver);
             statisticsRepository.trackCity(photoId, userId, city.getId());
+        } else {
+        	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
+        	if (vote != null) {
+        		photoDetailsDto.setLike(vote.getLike());
+                photoDetailsDto.setReport(vote.getReport());		
+        	} else {
+        		LOGGER.error("Photo with id {} was opened by user with id {} but vote not found", photoId, userId);
+        	}
         }
-
-        ReceivedPhotoDetailsDto photoDetailsDto = new ReceivedPhotoDetailsDto();
+        
         mapPhotoDetailsDto(photoReceiver.getPhoto(), photoDetailsDto, userId);
-        photoDetailsDto.setLike(photoReceiver.getLike());
-        photoDetailsDto.setReport(photoReceiver.getReport());
 
         return photoDetailsDto;
     }
 
-    // TODO: Maybe allow changing dislike to like?
     public void likeReceived(Long photoId, Long userId) {
-        PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-        if (photoReceiver.getLike() == null) {
-            photoReceiver.setLike(true);
-            photoReceiverRepository.save(photoReceiver);
-
-            asyncPhotoSenderService.resendPhotoOnLike(photoId, photoReceiver.getId());
-            likePhoto(photoId, userId);
-        }
+    	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
+    	if (vote == null) {
+    		savePhotoLike(photoId, userId);
+    		PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
+    		asyncPhotoSenderService.resendPhotoOnLike(photoId, photoReceiver.getId());
+    	}
     }
-    
-    public void likePhoto(Long photoId, Long userId) {
-    	// TODO: Implement checking if user voted already
-    	Photo photo = photoRepository.findOne(photoId);
-        Long photoOwnerId = photo.getUser().getId();
-        statisticsRepository.likePhoto(photoId, photoOwnerId);
-        rankingService.addPointsForLikedPhoto(photoOwnerId);
 
-        if (!photo.getDeleted()) {
-	    	User user = userRepository.findOne(userId);
-	    	userActivityService.addPhotoLikedActivity(photo, user);
-        }
+    // TODO: Maybe allow changing dislike to like?
+    public void likePhoto(Long photoId, Long userId) {
+    	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
+    	if (vote == null) {
+    		savePhotoLike(photoId, userId);
+    	}
+	}
+
+	private void savePhotoLike(Long photoId, Long userId) {
+		Photo photo = photoRepository.findOne(photoId);
+		User user = userRepository.findOne(userId);
+		
+		PhotoVote vote = new PhotoVote();
+		vote.setPhoto(photo);
+		vote.setUser(user);
+		vote.setLike(true);
+		photoVoteRepository.save(vote);
+		
+		Long photoOwnerId = photo.getUser().getId();
+		statisticsRepository.likePhoto(photoId, photoOwnerId);
+		rankingService.addPointsForLikedPhoto(photoOwnerId);
+
+		if (!photo.getDeleted()) {
+			userActivityService.addPhotoLikedActivity(photo, user);
+		}
 	}
 
     // TODO: Maybe allow changing like to dislike?
     public void dislikeReceived(Long photoId, Long userId) {
-        PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-        if (photoReceiver.getLike() == null) {
-            photoReceiver.setLike(false);
-            photoReceiver.setDeleted(true);
+    	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
+    	if (vote == null) {
+    		savePhotoDislike(photoId, userId);
+    		PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
+    		photoReceiver.setDeleted(true);
             photoReceiverRepository.save(photoReceiver);
-
-            dislikePhoto(photoId, userId);
+            
             // TODO: Logic when to stop photo from traveling
-        }
+    	}
     }
 
 	public void dislikePhoto(Long photoId, Long userId) {
-		// TODO: Implement checking if user voted already
-        Photo photo = photoRepository.findOne(photoId);
-        Long photoOwnerId = photo.getUser().getId();
+		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
+    	if (vote == null) {
+    		savePhotoDislike(photoId, userId);
+    	}
+	}
+
+	private void savePhotoDislike(Long photoId, Long userId) {
+		Photo photo = photoRepository.findOne(photoId);
+		User user = userRepository.findOne(userId);
+		
+		PhotoVote vote = new PhotoVote();
+		vote.setPhoto(photo);
+		vote.setUser(user);
+		vote.setLike(false);
+		photoVoteRepository.save(vote);
+		
+		Long photoOwnerId = photo.getUser().getId();
 		statisticsRepository.dislikePhoto(photoId, photoOwnerId);
-    	rankingService.removePointsForDislikedPhoto(photoOwnerId);
+		rankingService.removePointsForDislikedPhoto(photoOwnerId);
 	}
 
     public void reportReceived(Long photoId, String reason, String reasonText, Long userId) {
-        PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-        if (photoReceiver.getReport() == null) {
-            photoReceiver.setReport(true);
-            photoReceiver.setReportType(reason);
-            photoReceiver.setReportText(reasonText);
+    	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
+    	if (vote == null) {
+    		PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
+    		
+    		vote = new PhotoVote();
+    		vote.setPhoto(photoReceiver.getPhoto());
+    		vote.setUser(photoReceiver.getUser());
+    		vote.setLike(false);
+    		vote.setReport(true);
+    		vote.setReportType(reason);
+    		vote.setReportText(reasonText);
+    		photoVoteRepository.save(vote);
+            
             photoReceiver.setDeleted(true);
             photoReceiverRepository.save(photoReceiver);
 
             Long photoOwnerId = photoReceiver.getPhoto().getUser().getId();
             statisticsRepository.reportPhoto(photoId, photoOwnerId);
             rankingService.removePointsForReportedPhoto(photoOwnerId);
-        }
+    	}
     }
 
     public List<PhotoTraveledDto> getTraveledLocations(Long photoId, Integer page) {
@@ -356,8 +405,11 @@ public class PhotoServiceImpl {
     private ReceivedPhotoDto mapToReceiverPhotoDto(PhotoReceiver photo) {
         ReceivedPhotoDto photoDto = new ReceivedPhotoDto();
         photoDtoMapper.mapToPhotoDto(photo.getPhoto(), photoDto);
-        photoDto.setLike(photo.getLike());
-        photoDto.setReport(photo.getReport());
+        PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(photo.getUser().getId(), photo.getPhoto().getId()));
+        if (vote != null) {
+        	photoDto.setLike(vote.getLike());
+            photoDto.setReport(vote.getReport());	
+        }
         photoDto.setOpened(photo.getOpenedDate() != null);
 
         return photoDto;
@@ -378,7 +430,14 @@ public class PhotoServiceImpl {
 
     private PhotoTraveledDto mapToPhotoTraveledDto(PhotoReceiver photoReceiver) {
         PhotoTraveledDto dto = new PhotoTraveledDto();
-        dto.setLiked(photoReceiver.getLike());
+        Long userId = photoReceiver.getUser().getId();
+        Long photoId = photoReceiver.getPhoto().getId();
+        PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
+        if (vote != null) {
+        	dto.setLiked(vote.getLike());
+        } else {
+    		LOGGER.error("Photo with id {} was opened by user with id {} but vote not found", photoId, userId);
+    	}
         dto.setLocation(CityUtils.getLocationName(photoReceiver.getCity()));
         dto.setTimeAgo(prettyTime.format(photoReceiver.getCreatedDate().toDate()));
         dto.setId(photoReceiver.getId());

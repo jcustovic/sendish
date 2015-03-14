@@ -220,11 +220,7 @@ create table photo_receiver (
   pr_id int8 not null default nextval('photo_receiver_seq'),
   pr_photo_id int8 not null,
   pr_user_id int8 not null,
-  pr_like boolean null,
   pr_deleted boolean not null,
-  pr_report boolean null,
-  pr_report_type varchar(32),
-  pr_report_text varchar(128),
   pr_opened_latitude numeric(19, 10) null,
   pr_opened_longitude numeric(19, 10) null,
   pr_opened_location geometry null,
@@ -241,7 +237,26 @@ create table photo_receiver (
 
 create index photo_receiver_user_idx on photo_receiver (pr_user_id);
 create index photo_receiver_photo_idx on photo_receiver (pr_photo_id);
+create index photo_receiver_user_photo_idx on photo_receiver (pr_user_id, pr_photo_id);
 create index photo_receiver_city_idx on photo_receiver (pr_city_id);
+
+-- PhotoVote table
+create table photo_vote (
+  pv_photo_id int8 not null,
+  pv_user_id int8 not null,
+  pv_like boolean not null,
+  pv_report boolean null,
+  pv_report_type varchar(32),
+  pv_report_text varchar(128),
+  pv_created_date timestamp not null,
+
+  primary key (pv_photo_id, pv_user_id),
+  constraint photo_vote_user_id_fk foreign key (pv_user_id) references auth_user,
+  constraint photo_vote_photo_id_fk foreign key (pv_photo_id) references photo
+);
+
+create index photo_vote_user_idx on photo_vote (pv_user_id);
+create index photo_vote_photo_idx on photo_vote (pv_photo_id);
 
 -- PhotoSendingDetails table
 create table photo_sending_details (

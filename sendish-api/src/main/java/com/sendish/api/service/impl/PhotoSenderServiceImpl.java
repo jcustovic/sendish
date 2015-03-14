@@ -65,6 +65,8 @@ public class PhotoSenderServiceImpl {
             photoSendingDetails.setSendStatus(PhotoSendStatus.SENT);
             photoSendingDetails.setLastReceiver(result);
         }
+        
+        photoSendingDetailsRepository.save(photoSendingDetails);
     }
 
 	public void resendPhotoOnLike(Long photoId, Long photoReceiverId) {

@@ -17,7 +17,6 @@ public class AsyncPhotoSenderServiceImpl {
     @Async
     public void resendPhoto(Long photoId) {
         try {
-        	LOGGER.debug("########################################### {}", photoId);
             photoSenderService.resendPhoto(photoId);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
