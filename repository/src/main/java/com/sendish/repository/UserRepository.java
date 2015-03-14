@@ -1,13 +1,15 @@
 package com.sendish.repository;
 
 import com.sendish.repository.model.jpa.User;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.QueryHint;
 
-@Transactional(readOnly = true)
+@Transactional(propagation = Propagation.MANDATORY)
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @QueryHints({

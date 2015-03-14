@@ -1,14 +1,16 @@
 package com.sendish.repository;
 
 import com.sendish.repository.model.jpa.Photo;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Transactional(readOnly = true)
+@Transactional(propagation = Propagation.MANDATORY)
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
 	// TODO: deleted flag is not checked because of timeline! On timeline there could be old entries and we need to get details

@@ -1,13 +1,15 @@
 package com.sendish.repository;
 
 import com.sendish.repository.model.jpa.ApnsPushToken;
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
-@Transactional(readOnly = true)
+@Transactional(propagation = Propagation.MANDATORY)
 public interface ApnsPushTokenRepository extends PushTokenRepository<ApnsPushToken> {
 
     ApnsPushToken findByToken(String p_token);

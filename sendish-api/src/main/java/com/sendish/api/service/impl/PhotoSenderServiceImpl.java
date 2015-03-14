@@ -51,6 +51,7 @@ public class PhotoSenderServiceImpl {
     public void resendPhoto(Long photoId) {
         PhotoSendingDetails photoSendingDetails = photoSendingDetailsRepository.findOne(photoId);
         if (photoSendingDetails == null) {
+        	LOGGER.debug("Search by id: {}", photoSendingDetailsRepository.findById(photoId));
             throw new IllegalStateException("PhotoSending with id " + photoId + " not found. Either the photo is not found or it is a new photo.");
         } else if (PhotoStatus.STOPPED.equals(photoSendingDetails.getPhotoStatus())) {
         	LOGGER.debug("Photo {} won't be resent because status is STOPPED", photoId);

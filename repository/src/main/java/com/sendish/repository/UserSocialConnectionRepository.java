@@ -9,12 +9,13 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
 
-@Transactional(readOnly = true)
+@Transactional(propagation = Propagation.MANDATORY)
 public interface UserSocialConnectionRepository extends JpaRepository<UserSocialConnection, UserSocialConnectionId>, JpaSpecificationExecutor<UserSocialConnection>, UserSocialConnectionRepositoryCustom {
 
     @Query("SELECT usc.userId FROM UserSocialConnection usc WHERE usc.providerId = ?1 AND usc.providerUserId = ?2")
