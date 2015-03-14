@@ -15,11 +15,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.social.connect.ConnectionFactoryLocator;
-import org.springframework.social.connect.UsersConnectionRepository;
 
 import com.sendish.api.security.authentication.CustomUserDetailsService;
 import com.sendish.api.security.web.authentication.SocialAuthenticationFilter;
-import com.sendish.repository.UserSocialConnectionRepository;
+import com.sendish.api.service.impl.UserSocialConnectionServiceImpl;
+import com.sendish.api.service.impl.UsersConnectionServiceImpl;
 
 @Configuration
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -29,13 +29,13 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String REALM_NAME = "Sendish API Realm";
     
     @Autowired
-    private UsersConnectionRepository usersConnectionRepository;
+    private UsersConnectionServiceImpl usersConnectionService;
 
     @Autowired
     private ConnectionFactoryLocator connectionFactoryLocator;
 
     @Autowired
-    private UserSocialConnectionRepository userSocialConnectionRepository;
+    private UserSocialConnectionServiceImpl userSocialConnectionService;
     
     @Autowired
     private ShaPasswordEncoder shaPasswordEncoder;
@@ -62,9 +62,9 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         SocialAuthenticationFilter socialAuthenticationFilter = new SocialAuthenticationFilter(basicAuthenticationEntryPoint());
         socialAuthenticationFilter.setUserDetailsService(userDetailsService());
-        socialAuthenticationFilter.setUsersConnectionRepository(usersConnectionRepository);
+        socialAuthenticationFilter.setUsersConnectionService(usersConnectionService);
         socialAuthenticationFilter.setConnectionFactoryLocator(connectionFactoryLocator);
-        socialAuthenticationFilter.setUserSocialConnectionRepository(userSocialConnectionRepository);
+        socialAuthenticationFilter.setUserSocialConnectionService(userSocialConnectionService);
 
         http
             .csrf().disable()
