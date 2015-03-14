@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.UserRankDto;
 import com.sendish.api.redis.KeyUtils;
@@ -21,6 +22,7 @@ import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.User;
 
 @Service
+@Transactional
 public class RankingServiceImpl {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RankingServiceImpl.class);

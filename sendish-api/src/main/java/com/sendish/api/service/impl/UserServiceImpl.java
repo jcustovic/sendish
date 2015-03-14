@@ -176,7 +176,8 @@ public class UserServiceImpl {
         UserDetails userDetails = getUserDetails(userId);
         UserSettingsDto userSettings = new UserSettingsDto();
         userSettings.setReceiveLimitPerDay(userDetails.getReceiveLimitPerDay());
-        userSettings.setReceiveNotifications(userDetails.getReceiveNotifications());
+        userSettings.setReceiveNewPhotoNotifications(userDetails.getReceiveNewPhotoNotifications());
+        userSettings.setReceiveCommentNotifications(userDetails.getReceiveCommentNotifications());
 
         return userSettings;
     }
@@ -184,7 +185,8 @@ public class UserServiceImpl {
     public void updateSettings(UserSettingsDto userSettings, Long userId) {
         UserDetails userDetails = getUserDetails(userId);
         userDetails.setReceiveLimitPerDay(userSettings.getReceiveLimitPerDay());
-        userDetails.setReceiveNotifications(userSettings.getReceiveNotifications());
+        userDetails.setReceiveNewPhotoNotifications(userSettings.getReceiveNewPhotoNotifications());
+        userDetails.setReceiveCommentNotifications(userSettings.getReceiveCommentNotifications());
         
         if (StringUtils.hasText(userSettings.getNickname())) {
         	userDetails.getUser().setNickname(userSettings.getNickname());

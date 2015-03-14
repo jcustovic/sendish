@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.InboxItemDto;
 import com.sendish.api.notification.AsyncNotificationProvider;
@@ -23,6 +24,7 @@ import com.sendish.repository.model.jpa.User;
 import com.sendish.repository.model.jpa.UserInboxItem;
 
 @Service
+@Transactional
 public class UserInboxServiceImpl {
 
     private static final int INBOX_PAGE_SIZE = 20;

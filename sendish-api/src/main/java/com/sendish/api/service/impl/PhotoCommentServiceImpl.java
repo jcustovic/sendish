@@ -113,7 +113,7 @@ public class PhotoCommentServiceImpl {
     }
     
     private void sendCommentNotificationToPhotoOwner(User user, Photo photo, String comment) {
-        if (user.getDetails().getReceiveNotifications()) {
+        if (user.getDetails().getReceiveCommentNotifications()) {
         	Map<String, Object> newCommentFields = new HashMap<>();
             newCommentFields.put("TYPE", "NEW_COMMENT");
             newCommentFields.put("REFERENCE_ID", photo.getId());

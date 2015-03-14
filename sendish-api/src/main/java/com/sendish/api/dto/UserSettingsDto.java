@@ -15,9 +15,13 @@ public class UserSettingsDto implements Serializable {
 	private Integer receiveLimitPerDay;
 
 	@NotNull
-	private Boolean receiveNotifications;
+	private Boolean receiveNewPhotoNotifications;
+
+	@NotNull
+	private Boolean receiveCommentNotifications;
 
 	@Max(20)
+	@NotNull
 	private String nickname;
 
 	// Getters & setters
@@ -30,12 +34,20 @@ public class UserSettingsDto implements Serializable {
 		this.receiveLimitPerDay = receiveLimitPerDay;
 	}
 
-	public Boolean getReceiveNotifications() {
-		return receiveNotifications;
+	public Boolean getReceiveNewPhotoNotifications() {
+		return receiveNewPhotoNotifications;
 	}
 
-	public void setReceiveNotifications(Boolean receiveNotifications) {
-		this.receiveNotifications = receiveNotifications;
+	public void setReceiveNewPhotoNotifications(Boolean receiveNewPhotoNotifications) {
+		this.receiveNewPhotoNotifications = receiveNewPhotoNotifications;
+	}
+
+	public Boolean getReceiveCommentNotifications() {
+		return receiveCommentNotifications;
+	}
+
+	public void setReceiveCommentNotifications(Boolean receiveCommentNotifications) {
+		this.receiveCommentNotifications = receiveCommentNotifications;
 	}
 
 	public String getNickname() {

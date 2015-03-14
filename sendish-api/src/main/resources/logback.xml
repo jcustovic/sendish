@@ -45,13 +45,15 @@
     <logger name="com.mangofactory.swagger" level="warn" />
     <logger name="org.springframework.boot.actuate" level="warn" />
     <logger name="com.notnoop.apns" level="warn" />
+    
+    <logger name="org.hibernate.jpa.spi" level="debug" />
 
-	<!--
     <logger name="net.sf.ehcache" level="trace" />
     <logger name="org.hibernate.cache" level="trace" />
-	-->
+    <!--
 	<logger name="org.hibernate.SQL" level="trace" />    
     <logger name="org.hibernate.stat.Statistics" level="trace" />
+    -->
 	
     <root level="INFO">
         <appender-ref ref="CONSOLE" />

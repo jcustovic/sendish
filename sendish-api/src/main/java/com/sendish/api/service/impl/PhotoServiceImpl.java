@@ -308,7 +308,7 @@ public class PhotoServiceImpl {
         statisticsRepository.incrementUnseenCount(userId);
         statisticsRepository.increaseDailyReceivedPhotoCount(userId, now.toLocalDate());
         
-        if (userDetails.getReceiveNotifications()) {
+        if (userDetails.getReceiveNewPhotoNotifications()) {
         	sendNewPhotoNotification(userId, photo);
         }
 

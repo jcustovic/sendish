@@ -2,14 +2,17 @@ package com.sendish.api.service.impl;
 
 import com.sendish.repository.CityRepository;
 import com.sendish.repository.model.jpa.City;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Service
+@Transactional
 public class CityServiceImpl {
 
     @Autowired

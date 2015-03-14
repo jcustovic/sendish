@@ -60,8 +60,11 @@ public class UserDetails implements Serializable, LocationAware {
     @Column(name = "aud_send_limit_day", nullable = false)
     private Integer sendLimitPerDay;
 
-    @Column(name = "aud_receive_notifications", nullable = false)
-    private Boolean receiveNotifications = true;
+    @Column(name = "aud_receive_new_photo_not", nullable = false)
+    private Boolean receiveNewPhotoNotifications = true;
+    
+    @Column(name = "aud_receive_comment_not", nullable = false)
+    private Boolean receiveCommentNotifications = true;
 
     @Column(name = "aud_last_received_time")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -148,15 +151,23 @@ public class UserDetails implements Serializable, LocationAware {
         this.sendLimitPerDay = sendLimitPerDay;
     }
 
-    public Boolean getReceiveNotifications() {
-        return receiveNotifications;
-    }
+    public Boolean getReceiveNewPhotoNotifications() {
+		return receiveNewPhotoNotifications;
+	}
 
-    public void setReceiveNotifications(Boolean receiveNotifications) {
-        this.receiveNotifications = receiveNotifications;
-    }
+	public void setReceiveNewPhotoNotifications(Boolean receiveNewPhotoNotifications) {
+		this.receiveNewPhotoNotifications = receiveNewPhotoNotifications;
+	}
 
-    public DateTime getLastReceivedTime() {
+	public Boolean getReceiveCommentNotifications() {
+		return receiveCommentNotifications;
+	}
+
+	public void setReceiveCommentNotifications(Boolean receiveCommentNotifications) {
+		this.receiveCommentNotifications = receiveCommentNotifications;
+	}
+
+	public DateTime getLastReceivedTime() {
         return lastReceivedTime;
     }
 
