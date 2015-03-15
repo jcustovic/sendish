@@ -18,11 +18,11 @@ public abstract class BaseEntity implements Serializable {
     @Column(name = "id")
     private Long              id;
 
-    public final Long getId() {
+    public Long getId() {
         return id;
     }
 
-    // public final void setId(final Long p_id) {
+    // public void setId(final Long p_id) {
     // this.id = p_id;
     // }
 

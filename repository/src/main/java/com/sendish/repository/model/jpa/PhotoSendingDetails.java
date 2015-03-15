@@ -29,7 +29,7 @@ public class PhotoSendingDetails implements Serializable {
     @Column(name = "psd_send_status")
     private PhotoSendStatus sendStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "psd_last_photo_rec_id")
     private PhotoReceiver lastReceiver;
 

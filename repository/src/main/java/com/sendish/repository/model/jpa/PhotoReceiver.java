@@ -47,7 +47,7 @@ public class PhotoReceiver extends BaseEntity {
 			@AttributeOverride(name = "location", column = @Column(name = "pr_opened_location")) })
 	private Location openedLocation;
 
-	@ManyToOne(optional = false)
+	@ManyToOne
 	@JoinColumn(name = "pr_city_id")
 	private City city;
 
