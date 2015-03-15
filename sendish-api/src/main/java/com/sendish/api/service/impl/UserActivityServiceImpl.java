@@ -155,7 +155,10 @@ public class UserActivityServiceImpl {
 		if (userActivities.isEmpty()) {
 			return new ArrayList<>(0);
 		} else {
-			return userActivities.stream().map(id -> userActivityRepository.findOne(id)).collect(Collectors.toList());
+			return userActivities.stream()
+					.map(id -> userActivityRepository.findOne(id))
+					.filter(ua -> ua != null) // TODO: Maybe log which ID were not found.
+					.collect(Collectors.toList());
 		}
 	}
 	
