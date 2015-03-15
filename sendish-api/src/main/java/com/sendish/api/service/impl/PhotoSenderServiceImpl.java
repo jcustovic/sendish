@@ -80,4 +80,12 @@ public class PhotoSenderServiceImpl {
 		}
 	}
 
+	public void stopSending(Long photoId, String stopReason) {
+		PhotoSendingDetails photoSendingDetails = photoSendingDetailsRepository.findOne(photoId);
+		photoSendingDetails.setPhotoStatus(PhotoStatus.STOPPED);
+		photoSendingDetails.setPhotoStatusReason(stopReason);
+		
+		photoSendingDetailsRepository.save(photoSendingDetails);
+	}
+
 }

@@ -30,6 +30,7 @@ import com.sendish.api.dto.ReceivedPhotoDetailsDto;
 import com.sendish.api.dto.ReceivedPhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
 import com.sendish.api.notification.AsyncNotificationProvider;
+import com.sendish.api.photo.PhotoStopDecider;
 import com.sendish.api.redis.KeyUtils;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.api.store.FileStore;
@@ -59,6 +60,8 @@ public class PhotoServiceImpl {
 
     private static final int PHOTO_PAGE_SIZE = 20;
     private static final int PHOTO_LOCATION_PAGE_SIZE = 20;
+    
+    private static PrettyTime prettyTime = new PrettyTime();
     
     @Autowired
     private PhotoRepository photoRepository;
@@ -110,8 +113,9 @@ public class PhotoServiceImpl {
     
     @Autowired
     private PhotoVoteRepository photoVoteRepository;
-
-    private static PrettyTime prettyTime = new PrettyTime();
+    
+    @Autowired
+    private PhotoStopDecider photoStopDecider;
 
     public Photo findOne(Long photoId) {
         return photoRepository.findOne(photoId);
@@ -208,7 +212,7 @@ public class PhotoServiceImpl {
             City city = cityService.findNearest(location.getLatitude(), location.getLongitude());
             photoReceiver.setCity(city);
             photoReceiverRepository.save(photoReceiver);
-            statisticsRepository.trackCity(photoId, userId, city.getId());
+            statisticsRepository.trackReceivedPhotoOpened(photoId, userId, city.getId());
         } else {
         	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
         	if (vote != null) {
@@ -269,7 +273,9 @@ public class PhotoServiceImpl {
     		photoReceiver.setDeleted(true);
             photoReceiverRepository.save(photoReceiver);
             
-            // TODO: Logic when to stop photo from traveling
+            if (photoStopDecider.checkToStop(photoId)) {
+            	photoSenderService.stopSending(photoId, "Stopped after dislike check");
+            }
     	}
     }
 
@@ -291,8 +297,8 @@ public class PhotoServiceImpl {
 		photoVoteRepository.save(vote);
 		
 		Long photoOwnerId = photo.getUser().getId();
-		statisticsRepository.dislikePhoto(photoId, photoOwnerId);
 		rankingService.removePointsForDislikedPhoto(photoOwnerId);
+		statisticsRepository.dislikePhoto(photoId, photoOwnerId);
 	}
 
     public void reportReceived(Long photoId, String reason, String reasonText, Long userId) {
@@ -315,6 +321,10 @@ public class PhotoServiceImpl {
             Long photoOwnerId = photoReceiver.getPhoto().getUser().getId();
             statisticsRepository.reportPhoto(photoId, photoOwnerId);
             rankingService.removePointsForReportedPhoto(photoOwnerId);
+            
+            if (photoStopDecider.checkToStop(photoId)) {
+            	photoSenderService.stopSending(photoId, "Stopped after report check");
+            }
     	}
     }
 

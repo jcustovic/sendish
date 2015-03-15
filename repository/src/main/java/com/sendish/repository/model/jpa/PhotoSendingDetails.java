@@ -24,11 +24,14 @@ public class PhotoSendingDetails implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "psd_photo_status")
     private PhotoStatus photoStatus;
+    
+    @Column(name = "psd_photo_status_reason", length = 32)
+    private String photoStatusReason;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "psd_send_status")
     private PhotoSendStatus sendStatus;
-
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "psd_last_photo_rec_id")
     private PhotoReceiver lastReceiver;
@@ -60,8 +63,16 @@ public class PhotoSendingDetails implements Serializable {
     public void setPhotoStatus(PhotoStatus photoStatus) {
         this.photoStatus = photoStatus;
     }
+    
+    public String getPhotoStatusReason() {
+		return photoStatusReason;
+	}
 
-    public PhotoSendStatus getSendStatus() {
+	public void setPhotoStatusReason(String photoStatusReason) {
+		this.photoStatusReason = photoStatusReason;
+	}
+
+	public PhotoSendStatus getSendStatus() {
         return sendStatus;
     }
 

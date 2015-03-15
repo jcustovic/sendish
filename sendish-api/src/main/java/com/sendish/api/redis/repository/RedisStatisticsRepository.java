@@ -47,16 +47,18 @@ public class RedisStatisticsRepository {
     }
 
     public PhotoStatisticsDto getPhotoStatistics(Long photoId) {
-        List<String> fields = Arrays.asList("likeCount", "dislikeCount", "commentCount");
+        List<String> fields = Arrays.asList("openedCount", "likeCount", "dislikeCount", "commentCount", "reportCount");
         HashOperations<String, String, String> hashOp = template.opsForHash();
         List<String> values = hashOp.multiGet(KeyUtils.photoStatistics(photoId), fields);
 
-        Long likeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(0), "0"));
-        Long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
-        Long commentCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
+        Long openedCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(0), "0"));
+        Long likeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
+        Long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
+        Long commentCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
+        Long reportCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(4), "0"));
         Long cityCount = photoCities(photoId).size(); 
 
-        return new PhotoStatisticsDto(likeCount, dislikeCount, cityCount, commentCount);
+        return new PhotoStatisticsDto(openedCount, likeCount, dislikeCount, cityCount, commentCount, reportCount);
     }
 
     public UserStatisticsDto getUserStatistics(Long userId) {
@@ -161,8 +163,9 @@ public class RedisStatisticsRepository {
         userStatistics(userId).increment("total.unreadInboxItemCount", -1);
     }
     
-    public void trackCity(Long photoId, Long userId, Long cityId) {
+    public void trackReceivedPhotoOpened(Long photoId, Long userId, Long cityId) {
     	String cityString = cityId.toString();
+    	photoStatistics(photoId).increment("openedCount", 1);
     	photoCities(photoId).add(cityString);
     	userCities(userId).add(cityString);
 	}

@@ -261,9 +261,10 @@ create index photo_vote_photo_idx on photo_vote (pv_photo_id);
 -- PhotoSendingDetails table
 create table photo_sending_details (
   psd_photo_id int8 not null,
-  psd_last_photo_rec_id int8 null,
+  psd_last_photo_rec_id int8,
   psd_photo_status varchar(9) not null,
-  psd_send_status varchar(7) null,
+  psd_photo_status_reason varchar(32),
+  psd_send_status varchar(7),
   psd_version int4,
 
   primary key (psd_photo_id),
