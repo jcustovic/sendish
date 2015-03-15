@@ -1,5 +1,7 @@
 package com.sendish.api.service.impl;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,7 +13,6 @@ import javax.imageio.ImageIO;
 
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.Thumbnails.Builder;
-import net.coobird.thumbnailator.filters.Transparency;
 import net.coobird.thumbnailator.geometry.Positions;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
+import com.sendish.api.thumbnailator.filter.TransparencyColorFilter;
+import com.sendish.api.util.ImageUtils;
 import com.sendish.api.util.RetryUtils;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.ResizedPhotoRepository;
@@ -46,6 +49,7 @@ public class ResizedPhotoServiceImpl {
     }
 
     //private final ImageFilter blurFilter = new GaussianBlurFilter(20);
+    private final TransparencyColorFilter transparencyColorFilter = new TransparencyColorFilter(0.8f, new Color(42, 48, 63));
 
     @Autowired
     private ResizedPhotoRepository resizedPhotoRepository;
@@ -90,12 +94,18 @@ public class ResizedPhotoServiceImpl {
                 thumbnails.crop(Positions.CENTER);
             }
             if (sizeKey.endsWith("blur")) {
-                //thumbnails.addFilter(blurFilter);
-            	thumbnails.addFilter(new Transparency(0.3));
-            	thumbnails.watermark(Positions.CENTER, ImageIO.read(logoOverlayPath.getInputStream()), 1f);
+            	thumbnails.addFilter(transparencyColorFilter);
+				BufferedImage bufferedImage = thumbnails.asBufferedImage();
+				
+				Thumbnails.of(bufferedImage)
+					.outputFormat(ImageUtils.getImageTypeFromContentType(photo.getContentType()))
+					.size(size[0], size[1])
+					.outputQuality(1)
+					.watermark(Positions.CENTER, ImageIO.read(logoOverlayPath.getInputStream()), 1f)
+					.toOutputStream(out);
+            } else {
+            	thumbnails.toOutputStream(out);	
             }
-
-            thumbnails.toOutputStream(out);
 
             return createResizedPhoto(photo, sizeKey, size[0], size[1], out.toByteArray());
         } catch (IOException e) {

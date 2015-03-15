@@ -29,5 +29,17 @@ public final class ImageUtils {
 
         throw new IllegalArgumentException("Cannot read image dimensions");
     }
+    
+    public static String getImageTypeFromContentType(String contentType) {
+    	if (contentType.equals("image/jpeg")) {
+    		return "jpeg";
+    	} else if (contentType.equals("image/png")) {
+    		return "png";
+    	} else if (contentType.equals("image-gif")) {
+    		return "gif";
+    	}
+    	
+    	return null;
+    }
 
 }
