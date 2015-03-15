@@ -12,7 +12,10 @@ import com.sendish.api.dto.HotPhotoDetailsDto;
 import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
 import com.sendish.repository.HotPhotoRepository;
+import com.sendish.repository.PhotoVoteRepository;
 import com.sendish.repository.model.jpa.HotPhoto;
+import com.sendish.repository.model.jpa.PhotoVote;
+import com.sendish.repository.model.jpa.PhotoVoteId;
 
 @Service
 @Transactional
@@ -28,6 +31,9 @@ public class HotPhotoServiceImpl {
 	
 	@Autowired
 	private PhotoCommentServiceImpl photoCommentService;
+	
+	@Autowired
+    private PhotoVoteRepository photoVoteRepository;
 
 	public List<PhotoDto> findAllActive(Integer page) {
 		List<HotPhoto> photos = hotPhotoRepository.findAllActive(new PageRequest(page, HOT_PHOTO_PAGE_SIZE, Direction.DESC, "selectedTime"));
@@ -51,7 +57,10 @@ public class HotPhotoServiceImpl {
 		HotPhotoDetailsDto photoDetails = new HotPhotoDetailsDto();
 		photoDtoMapper.mapToPhotoDto(hotPhoto.getPhoto(), photoDetails);
 		photoDetails.setComments(photoCommentService.findFirstByPhotoId(photoId, userId, 3));
-		// TODO: Implement like flag on HotPhotoDetailsDto
+		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(photoId, userId));
+        if (vote != null) {
+        	photoDetails.setLike(vote.getLike());
+        }
 		
 		return photoDetails;
 	}

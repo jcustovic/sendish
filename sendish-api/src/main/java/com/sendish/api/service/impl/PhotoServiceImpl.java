@@ -405,11 +405,6 @@ public class PhotoServiceImpl {
     private ReceivedPhotoDto mapToReceiverPhotoDto(PhotoReceiver photo) {
         ReceivedPhotoDto photoDto = new ReceivedPhotoDto();
         photoDtoMapper.mapToPhotoDto(photo.getPhoto(), photoDto);
-        PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(photo.getUser().getId(), photo.getPhoto().getId()));
-        if (vote != null) {
-        	photoDto.setLike(vote.getLike());
-            photoDto.setReport(vote.getReport());	
-        }
         photoDto.setOpened(photo.getOpenedDate() != null);
 
         return photoDto;
