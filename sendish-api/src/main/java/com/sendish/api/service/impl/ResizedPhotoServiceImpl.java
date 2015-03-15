@@ -1,30 +1,33 @@
 package com.sendish.api.service.impl;
 
-import com.sendish.api.store.FileStore;
-import com.sendish.api.store.exception.ResourceNotFoundException;
-import com.sendish.api.thumbnailator.filter.GaussianBlurFilter;
-import com.sendish.api.util.RetryUtils;
-import com.sendish.repository.PhotoRepository;
-import com.sendish.repository.ResizedPhotoRepository;
-import com.sendish.repository.model.jpa.Photo;
-import com.sendish.repository.model.jpa.ResizedPhoto;
-
-import net.coobird.thumbnailator.Thumbnails;
-import net.coobird.thumbnailator.Thumbnails.Builder;
-import net.coobird.thumbnailator.filters.ImageFilter;
-import net.coobird.thumbnailator.geometry.Positions;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
+
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.Thumbnails.Builder;
+import net.coobird.thumbnailator.filters.Transparency;
+import net.coobird.thumbnailator.geometry.Positions;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.sendish.api.store.FileStore;
+import com.sendish.api.store.exception.ResourceNotFoundException;
+import com.sendish.api.util.RetryUtils;
+import com.sendish.repository.PhotoRepository;
+import com.sendish.repository.ResizedPhotoRepository;
+import com.sendish.repository.model.jpa.Photo;
+import com.sendish.repository.model.jpa.ResizedPhoto;
 
 @Service
 @Transactional
@@ -42,7 +45,7 @@ public class ResizedPhotoServiceImpl {
         KEY_SIZE_MAP.put("list_square_small_blur", new int[] { 160, 160 });
     }
 
-    private final ImageFilter blurFilter = new GaussianBlurFilter(20);
+    //private final ImageFilter blurFilter = new GaussianBlurFilter(20);
 
     @Autowired
     private ResizedPhotoRepository resizedPhotoRepository;
@@ -52,6 +55,9 @@ public class ResizedPhotoServiceImpl {
 
     @Autowired
     private FileStore fileStore;
+    
+    @Value("${app.image.overlay.sendish_logo}")
+    private Resource logoOverlayPath;
 
     public ResizedPhoto getResizedPhoto(Long photoId, String sizeKey) {
     	return RetryUtils.retry(() -> {
@@ -84,7 +90,9 @@ public class ResizedPhotoServiceImpl {
                 thumbnails.crop(Positions.CENTER);
             }
             if (sizeKey.endsWith("blur")) {
-                thumbnails.addFilter(blurFilter);
+                //thumbnails.addFilter(blurFilter);
+            	thumbnails.addFilter(new Transparency(0.3));
+            	thumbnails.watermark(Positions.CENTER, ImageIO.read(logoOverlayPath.getInputStream()), 1f);
             }
 
             thumbnails.toOutputStream(out);

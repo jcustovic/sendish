@@ -64,6 +64,9 @@ app:
       prod:
         path: classpath:ios/apns/SendishAPNS_PROD.jks
         pass: sendisH
+  image:
+    overlay:
+      sendish_logo: classpath:app/image/sendish_64x64.png
 
 ---
 
