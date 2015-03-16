@@ -60,6 +60,8 @@ public class PhotoServiceImpl {
 
     private static final int PHOTO_PAGE_SIZE = 20;
     private static final int PHOTO_LOCATION_PAGE_SIZE = 20;
+    private static final int MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS = 24;
+    private static final int MAX_LOCATION_NAME_LENGTH_PHOTO_LIST = 30;
     
     private static PrettyTime prettyTime = new PrettyTime();
     
@@ -168,7 +170,7 @@ public class PhotoServiceImpl {
         List<Photo> photos = photoRepository.findByUserId(userId, 
         		new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
 
-        return photoDtoMapper.mapToPhotoDto(photos);
+        return photoDtoMapper.mapToPhotoDto(photos, MAX_LOCATION_NAME_LENGTH_PHOTO_LIST);
     }
 
     public List<ReceivedPhotoDto> findReceivedByUserId(Long userId, Integer page) {
@@ -179,7 +181,7 @@ public class PhotoServiceImpl {
 			statisticsRepository.resetUnseenCount(userId);
 		}
 
-        return mapToReceivedPhotoDto(photos);
+        return mapToReceivedPhotoDto(photos, MAX_LOCATION_NAME_LENGTH_PHOTO_LIST);
     }
 
     public PhotoDetailsDto findByIdAndUserId(Long photoId, Long userId) {
@@ -219,6 +221,7 @@ public class PhotoServiceImpl {
         		photoDetailsDto.setLike(vote.getLike());
                 photoDetailsDto.setReport(vote.getReport());		
         	} else {
+        		// TODO: Remove this. I use it just to see how often this happens
         		LOGGER.error("Photo with id {} was opened by user with id {} but vote not found", photoId, userId);
         	}
         }
@@ -247,6 +250,12 @@ public class PhotoServiceImpl {
 
 	private void savePhotoLike(Long photoId, Long userId) {
 		Photo photo = photoRepository.findOne(photoId);
+        Long photoOwnerId = photo.getUser().getId();
+
+        if (photoOwnerId.equals(userId)) {
+            throw new IllegalStateException("User cannot like his own photo. UserId: " + userId + ", PhotoId: " + photoId);
+        }
+
 		User user = userRepository.findOne(userId);
 		
 		PhotoVote vote = new PhotoVote();
@@ -254,8 +263,7 @@ public class PhotoServiceImpl {
 		vote.setUser(user);
 		vote.setLike(true);
 		photoVoteRepository.save(vote);
-		
-		Long photoOwnerId = photo.getUser().getId();
+
 		statisticsRepository.likePhoto(photoId, photoOwnerId);
 		rankingService.addPointsForLikedPhoto(photoOwnerId);
 
@@ -288,6 +296,12 @@ public class PhotoServiceImpl {
 
 	private void savePhotoDislike(Long photoId, Long userId) {
 		Photo photo = photoRepository.findOne(photoId);
+        Long photoOwnerId = photo.getUser().getId();
+
+        if (photoOwnerId.equals(userId)) {
+            throw new IllegalStateException("User cannot dislike his own photo. UserId: " + userId + ", PhotoId: " + photoId);
+        }
+
 		User user = userRepository.findOne(userId);
 		
 		PhotoVote vote = new PhotoVote();
@@ -295,8 +309,7 @@ public class PhotoServiceImpl {
 		vote.setUser(user);
 		vote.setLike(false);
 		photoVoteRepository.save(vote);
-		
-		Long photoOwnerId = photo.getUser().getId();
+
 		rankingService.removePointsForDislikedPhoto(photoOwnerId);
 		statisticsRepository.dislikePhoto(photoId, photoOwnerId);
 	}
@@ -305,6 +318,11 @@ public class PhotoServiceImpl {
     	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
     	if (vote == null) {
     		PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
+            Long photoOwnerId = photoReceiver.getPhoto().getUser().getId();
+
+            if (photoOwnerId.equals(userId)) {
+                throw new IllegalStateException("User cannot report his own photo. UserId: " + userId + ", PhotoId: " + photoId);
+            }
     		
     		vote = new PhotoVote();
     		vote.setPhoto(photoReceiver.getPhoto());
@@ -318,7 +336,6 @@ public class PhotoServiceImpl {
             photoReceiver.setDeleted(true);
             photoReceiverRepository.save(photoReceiver);
 
-            Long photoOwnerId = photoReceiver.getPhoto().getUser().getId();
             statisticsRepository.reportPhoto(photoId, photoOwnerId);
             rankingService.removePointsForReportedPhoto(photoOwnerId);
             
@@ -381,7 +398,7 @@ public class PhotoServiceImpl {
 		Map<String, Object> photoReceivedFields = new HashMap<>();
         photoReceivedFields.put("TYPE", "RECEIVED_PHOTO");
         photoReceivedFields.put("REFERENCE_ID", photo.getId());
-        notificationProvider.sendPlainTextNotification(CityUtils.getLocationName(photo.getCity()), photoReceivedFields, userId);
+        notificationProvider.sendPlainTextNotification(CityUtils.getTrimmedLocationName(photo.getCity()), photoReceivedFields, userId);
 	}
 
     private Photo mapToPhoto(LocationBasedFileUpload p_upload, Long p_userId, MultipartFile file) {
@@ -403,18 +420,18 @@ public class PhotoServiceImpl {
     }
 
     private void mapPhotoDetailsDto(Photo photo, PhotoDetailsDto photoDetailsDto, Long userId) {
-    	photoDtoMapper.mapToPhotoDto(photo, photoDetailsDto);
+    	photoDtoMapper.mapToPhotoDto(photo, photoDetailsDto, MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS);
 
         photoDetailsDto.setComments(photoCommentService.findFirstByPhotoId(photo.getId(), userId, 3));
     }
 
-    private List<ReceivedPhotoDto> mapToReceivedPhotoDto(List<PhotoReceiver> photos) {
-        return photos.stream().map(photo -> mapToReceiverPhotoDto(photo)).collect(Collectors.toList());
+    private List<ReceivedPhotoDto> mapToReceivedPhotoDto(List<PhotoReceiver> photos, int maxLocationNameLength) {
+        return photos.stream().map(photo -> mapToReceiverPhotoDto(photo, maxLocationNameLength)).collect(Collectors.toList());
     }
 
-    private ReceivedPhotoDto mapToReceiverPhotoDto(PhotoReceiver photo) {
+    private ReceivedPhotoDto mapToReceiverPhotoDto(PhotoReceiver photo, int maxLocationNameLength) {
         ReceivedPhotoDto photoDto = new ReceivedPhotoDto();
-        photoDtoMapper.mapToPhotoDto(photo.getPhoto(), photoDto);
+        photoDtoMapper.mapToPhotoDto(photo.getPhoto(), photoDto, maxLocationNameLength);
         photoDto.setOpened(photo.getOpenedDate() != null);
 
         return photoDto;
@@ -440,10 +457,8 @@ public class PhotoServiceImpl {
         PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
         if (vote != null) {
         	dto.setLiked(vote.getLike());
-        } else {
-    		LOGGER.error("Photo with id {} was opened by user with id {} but vote not found", photoId, userId);
-    	}
-        dto.setLocation(CityUtils.getLocationName(photoReceiver.getCity()));
+        }
+        dto.setLocation(CityUtils.getTrimmedLocationName(photoReceiver.getCity()));
         dto.setTimeAgo(prettyTime.format(photoReceiver.getCreatedDate().toDate()));
         dto.setId(photoReceiver.getId());
 
