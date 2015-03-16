@@ -76,7 +76,7 @@ public class RedisStatisticsRepository {
         long unreadInboxItemCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(4), "0"));
         boolean hasNewActivities = values.get(5) != null;
         
-        long dailySentCount = getCurrentDailySentCount(userId, LocalDate.now());
+        long dailySentCount = getDailySentPhotoCount(userId, LocalDate.now());
         long totalCityCount = userCities(userId).size();
 
 		return new UserStatisticsDto(likeCount, dislikeCount, reportCount,
@@ -85,19 +85,13 @@ public class RedisStatisticsRepository {
     }
 
     public Long increaseDailySentPhotoCount(Long userId, LocalDate date) {
-        String currentDate = userStatistics(userId).get("daily.currentDate");
-        String stringDate = date.toString();
-        if (currentDate == null || !currentDate.equals(stringDate)) {
-        	userStatistics(userId).put("daily.sentCount", "0");
-            userStatistics(userId).put("daily.currentDate", stringDate);
-        }
+        checkIfNewDayAndReset(userId, date);
 
         return userStatistics(userId).increment("daily.sentCount", 1);
     }
-
-    public Long getCurrentDailySentCount(Long userId, LocalDate date) {
-        String currentDate = userStatistics(userId).get("daily.currentDate");
-        if (currentDate == null || !currentDate.equals(date.toString())) {
+    
+    public Long getDailySentPhotoCount(Long userId, LocalDate date) {
+        if (checkIfNewDayAndReset(userId, date)){ 
             return 0L;
         }
         
@@ -107,25 +101,32 @@ public class RedisStatisticsRepository {
     }
 
     public void increaseDailyReceivedPhotoCount(Long userId, LocalDate date) {
-        String currentDate = userStatistics(userId).get("daily.currentDate");
-        String stringDate = date.toString();
-        if (currentDate == null || !currentDate.equals(stringDate)) {
-        	userStatistics(userId).put("daily.receivedCount", "0");
-            userStatistics(userId).put("daily.currentDate", stringDate);
-        }
+    	checkIfNewDayAndReset(userId, date);
 
         userStatistics(userId).increment("daily.receivedCount", 1);
     }
 
-    public Long getDailyReceivedCount(Long userId, LocalDate date) {
-        String currentDate = userStatistics(userId).get("daily.currentDate");
-        if (currentDate == null || !currentDate.equals(date.toString())) {
+	public Long getDailyReceivedPhotoCount(Long userId, LocalDate date) {
+		if (checkIfNewDayAndReset(userId, date)){ 
             return 0L;
         }
         
         String receivedCountString = userStatistics(userId).get("daily.receivedCount");
 
         return Long.valueOf(ObjectUtils.defaultIfNull(receivedCountString, "0"));
+    }
+	
+	private boolean checkIfNewDayAndReset(Long userId, LocalDate date) {
+    	String currentDate = userStatistics(userId).get("daily.currentDate");
+        String stringDate = date.toString();
+        if (currentDate == null || !currentDate.equals(stringDate)) {
+        	userStatistics(userId).put("daily.receivedCount", "0");
+    		userStatistics(userId).put("daily.sentCount", "0");
+            userStatistics(userId).put("daily.currentDate", stringDate);
+        	return true;
+        }
+        
+        return false;
     }
 
     public void likeComment(Long photoCommentId) {
