@@ -2,6 +2,8 @@ package com.sendish.api.web.controller.api.v1;
 
 import java.util.List;
 
+import com.sendish.api.dto.PhotoDetailsDto;
+import com.sendish.api.dto.PhotoTraveledDto;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -114,12 +116,16 @@ public class HotPhotosController {
     @RequestMapping(value = "/{photoId}/like", method = RequestMethod.PUT)
     @ApiOperation(value = "Like given hot photo")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "You are trying to vote on your photo"),
+        @ApiResponse(code = 404, message = "Photo not found")
     })
     public ResponseEntity<Void> like(@PathVariable Long photoId, AuthUser user) {
     	HotPhoto photo = hotPhotoService.findByPhotoId(photoId);
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if (photo.getPhoto().getUser().getId().equals(user.getUserId())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
             photoService.likePhoto(photoId, user.getUserId());
             return new ResponseEntity<>(HttpStatus.OK);
@@ -129,15 +135,35 @@ public class HotPhotosController {
     @RequestMapping(value = "/{photoId}/dislike", method = RequestMethod.PUT)
     @ApiOperation(value = "Dislike given hot photo")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "You are trying to vote on your photo"),
+        @ApiResponse(code = 404, message = "Photo not found")
     })
     public ResponseEntity<Void> dislike(@PathVariable Long photoId, AuthUser user) {
     	HotPhoto photo = hotPhotoService.findByPhotoId(photoId);
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if (photo.getPhoto().getUser().getId().equals(user.getUserId())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
             photoService.dislikePhoto(photoId, user.getUserId());
             return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = "/{photoId}/traveled", method = RequestMethod.GET)
+    @ApiOperation(value = "Get where the hot photo has traveled")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Photo not found")
+    })
+    public ResponseEntity<List<PhotoTraveledDto>> getTraveled(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page, AuthUser user) {
+        HotPhoto photo = hotPhotoService.findByPhotoId(photoId);
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            List<PhotoTraveledDto> traveledLocations = photoService.getTraveledLocations(photoId, page);
+            return new ResponseEntity<>(traveledLocations, HttpStatus.OK);
         }
     }
     

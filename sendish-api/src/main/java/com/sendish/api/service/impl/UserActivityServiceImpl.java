@@ -86,7 +86,7 @@ public class UserActivityServiceImpl {
 			return UserUtils.getDisplayNameWithCity(user);
 		}
 		
-		return CityUtils.getLocationName(user.getDetails().getCurrentCity());
+		return CityUtils.getTrimmedLocationName(user.getDetails().getCurrentCity());
 	}
 
 	public void addPhotoCommentActivity(PhotoComment photoComment) {

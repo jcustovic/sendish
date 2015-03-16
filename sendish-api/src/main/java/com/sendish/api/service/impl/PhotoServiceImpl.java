@@ -219,8 +219,7 @@ public class PhotoServiceImpl {
         		photoDetailsDto.setLike(vote.getLike());
                 photoDetailsDto.setReport(vote.getReport());		
         	} else {
-        		// TODO: Remove this. I use it just to see how often this happens
-        		LOGGER.error("Received photo with id {} was opened by user with id {} but vote not found", photoId, userId);
+        		LOGGER.error("Photo with id {} was opened by user with id {} but vote not found", photoId, userId);
         	}
         }
         
@@ -441,7 +440,9 @@ public class PhotoServiceImpl {
         PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
         if (vote != null) {
         	dto.setLiked(vote.getLike());
-        }
+        } else {
+    		LOGGER.error("Photo with id {} was opened by user with id {} but vote not found", photoId, userId);
+    	}
         dto.setLocation(CityUtils.getLocationName(photoReceiver.getCity()));
         dto.setTimeAgo(prettyTime.format(photoReceiver.getCreatedDate().toDate()));
         dto.setId(photoReceiver.getId());

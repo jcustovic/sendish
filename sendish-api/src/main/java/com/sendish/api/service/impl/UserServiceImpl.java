@@ -94,7 +94,7 @@ public class UserServiceImpl {
 
         UserProfileDto userProfileDto = new UserProfileDto();
         if (userDetails.getLastLocationTime() != null) {
-            userProfileDto.setLastPlace(CityUtils.getLocationName(userDetails.getCurrentCity()));
+            userProfileDto.setLastPlace(CityUtils.getTrimmedLocationName(userDetails.getCurrentCity()));
             userProfileDto.setLastLat(userDetails.getLocation().getLatitude());
             userProfileDto.setLastLng(userDetails.getLocation().getLongitude());
             userProfileDto.setLastLocationTime(userDetails.getLastInteractionTime().toDate());
