@@ -6,22 +6,30 @@ import com.sendish.repository.model.jpa.City;
 import com.sendish.repository.model.jpa.User;
 
 public class UserUtils {
+
+    private static final int MAX_NAME_LENGTH = 24;
 	
 	public static String getDisplayName(User user) {
+        String displayName;
 		if (StringUtils.hasText(user.getNickname())) {
-			return user.getNickname();
+			displayName = user.getNickname();
 		} else {
-			return CityUtils.getLocationName(user.getDetails().getCurrentCity());
+			displayName = CityUtils.getLocationName(user.getDetails().getCurrentCity());
 		}
+
+        return com.sendish.api.util.StringUtils.trim(displayName, MAX_NAME_LENGTH);
 	}
-	
-	public static String getDisplayNameWithCity(User user) {
+
+    public static String getDisplayNameWithCity(User user) {
 		City city = user.getDetails().getCurrentCity();
+        String displayName;
 		if (StringUtils.hasText(user.getNickname())) {
-			return user.getNickname() + ", " + city.getName();
+            displayName = user.getNickname() + ", " + city.getName();
 		} else {
-			return CityUtils.getLocationName(city);
+            displayName = CityUtils.getLocationName(city);
 		}
+
+        return com.sendish.api.util.StringUtils.trim(displayName, MAX_NAME_LENGTH);
 	}
 
 }

@@ -114,12 +114,16 @@ public class HotPhotosController {
     @RequestMapping(value = "/{photoId}/like", method = RequestMethod.PUT)
     @ApiOperation(value = "Like given hot photo")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "You are trying to vote on your photo"),
+        @ApiResponse(code = 404, message = "Photo not found")
     })
     public ResponseEntity<Void> like(@PathVariable Long photoId, AuthUser user) {
     	HotPhoto photo = hotPhotoService.findByPhotoId(photoId);
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if (photo.getPhoto().getUser().getId().equals(user.getUserId())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
             photoService.likePhoto(photoId, user.getUserId());
             return new ResponseEntity<>(HttpStatus.OK);
@@ -129,12 +133,16 @@ public class HotPhotosController {
     @RequestMapping(value = "/{photoId}/dislike", method = RequestMethod.PUT)
     @ApiOperation(value = "Dislike given hot photo")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "You are trying to vote on your photo"),
+        @ApiResponse(code = 404, message = "Photo not found")
     })
     public ResponseEntity<Void> dislike(@PathVariable Long photoId, AuthUser user) {
     	HotPhoto photo = hotPhotoService.findByPhotoId(photoId);
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if (photo.getPhoto().getUser().getId().equals(user.getUserId())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
             photoService.dislikePhoto(photoId, user.getUserId());
             return new ResponseEntity<>(HttpStatus.OK);

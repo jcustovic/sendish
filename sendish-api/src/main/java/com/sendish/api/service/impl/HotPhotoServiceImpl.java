@@ -22,6 +22,8 @@ import com.sendish.repository.model.jpa.PhotoVoteId;
 public class HotPhotoServiceImpl {
 	
 	private static final int HOT_PHOTO_PAGE_SIZE = 20;
+    private static final int MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS = 24;
+    private static final int MAX_LOCATION_NAME_LENGTH_PHOTO_LIST = 30;
 	
 	@Autowired
 	private HotPhotoRepository hotPhotoRepository;
@@ -38,7 +40,7 @@ public class HotPhotoServiceImpl {
 	public List<PhotoDto> findAllActive(Integer page) {
 		List<HotPhoto> photos = hotPhotoRepository.findAllActive(new PageRequest(page, HOT_PHOTO_PAGE_SIZE, Direction.DESC, "selectedTime"));
 		
-		return photoDtoMapper.mapHotToPhotoDto(photos);
+		return photoDtoMapper.mapHotToPhotoDto(photos, MAX_LOCATION_NAME_LENGTH_PHOTO_LIST);
 	}
 
 	public HotPhoto findPhotoByPhotoUuid(String photoUUID) {
@@ -55,7 +57,7 @@ public class HotPhotoServiceImpl {
 			return null;
 		}
 		HotPhotoDetailsDto photoDetails = new HotPhotoDetailsDto();
-		photoDtoMapper.mapToPhotoDto(hotPhoto.getPhoto(), photoDetails);
+		photoDtoMapper.mapToPhotoDto(hotPhoto.getPhoto(), photoDetails, MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS);
 		photoDetails.setComments(photoCommentService.findFirstByPhotoId(photoId, userId, 3));
 		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
         if (vote != null) {

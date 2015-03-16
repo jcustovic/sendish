@@ -17,29 +17,29 @@ import com.sendish.repository.model.jpa.Photo;
 
 @Component
 public class PhotoDtoMapper {
-	
+
 	private static PrettyTime prettyTime = new PrettyTime();
 	
 	@Autowired
     private RedisStatisticsRepository statisticsRepository;
 	
-	public List<PhotoDto> mapHotToPhotoDto(List<HotPhoto> photos) {
-        return photos.stream().map(photo -> mapToPhotoDto(photo.getPhoto())).collect(Collectors.toList());
+	public List<PhotoDto> mapHotToPhotoDto(List<HotPhoto> photos, int maxLocationNameLength) {
+        return photos.stream().map(photo -> mapToPhotoDto(photo.getPhoto(), maxLocationNameLength)).collect(Collectors.toList());
     }
 	
-	public List<PhotoDto> mapToPhotoDto(List<Photo> photos) {
-        return photos.stream().map(photo -> mapToPhotoDto(photo)).collect(Collectors.toList());
+	public List<PhotoDto> mapToPhotoDto(List<Photo> photos, int maxLocationNameLength) {
+        return photos.stream().map(photo -> mapToPhotoDto(photo, maxLocationNameLength)).collect(Collectors.toList());
     }
 	
-	public PhotoDto mapToPhotoDto(Photo photo) {
+	public PhotoDto mapToPhotoDto(Photo photo, int locationMaxLength) {
 		PhotoDto photoDto = new PhotoDto();
 		
-		return mapToPhotoDto(photo, photoDto);
+		return mapToPhotoDto(photo, photoDto, locationMaxLength);
 	}
 	
-	public PhotoDto mapToPhotoDto(Photo photo, PhotoDto photoDto) {
+	public PhotoDto mapToPhotoDto(Photo photo, PhotoDto photoDto, int locationMaxLength) {
         photoDto.setId(photo.getId());
-        photoDto.setOriginLocation(CityUtils.getLocationName(photo.getCity()));
+        photoDto.setOriginLocation(CityUtils.getLocationName(photo.getCity(), locationMaxLength));
         photoDto.setDescription(photo.getDescription());
         photoDto.setTimeAgo(getPrettyTime(photo.getCreatedDate()));
         photoDto.setUuid(photo.getUuid());
