@@ -39,6 +39,7 @@ public class PhotoDtoMapper {
 	
 	public PhotoDto mapToPhotoDto(Photo photo, PhotoDto photoDto, int locationMaxLength) {
         photoDto.setId(photo.getId());
+        photoDto.setOwnerUserId(photo.getUser().getId());
         photoDto.setOriginLocation(CityUtils.getLocationName(photo.getCity(), locationMaxLength));
         photoDto.setDescription(photo.getDescription());
         photoDto.setTimeAgo(getPrettyTime(photo.getCreatedDate()));
