@@ -2,6 +2,8 @@ package com.sendish.api.web.controller.api.v1;
 
 import java.util.List;
 
+import com.sendish.api.dto.PhotoDetailsDto;
+import com.sendish.api.dto.PhotoTraveledDto;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -146,6 +148,22 @@ public class HotPhotosController {
         } else {
             photoService.dislikePhoto(photoId, user.getUserId());
             return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = "/{photoId}/traveled", method = RequestMethod.GET)
+    @ApiOperation(value = "Get where the hot photo has traveled")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Photo not found")
+    })
+    public ResponseEntity<List<PhotoTraveledDto>> getTraveled(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page, AuthUser user) {
+        HotPhoto photo = hotPhotoService.findByPhotoId(photoId);
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            List<PhotoTraveledDto> traveledLocations = photoService.getTraveledLocations(photoId, page);
+            return new ResponseEntity<>(traveledLocations, HttpStatus.OK);
         }
     }
     
