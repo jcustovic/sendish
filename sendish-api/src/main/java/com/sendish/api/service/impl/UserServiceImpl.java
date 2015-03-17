@@ -124,11 +124,10 @@ public class UserServiceImpl {
         return userProfileDto;
     }
 
-    public Long getSentLimitLeft(Long userId) {
+    public boolean isSentLimitReached(Long userId) {
         UserDetails userDetails = getUserDetails(userId);
-        UserStatisticsDto userStatistics = statisticsRepository.getUserStatistics(userId);
 
-        return getSentLimitLeft(userDetails, userStatistics);
+        return userDetails.getSendAllowedTime() != null && userDetails.getSendAllowedTime().isAfterNow();
     }
 
     private Long getSentLimitLeft(UserDetails userDetails, UserStatisticsDto userStatistics) {

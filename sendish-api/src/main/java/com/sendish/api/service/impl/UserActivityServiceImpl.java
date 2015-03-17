@@ -35,6 +35,8 @@ public class UserActivityServiceImpl {
 	private static final int PAGE_SIZE = 20;
 	private static final int MAX_ACTIVITY_PER_USER = 50;
     private static final int MAX_ACTIVITY_TEXT_LENGTH = 50;
+    // Max chars we want in the end is MAX_ACTIVITY_TEXT_LENGTH and we suspect that users display name will be cca 10.
+    private static final int MAX_ACTIVITY_TEXT_IN_DB_LENGTH = MAX_ACTIVITY_TEXT_LENGTH - 10;
 	
 	private static PrettyTime prettyTime = new PrettyTime();
 	
@@ -100,8 +102,7 @@ public class UserActivityServiceImpl {
 		activity.setImageUuid(photo.getUuid());
 		activity.setReferenceType("PHOTO_COMMENT");
 		activity.setReferenceId(photo.getId().toString());
-        // Max chars we want in the end is 50 and we suspect that users display name will be 50.
-        String text = StringUtils.trim(" commented on your photo: " + photoComment.getComment(), 40);
+        String text = StringUtils.trim(" commented on your photo: " + photoComment.getComment(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
 		activity.setText(text);
 		
 		activity = userActivityRepository.save(activity);
@@ -136,8 +137,7 @@ public class UserActivityServiceImpl {
 		activity.setImageUuid(comment.getPhoto().getUuid());
 		activity.setReferenceType(referenceType);
 		activity.setReferenceId(comment.getPhoto().getId().toString());
-        // Max chars we want in the end is 50 and we suspect that users display name will be 50.
-        String text = StringUtils.trim(" liked your comment: " + comment.getComment(), 40);
+        String text = StringUtils.trim(" liked your comment: " + comment.getComment(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
         activity.setText(text);
 		
 		activity = userActivityRepository.save(activity);

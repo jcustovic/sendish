@@ -306,7 +306,7 @@ public class PhotosController {
     })
     public ResponseEntity<Void> upload(@Valid @ModelAttribute LocationBasedFileUpload locationBasedFileUpload,
                                        MultipartFile image, AuthUser user) { // FIXME: MultipartFile image is also specified here because of swagger!
-        if (userService.getSentLimitLeft(user.getUserId()) <= 0) {
+        if (userService.isSentLimitReached(user.getUserId())) {
             return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
         }
         PhotoSendingDetails photoSendingDetails = photoService.processNewImage(locationBasedFileUpload, user.getUserId());
