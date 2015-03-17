@@ -125,14 +125,9 @@ public class PhotoCommentServiceImpl {
 	}
 
 	private String getNotificationText(User user, String comment) {
-		String prefix = UserUtils.getDisplayNameWithCity(user) + " said: ";
-		int charsLeftForComment = 50 - prefix.length();
-		
-		if (comment.length() > charsLeftForComment) {
-			return prefix + StringUtils.left(comment, charsLeftForComment - 3) + "...";
-		} else {
-			return prefix + comment;
-		}
+		String text = UserUtils.getDisplayNameWithCity(user) + " said: " + comment;
+
+        return com.sendish.api.util.StringUtils.trim(text, 50, "...");
 	}
 
     private CommentDto mapToCommentDto(PhotoComment comment, Long userId) {

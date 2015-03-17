@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.sendish.api.util.StringUtils;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ public class UserActivityServiceImpl {
 	
 	private static final int PAGE_SIZE = 20;
 	private static final int MAX_ACTIVITY_PER_USER = 50;
+    private static final int MAX_ACTIVITY_TEXT_LENGTH = 50;
 	
 	private static PrettyTime prettyTime = new PrettyTime();
 	
@@ -56,8 +58,9 @@ public class UserActivityServiceImpl {
 
 	private ActivityItemDto mapToActivityItemDto(UserActivity userActivity) {
 		ActivityItemDto activityItem = new ActivityItemDto();
-		activityItem.setDisplayName(getDisplayName(userActivity.getReferenceType(), userActivity.getFromUser()));
-		activityItem.setDescription(userActivity.getText());
+        String displayName = getDisplayName(userActivity.getReferenceType(), userActivity.getFromUser());
+		activityItem.setDisplayName(displayName);
+		activityItem.setDescription(StringUtils.trim(userActivity.getText(), MAX_ACTIVITY_TEXT_LENGTH - displayName.length(), "..."));
 		activityItem.setReferenceId(userActivity.getReferenceId());
 		activityItem.setReferenceType(getDtoReferenceType(userActivity.getReferenceType()));
 		activityItem.setImageUuid(userActivity.getImageUuid());
@@ -97,7 +100,9 @@ public class UserActivityServiceImpl {
 		activity.setImageUuid(photo.getUuid());
 		activity.setReferenceType("PHOTO_COMMENT");
 		activity.setReferenceId(photo.getId().toString());
-		activity.setText(" commented your photo");
+        // Max chars we want in the end is 50 and we suspect that users display name will be 50.
+        String text = StringUtils.trim(" commented on your photo: " + photoComment.getComment(), 40);
+		activity.setText(text);
 		
 		activity = userActivityRepository.save(activity);
 		addActivityToUserTimeline(photo.getUser().getId(), activity.getId());
@@ -131,7 +136,9 @@ public class UserActivityServiceImpl {
 		activity.setImageUuid(comment.getPhoto().getUuid());
 		activity.setReferenceType(referenceType);
 		activity.setReferenceId(comment.getPhoto().getId().toString());
-		activity.setText(" liked your comment");
+        // Max chars we want in the end is 50 and we suspect that users display name will be 50.
+        String text = StringUtils.trim(" liked your comment: " + comment.getComment(), 40);
+        activity.setText(text);
 		
 		activity = userActivityRepository.save(activity);
 		addActivityToUserTimeline(comment.getUser().getId(), activity.getId());

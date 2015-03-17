@@ -17,7 +17,7 @@ public class UserUtils {
 			displayName = CityUtils.getLocationName(user.getDetails().getCurrentCity());
 		}
 
-        return com.sendish.api.util.StringUtils.trim(displayName, MAX_NAME_LENGTH);
+        return com.sendish.api.util.StringUtils.trim(displayName, MAX_NAME_LENGTH, "...");
 	}
 
     public static String getDisplayNameWithCity(User user) {
@@ -29,7 +29,7 @@ public class UserUtils {
             displayName = CityUtils.getLocationName(city);
 		}
 
-        return com.sendish.api.util.StringUtils.trim(displayName, MAX_NAME_LENGTH);
+        return com.sendish.api.util.StringUtils.trim(displayName, MAX_NAME_LENGTH, "...");
 	}
 
 }
