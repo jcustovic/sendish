@@ -79,7 +79,7 @@ public class Resources_en extends ListResourceBundle {
             { "WeekFuturePrefix", "" },
             { "WeekFutureSuffix", " from now" },
             { "WeekPastPrefix", "" },
-            { "WeekPastSuffix", " ago" },
+            { "WeekPastSuffix", "" },
             { "WeekSingularName", "week" },
             { "WeekPluralName", "weeks" },
             { "YearPattern", "%n %u" },

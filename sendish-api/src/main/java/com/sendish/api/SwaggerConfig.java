@@ -1,7 +1,6 @@
 package com.sendish.api;
 
 import static com.google.common.collect.Maps.newLinkedHashMap;
-import static com.mangofactory.swagger.ScalaUtils.toOption;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -21,8 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.sendish.api.security.userdetails.AuthUser;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +34,7 @@ import scala.Option;
 import com.mangofactory.swagger.configuration.SpringSwaggerConfig;
 import com.mangofactory.swagger.plugin.EnableSwagger;
 import com.mangofactory.swagger.plugin.SwaggerSpringMvcPlugin;
+import com.sendish.api.security.userdetails.AuthUser;
 import com.wordnik.swagger.model.ApiInfo;
 import com.wordnik.swagger.model.ResponseMessage;
 
@@ -56,53 +54,53 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
     public Map<RequestMethod, List<ResponseMessage>> defaultResponseMessages() {
     	LinkedHashMap<RequestMethod, List<ResponseMessage>> responses = newLinkedHashMap();
         
-    	final Option<String> option = toOption(null);
+    	final Option<String> emptyOption = Option.empty();
         
 		responses.put(GET, asList(
-            new ResponseMessage(OK.value(), OK.getReasonPhrase(), option),
-            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), option),
-            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, option)
+            new ResponseMessage(OK.value(), OK.getReasonPhrase(), emptyOption),
+            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), emptyOption),
+            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, emptyOption)
 	    ));
 
         responses.put(PUT, asList(
-            new ResponseMessage(NOT_FOUND.value(), NOT_FOUND.getReasonPhrase(), option),
-            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), option),
-            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, option)
+            new ResponseMessage(NOT_FOUND.value(), NOT_FOUND.getReasonPhrase(), emptyOption),
+            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), emptyOption),
+            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, emptyOption)
         ));
 
         responses.put(POST, asList(
-            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), option),
-            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, option)
+            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), emptyOption),
+            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, emptyOption)
         ));
 
         responses.put(DELETE, asList(
-	        new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), option),
-	        new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), option),
-	        new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, option)
+	        new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), emptyOption),
+	        new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), emptyOption),
+	        new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, emptyOption)
         ));
 
         responses.put(PATCH, asList(
-            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), option),
-            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), option),
-            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, option)
+            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), emptyOption),
+            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), emptyOption),
+            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, emptyOption)
         ));
 
         responses.put(TRACE, asList(
-            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), option),
-            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), option),
-            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, option)
+            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), emptyOption),
+            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), emptyOption),
+            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, emptyOption)
         ));
 
         responses.put(OPTIONS, asList(
-            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), option),
-            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), option),
-            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, option)
+            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), emptyOption),
+            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), emptyOption),
+            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, emptyOption)
         ));
         
         responses.put(HEAD, asList(
-            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), option),
-            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), option),
-            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, option)
+            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), emptyOption),
+            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), emptyOption),
+            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, emptyOption)
         ));
 
     	return responses;

@@ -5,15 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.sendish.api.dto.CommentDto;
-import com.sendish.api.notification.AsyncNotificationProvider;
-import com.sendish.api.redis.dto.CommentStatisticsDto;
-import com.sendish.api.redis.repository.RedisStatisticsRepository;
-import com.sendish.api.util.UserUtils;
-import com.sendish.repository.PhotoCommentVoteRepository;
-import com.sendish.repository.model.jpa.*;
-
-import org.apache.commons.lang3.StringUtils;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -21,9 +12,22 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sendish.api.dto.CommentDto;
+import com.sendish.api.notification.AsyncNotificationProvider;
+import com.sendish.api.redis.dto.CommentStatisticsDto;
+import com.sendish.api.redis.repository.RedisStatisticsRepository;
+import com.sendish.api.util.StringUtils;
+import com.sendish.api.util.UserUtils;
 import com.sendish.repository.PhotoCommentRepository;
+import com.sendish.repository.PhotoCommentVoteRepository;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.UserRepository;
+import com.sendish.repository.model.jpa.Photo;
+import com.sendish.repository.model.jpa.PhotoComment;
+import com.sendish.repository.model.jpa.PhotoCommentVote;
+import com.sendish.repository.model.jpa.PhotoCommentVoteId;
+import com.sendish.repository.model.jpa.User;
+import com.sendish.repository.model.jpa.UserDetails;
 
 @Service
 @Transactional
@@ -127,7 +131,7 @@ public class PhotoCommentServiceImpl {
 	private String getNotificationText(User user, String comment) {
 		String text = UserUtils.getDisplayNameWithCity(user) + " said: " + comment;
 
-        return com.sendish.api.util.StringUtils.trim(text, 50, "...");
+        return StringUtils.trim(text, 50, "...");
 	}
 
     private CommentDto mapToCommentDto(PhotoComment comment, Long userId) {

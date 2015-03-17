@@ -2,8 +2,6 @@ package com.sendish.api.web.controller.api.v1;
 
 import java.util.List;
 
-import com.sendish.api.dto.PhotoDetailsDto;
-import com.sendish.api.dto.PhotoTraveledDto;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -21,6 +19,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.sendish.api.dto.HotPhotoDetailsDto;
 import com.sendish.api.dto.PhotoDto;
+import com.sendish.api.dto.PhotoTraveledDto;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.HotPhotoServiceImpl;
 import com.sendish.api.service.impl.PhotoServiceImpl;

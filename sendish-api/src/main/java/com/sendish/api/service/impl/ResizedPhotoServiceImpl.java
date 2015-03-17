@@ -1,16 +1,12 @@
 package com.sendish.api.service.impl;
 
 import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageFilter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
 
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.Thumbnails.Builder;
@@ -27,7 +23,6 @@ import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.thumbnailator.filter.GaussianBlurFilter;
 import com.sendish.api.thumbnailator.filter.TransparencyColorFilter;
-import com.sendish.api.util.ImageUtils;
 import com.sendish.api.util.RetryUtils;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.ResizedPhotoRepository;
