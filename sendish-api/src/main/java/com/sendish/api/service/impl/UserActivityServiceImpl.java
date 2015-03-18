@@ -34,7 +34,7 @@ public class UserActivityServiceImpl {
 	
 	private static final int PAGE_SIZE = 20;
 	private static final int MAX_ACTIVITY_PER_USER = 50;
-    private static final int MAX_ACTIVITY_TEXT_LENGTH = 50;
+    private static final int MAX_ACTIVITY_TEXT_LENGTH = 58;
     // Max chars we want in the end is MAX_ACTIVITY_TEXT_LENGTH and we suspect that users display name will be cca 10.
     private static final int MAX_ACTIVITY_TEXT_IN_DB_LENGTH = MAX_ACTIVITY_TEXT_LENGTH - 10;
 	
