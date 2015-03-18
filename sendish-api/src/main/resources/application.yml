@@ -28,6 +28,9 @@ spring:
     port: 587
     username: app.sender@sendish.com
     password: 4fLlmz2qtlDF
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
 
 management:
   context-path: /manage
@@ -55,7 +58,7 @@ app:
   baseUrl: http://api.sendish.com
   store:
     data:
-      path: C:\Users\chus\sendish\data
+      path: C:\Users\janc\sendish\data
   ios:
     cert:
       dev:

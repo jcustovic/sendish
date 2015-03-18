@@ -111,25 +111,49 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
 		for (ResponseMessage responseMessage : responseMessages) {
 			list.add(responseMessage);
 		}
+
 		return list;
 	}
 
     @Bean
-    public SwaggerSpringMvcPlugin customImplementation() {
+    public SwaggerSpringMvcPlugin apiV1Implementation() {
         springSwaggerConfig.defaultIgnorableParameterTypes().add(AuthUser.class);
         springSwaggerConfig.defaultIgnorableParameterTypes().add(WebRequest.class);
 
         return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
                 .includePatterns("/api/v1.0/.*")
                 .swaggerGroup("v1.0")
-                .apiInfo(apiInfo())
+                .apiInfo(v1ApiInfo())
                 .useDefaultResponseMessages(true);
     }
 
-    private ApiInfo apiInfo() {
+    private ApiInfo v1ApiInfo() {
         return new ApiInfo(
                 "Sendish API",
                 "REST API to connect to backend system",
+                null, // "My Apps API terms of service"
+                "jan@sendish.com",
+                "© Sendish.com",
+                null // "My Apps API License URL"
+        );
+    }
+
+    @Bean
+    public SwaggerSpringMvcPlugin adminImplementation() {
+        springSwaggerConfig.defaultIgnorableParameterTypes().add(AuthUser.class);
+        springSwaggerConfig.defaultIgnorableParameterTypes().add(WebRequest.class);
+
+        return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
+                .includePatterns("/api/admin/.*")
+                .swaggerGroup("admin")
+                .apiInfo(adminApiInfo())
+                .useDefaultResponseMessages(true);
+    }
+
+    private ApiInfo adminApiInfo() {
+        return new ApiInfo(
+                "Sendish Admin API",
+                "Admin stuff",
                 null, // "My Apps API terms of service"
                 "jan@sendish.com",
                 "© Sendish.com",

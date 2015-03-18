@@ -1,6 +1,5 @@
 package com.sendish.api;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -8,15 +7,13 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
-import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
 
 @Configuration
-@Order(Ordered.LOWEST_PRECEDENCE - 1)
+@Order(Ordered.LOWEST_PRECEDENCE - 1000)
 public class SwaggerSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    public static final String REALM_NAME = "Sendish Docs Realm";
     public static final String ROLE_DOCS = "DOCS";
+    public static final String ROLE_DOCS_ADMIN = "DOCS_ADMIN";
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -29,15 +26,10 @@ public class SwaggerSecurityConfig extends WebSecurityConfigurerAdapter {
             .requestMatchers().antMatchers("/documentation/**", "/swagger-ui/**", "/api-docs/**").and()
             .csrf().disable()
             .headers().frameOptions().disable()
-            .authorizeRequests().anyRequest().hasRole(ROLE_DOCS);
+            .authorizeRequests()
+                .antMatchers("/api-docs/admin/**").hasRole(ROLE_DOCS_ADMIN)
+                .anyRequest().hasRole(ROLE_DOCS);
 
-        // Digest
-        /*
-        http
-            .exceptionHandling()
-                .authenticationEntryPoint(digestEntryPoint()).and()
-            .addFilter(digestAuthenticationFilter(digestEntryPoint()));
-        */
         http
             .formLogin()
                 .loginPage("/documentation/login")
@@ -45,7 +37,7 @@ public class SwaggerSecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/documentation", true)
                 .permitAll()
             .and()
-            .logout()
+                .logout()
                 .logoutUrl("/documentation/logout")
                 .logoutSuccessUrl("/documentation/login")
                 .permitAll();
@@ -54,24 +46,9 @@ public class SwaggerSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser("docs").password("docs").roles(ROLE_DOCS);
+                .withUser("docs").password("docs").roles(ROLE_DOCS)
+                .and()
+                .withUser("admin").password("admin").roles(ROLE_DOCS, ROLE_DOCS_ADMIN);
     }
-    
-	public DigestAuthenticationFilter digestAuthenticationFilter(DigestAuthenticationEntryPoint digestAuthenticationEntryPoint) throws Exception {
-		DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();
-		digestAuthenticationFilter.setAuthenticationEntryPoint(digestEntryPoint());
-		digestAuthenticationFilter.setUserDetailsService(userDetailsServiceBean());
-		
-		return digestAuthenticationFilter;
-	}
-
-	@Bean
-	public DigestAuthenticationEntryPoint digestEntryPoint() {
-		DigestAuthenticationEntryPoint digestAuthenticationEntryPoint = new DigestAuthenticationEntryPoint();
-		digestAuthenticationEntryPoint.setKey("akdas/(&%$");
-		digestAuthenticationEntryPoint.setRealmName(REALM_NAME);
-		
-		return digestAuthenticationEntryPoint;
-	}
 
 }
