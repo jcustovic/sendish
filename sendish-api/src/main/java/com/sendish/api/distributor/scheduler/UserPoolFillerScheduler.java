@@ -1,15 +1,20 @@
 package com.sendish.api.distributor.scheduler;
 
+import com.mysema.query.types.Projections;
 import com.sendish.api.distributor.UserPool;
 import com.sendish.api.distributor.UserWithScore;
+import com.sendish.api.distributor.dto.LastReceivedUserDto;
 import com.sendish.repository.UserDetailsRepository;
-import com.sendish.repository.model.jpa.UserDetails;
+import com.sendish.repository.model.jpa.QUserDetails;
 
+import com.sendish.repository.querydsl.predicate.UserDetailsPredicate;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,8 +51,7 @@ public class UserPoolFillerScheduler {
             DateTime oldestUserPhotoReceivedDate = getOldestUserPhotoReceivedDate();
             LOGGER.info("Oldest user received photo timestamp in pool is {}", oldestUserPhotoReceivedDate);
 
-            // TODO: Only return userId and lastReceivedTime! Save all the joins and hibernate city and what not selections!
-            Page<UserDetails> userDetails = userDetailsRepository.searchUsersForSendingPool(latestUserPhotoReceivedDate, fetchSize);
+            Page<LastReceivedUserDto> userDetails = searchUsersForSendingPool(fetchSize, latestUserPhotoReceivedDate);
             if (userDetails.hasContent()) {
                 List<UserWithScore> usersWithScore = userDetails.getContent().stream()
                         .map(user -> new UserWithScore(user.getUserId().toString(), (user.getLastReceivedTime() == null) ? 0 : user.getLastReceivedTime().getMillis()))
@@ -67,8 +71,18 @@ public class UserPoolFillerScheduler {
         }
     }
 
+    private Page<LastReceivedUserDto> searchUsersForSendingPool(int fetchSize, DateTime latestUserPhotoReceivedDate) {
+        QUserDetails qUserDetails = QUserDetails.userDetails;
+
+        return userDetailsRepository.findAll(Projections.bean(LastReceivedUserDto.class, qUserDetails.userId, qUserDetails.lastReceivedTime),
+                UserDetailsPredicate.searchUsersForSendingPool(latestUserPhotoReceivedDate), new PageRequest(0, fetchSize, Sort.Direction.ASC, "lastReceivedTime"));
+    }
+
     private void checkIfWeHaveSomeOldUsers(DateTime oldestUserPhotoReceivedDate) {
-        Page<UserDetails> userDetails = userDetailsRepository.searchOldUsersForSendingPool(oldestUserPhotoReceivedDate, 100);
+        QUserDetails qUserDetails = QUserDetails.userDetails;
+
+        Page<LastReceivedUserDto> userDetails = userDetailsRepository.findAll(Projections.bean(LastReceivedUserDto.class, qUserDetails.userId, qUserDetails.lastReceivedTime),
+                UserDetailsPredicate.searchOldUsersForSendingPool(oldestUserPhotoReceivedDate), new PageRequest(0, 100, Sort.Direction.ASC, "lastReceivedTime"));
         if (userDetails.hasContent()) {
             List<UserWithScore> usersWithScore = userDetails.getContent().stream()
                     .map(user -> new UserWithScore(user.getUserId().toString(), (user.getLastReceivedTime() == null) ? 0 : user.getLastReceivedTime().getMillis()))

@@ -7,6 +7,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional(propagation = Propagation.MANDATORY)
-public interface UserDetailsRepository extends CustomQueryDslJpaRepository<UserDetails, Long>, UserDetailsRepositoryCustom {
+public interface UserDetailsRepository extends CustomQueryDslJpaRepository<UserDetails, Long> {
 
 }

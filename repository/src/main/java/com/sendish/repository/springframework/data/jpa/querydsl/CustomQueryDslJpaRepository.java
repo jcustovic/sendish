@@ -23,6 +23,6 @@ public interface CustomQueryDslJpaRepository<T, ID extends Serializable> extends
      * @param pageable
      * @return
      */
-    Page<T> findAll(FactoryExpression<T> factoryExpression, Predicate predicate, Pageable pageable);
+    <K> Page<K> findAll(FactoryExpression<K> factoryExpression, Predicate predicate, Pageable pageable);
 
 }

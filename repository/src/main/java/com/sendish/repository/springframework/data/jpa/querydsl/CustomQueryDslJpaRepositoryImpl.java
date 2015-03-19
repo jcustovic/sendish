@@ -42,13 +42,14 @@ public class CustomQueryDslJpaRepositoryImpl<T, ID extends Serializable> extends
     }
 
     @Override
-    public Page<T> findAll(FactoryExpression<T> factoryExpression, Predicate predicate, Pageable pageable) {
+    public <K> Page<K> findAll(FactoryExpression<K> factoryExpression, Predicate predicate, Pageable pageable) {
         JPQLQuery countQuery = createQuery(predicate);
         JPQLQuery query = querydsl.applyPagination(pageable, createQuery(predicate));
 
         Long total = countQuery.count();
-        List<T> content = total > pageable.getOffset() ? query.list(factoryExpression) : Collections.emptyList();
+        List<K> content = total > pageable.getOffset() ? query.list(factoryExpression) : Collections.emptyList();
 
         return new PageImpl(content, pageable, total);
     }
+
 }
