@@ -152,6 +152,7 @@ public class UserInboxServiceImpl {
         inboxItemDto.setShortTitle(inboxMessage.getShortTitle());
         inboxItemDto.setTitle(inboxMessage.getTitle());
         inboxItemDto.setUrl(inboxMessage.getUrl());
+        inboxItemDto.setUrlText(inboxMessage.getUrlText());
         inboxItemDto.setId(inboxItem.getId());
         inboxItemDto.setTimeAgo(getPrettyTime(inboxItem.getCreatedDate()));
         inboxItemDto.setRead(inboxItem.getRead());

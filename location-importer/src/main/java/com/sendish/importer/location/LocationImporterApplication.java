@@ -2,6 +2,7 @@ package com.sendish.importer.location;
 
 import com.sendish.repository.CityRepository;
 import com.sendish.repository.CountryRepository;
+import com.sendish.repository.springframework.data.jpa.querydsl.CustomQueryDslJpaRepositoryFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -17,7 +18,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan
 @EnableAutoConfiguration
 @EntityScan(basePackages = "com.sendish.repository.model.jpa")
-@EnableJpaRepositories(basePackages = { "com.sendish.repository" })
+@EnableJpaRepositories(repositoryFactoryBeanClass = CustomQueryDslJpaRepositoryFactoryBean.class, basePackages = "com.sendish.repository")
 @EnableTransactionManagement
 public class LocationImporterApplication {
 
