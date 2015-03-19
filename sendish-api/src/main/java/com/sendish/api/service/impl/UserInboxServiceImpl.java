@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.sendish.api.util.StringUtils;
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,10 +135,11 @@ public class UserInboxServiceImpl {
     }
     
     private void sendNewInboxItemNotification(UserInboxItem userInboxItem) {
+        InboxMessage inboxMsg = userInboxItem.getInboxMessage();
 		Map<String, Object> customFields = new HashMap<>();
         customFields.put("TYPE", "NEW_INBOX_ITEM");
-        customFields.put("REFERENCE_ID", userInboxItem.getId());
-        notificationProvider.sendPlainTextNotification("New inbox message", customFields, userInboxItem.getUser().getId());
+        customFields.put("REFERENCE_ID", inboxMsg.getId());
+        notificationProvider.sendPlainTextNotification(StringUtils.trim(inboxMsg.getShortTitle(), 50), customFields, userInboxItem.getUser().getId());
 	}
 
     private List<InboxItemDto> mapToInboxItemDto(List<UserInboxItem> inboxItems) {
