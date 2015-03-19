@@ -68,7 +68,7 @@ public class UserInboxServiceImpl {
         return getAndMarkAsRead(inboxItem);
     }
 
-    public InboxItemDto getOneByInboxMessageId(Long inboxMessageId, Long userId) {
+    public InboxItemDto getByInboxMessageIdAndMarkRead(Long inboxMessageId, Long userId) {
         UserInboxItem inboxItem = userInboxItemRepository.findByInboxMessageIdAndUserId(inboxMessageId, userId);
 
         if (inboxItem == null) {
@@ -77,18 +77,22 @@ public class UserInboxServiceImpl {
 
         return getAndMarkAsRead(inboxItem);
     }
+
+    public UserInboxItem findByInboxMessageId(Long inboxMessageId, Long userId) {
+        return userInboxItemRepository.findByInboxMessageIdAndUserId(inboxMessageId, userId);
+    }
     
-    public UserInboxItem save(Long itemId, Long userId) {
+    public UserInboxItem sendInboxMessage(Long inboxMessageId, Long userId) {
     	User user = userRepository.findOne(userId);
-    	InboxMessage inboxMsg = inboxMessageRepository.findOne(itemId);
+    	InboxMessage inboxMsg = inboxMessageRepository.findOne(inboxMessageId);
     	UserInboxItem userInboxItem = new UserInboxItem();
     	userInboxItem.setInboxMessage(inboxMsg);
     	userInboxItem.setUser(user);
     	
     	userInboxItem = userInboxItemRepository.save(userInboxItem);
-    	userActivityService.addUserInboxItemActivity(userInboxItem);
-    	
+
     	// TODO: Move after transaction for save is done!
+        userActivityService.addUserInboxItemActivity(userInboxItem);
     	statisticsRepository.incrementUnreadInboxItemCount(userId);
     	sendNewInboxItemNotification(userInboxItem);
     	

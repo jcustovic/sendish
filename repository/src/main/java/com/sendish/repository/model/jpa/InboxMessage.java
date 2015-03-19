@@ -28,6 +28,9 @@ public class InboxMessage extends BaseEntity {
     @Column(name = "im_url", length = 256)
     private String url;
 
+    @Column(name = "im_url_text", length = 32)
+    private String urlText;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "im_image_id")
     private Image image;
@@ -73,6 +76,14 @@ public class InboxMessage extends BaseEntity {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getUrlText() {
+        return urlText;
+    }
+
+    public void setUrlText(String urlText) {
+        this.urlText = urlText;
     }
 
     public Image getImage() {

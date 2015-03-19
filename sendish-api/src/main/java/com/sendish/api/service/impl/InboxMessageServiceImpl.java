@@ -62,6 +62,7 @@ public class InboxMessageServiceImpl {
         inboxMessage.setShortTitle(createInboxMessage.getShortTitle());
         inboxMessage.setTitle(createInboxMessage.getTitle());
         inboxMessage.setUrl(createInboxMessage.getUrl());
+        inboxMessage.setUrlText(createInboxMessage.getUrlText());
 
         Image image = imageService.create(createInboxMessage.getImage());
         inboxMessage.setImage(image);

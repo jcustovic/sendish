@@ -34,7 +34,7 @@ public class UserActivityServiceImpl {
 	
 	private static final int PAGE_SIZE = 20;
 	private static final int MAX_ACTIVITY_PER_USER = 50;
-    private static final int MAX_ACTIVITY_TEXT_LENGTH = 58;
+    private static final int MAX_ACTIVITY_TEXT_LENGTH = 50;
     // Max chars we want in the end is MAX_ACTIVITY_TEXT_LENGTH and we suspect that users display name will be cca 10.
     private static final int MAX_ACTIVITY_TEXT_IN_DB_LENGTH = MAX_ACTIVITY_TEXT_LENGTH - 10;
 	
@@ -87,6 +87,10 @@ public class UserActivityServiceImpl {
 	}
 
 	private String getDisplayName(String referenceType, User user) {
+        if (user == null) {
+            // TODO: Hack here. If from user is empty (e.g. inbox message).
+            return "Sendish";
+        }
 		if ("PHOTO_COMMENT".equals(referenceType)) {
 			return UserUtils.getDisplayNameWithCity(user);
 		}
@@ -150,7 +154,8 @@ public class UserActivityServiceImpl {
 		activity.setImageUuid(userInboxItem.getInboxMessage().getImage().getUuid());
 		activity.setReferenceType("INBOX_ITEM");
 		activity.setReferenceId(userInboxItem.getId().toString());
-		activity.setText("New inbox message");
+        String text = StringUtils.trim("New inbox: " + userInboxItem.getInboxMessage().getShortTitle(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
+		activity.setText(text);
 		
 		activity = userActivityRepository.save(activity);
 		addActivityToUserTimeline(userInboxItem.getUser().getId(), activity.getId());

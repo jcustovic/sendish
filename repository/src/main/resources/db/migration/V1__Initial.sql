@@ -392,6 +392,7 @@ create table inbox_message (
   im_title varchar(256) not null,
   im_message text not null,
   im_url varchar(256),
+  im_url_text varchar(32),
   im_image_id int8 not null,
   im_created_date timestamp not null,
 

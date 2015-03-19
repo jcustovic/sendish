@@ -29,6 +29,9 @@ public class CreateInboxMessage implements Serializable {
     @URL
     private String url;
 
+    @Size(max = 32)
+    private String urlText;
+
     // Getters & setters
 
     public MultipartFile getImage() {
@@ -69,6 +72,14 @@ public class CreateInboxMessage implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getUrlText() {
+        return urlText;
+    }
+
+    public void setUrlText(String urlText) {
+        this.urlText = urlText;
     }
 
 }
