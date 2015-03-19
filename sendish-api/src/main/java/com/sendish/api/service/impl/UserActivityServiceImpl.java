@@ -24,7 +24,6 @@ import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoComment;
 import com.sendish.repository.model.jpa.User;
 import com.sendish.repository.model.jpa.UserActivity;
-import com.sendish.repository.model.jpa.UserInboxItem;
 
 @Service
 @Transactional
@@ -146,19 +145,6 @@ public class UserActivityServiceImpl {
 		
 		activity = userActivityRepository.save(activity);
 		addActivityToUserTimeline(comment.getUser().getId(), activity.getId());
-	}
-	
-	public void addUserInboxItemActivity(UserInboxItem userInboxItem) {
-		UserActivity activity = new UserActivity();
-		activity.setUser(userInboxItem.getUser());
-		activity.setImageUuid(userInboxItem.getInboxMessage().getImage().getUuid());
-		activity.setReferenceType("INBOX_ITEM");
-		activity.setReferenceId(userInboxItem.getId().toString());
-        String text = StringUtils.trim("New inbox: " + userInboxItem.getInboxMessage().getShortTitle(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
-		activity.setText(text);
-		
-		activity = userActivityRepository.save(activity);
-		addActivityToUserTimeline(userInboxItem.getUser().getId(), activity.getId());
 	}
 	
 	public List<UserActivity> findUserActivity(Long userId, int page) {

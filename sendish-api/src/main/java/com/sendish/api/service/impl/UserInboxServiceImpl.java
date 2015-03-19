@@ -42,9 +42,6 @@ public class UserInboxServiceImpl {
     private RedisStatisticsRepository statisticsRepository;
     
     @Autowired
-    private UserActivityServiceImpl userActivityService;
-    
-    @Autowired
     private AsyncNotificationProvider notificationProvider;
 
     private static PrettyTime prettyTime = new PrettyTime();
@@ -59,7 +56,7 @@ public class UserInboxServiceImpl {
         return userInboxItemRepository.findByIdAndUserId(itemId, userId);
     }
 
-    public InboxItemDto getOne(Long itemId, Long userId) {
+    public InboxItemDto getByItemIdAndMarkRead(Long itemId, Long userId) {
         UserInboxItem inboxItem = userInboxItemRepository.findByIdAndUserId(itemId, userId);
         if (inboxItem == null) {
             return null;
@@ -92,7 +89,6 @@ public class UserInboxServiceImpl {
     	userInboxItem = userInboxItemRepository.save(userInboxItem);
 
     	// TODO: Move after transaction for save is done!
-        userActivityService.addUserInboxItemActivity(userInboxItem);
     	statisticsRepository.incrementUnreadInboxItemCount(userId);
     	sendNewInboxItemNotification(userInboxItem);
     	

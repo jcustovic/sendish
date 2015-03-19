@@ -40,7 +40,7 @@ public class UserInboxController {
         @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<InboxItemDto> inboxItemDetails(@PathVariable Long itemId, AuthUser authUser) throws BindException {
-        InboxItemDto userInboxItem = userInboxService.getOne(itemId, authUser.getUserId());
+        InboxItemDto userInboxItem = userInboxService.getByItemIdAndMarkRead(itemId, authUser.getUserId());
         if (userInboxItem == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {

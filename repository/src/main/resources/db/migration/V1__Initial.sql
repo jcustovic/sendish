@@ -406,7 +406,7 @@ create sequence user_inbox_item_seq;
 create table user_inbox_item (
   uii_id int8 not null default nextval('user_inbox_item_seq'),
   uii_user_id int8 not null,
-  uii_inbox_message_id int8 not null unique,
+  uii_inbox_message_id int8 not null,
   uii_first_opened_date timestamp,
   uii_deleted boolean not null default false,
   uii_read boolean not null default false,
