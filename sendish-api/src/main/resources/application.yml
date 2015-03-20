@@ -54,7 +54,7 @@ flyway:
 app:
   registration:
     mail:
-      from: noreply@sendish.com
+      from: Sendish <noreply@sendish.com>
   baseUrl: http://api.sendish.com
   store:
     data:

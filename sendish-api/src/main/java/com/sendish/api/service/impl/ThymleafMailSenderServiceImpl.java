@@ -31,7 +31,7 @@ public class ThymleafMailSenderServiceImpl implements MailSenderService {
 	private String baseUrl;
 
 	@Override
-	public void sendEmail(String toEmail, String fromEmail, Map<String, Object> variables, String tplName, Map<String, byte[]> pngImages) throws MessagingException {
+	public void sendEmail(String toEmail, String fromEmail, String subject, Map<String, Object> variables, String tplName, Map<String, byte[]> pngImages) throws MessagingException {
 		final Context ctx = new Context();
 		ctx.setVariables(variables);
 		ctx.setVariable("baseUrl", baseUrl);
@@ -39,7 +39,7 @@ public class ThymleafMailSenderServiceImpl implements MailSenderService {
 		// Prepare message using a Spring helper
 		final MimeMessage mimeMessage = mailSender.createMimeMessage();
 		final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
-		message.setSubject("Example HTML email with inline image");
+		message.setSubject(subject);
 		message.setFrom(fromEmail);
 		message.setTo(toEmail);
 

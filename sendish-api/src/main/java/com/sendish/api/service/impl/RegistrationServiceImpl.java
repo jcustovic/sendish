@@ -48,7 +48,7 @@ public class RegistrationServiceImpl {
 		Map<String, byte[]> inlineImages = getInlineImages();
 		
 		try {
-			mailSenderService.sendEmail(user.getEmail(), fromEmail, variables, "verify-registration", inlineImages);
+			mailSenderService.sendEmail(user.getEmail(), fromEmail, "Welcome to Sendish", variables, "verify-registration", inlineImages);
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);
 		}
