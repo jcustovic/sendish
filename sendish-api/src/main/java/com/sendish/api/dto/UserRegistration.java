@@ -15,7 +15,7 @@ public class UserRegistration implements Serializable {
 	@Email
 	private String email;
 
-	@Size(max = 20)
+	@Size(max = 20, min = 2)
     @NotEmpty
 	private String nickname;
 

@@ -1,8 +1,11 @@
 package com.sendish.api.dto;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 public class UserSettingsDto implements Serializable {
@@ -20,8 +23,8 @@ public class UserSettingsDto implements Serializable {
 	@NotNull
 	private Boolean receiveCommentNotifications;
 
-	@Max(20)
-	@NotNull
+    @Size(max = 20, min = 2)
+    @NotEmpty
 	private String nickname;
 
 	// Getters & setters
