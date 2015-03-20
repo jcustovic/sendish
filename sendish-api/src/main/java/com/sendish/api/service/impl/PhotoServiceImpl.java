@@ -30,6 +30,7 @@ import com.sendish.api.dto.ReceivedPhotoDetailsDto;
 import com.sendish.api.dto.ReceivedPhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
 import com.sendish.api.notification.AsyncNotificationProvider;
+import com.sendish.api.photo.HotPhotoDecider;
 import com.sendish.api.photo.PhotoStopDecider;
 import com.sendish.api.redis.KeyUtils;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
@@ -118,6 +119,9 @@ public class PhotoServiceImpl {
     
     @Autowired
     private PhotoStopDecider photoStopDecider;
+    
+    @Autowired
+    private HotPhotoDecider hotPhotoDecider;
 
     public Photo findOne(Long photoId) {
         return photoRepository.findOne(photoId);
@@ -264,7 +268,8 @@ public class PhotoServiceImpl {
 		vote.setLike(true);
 		photoVoteRepository.save(vote);
 
-		statisticsRepository.likePhoto(photoId, photoOwnerId);
+		Long likeCount = statisticsRepository.likePhoto(photoId, photoOwnerId);
+		hotPhotoDecider.decide(photoId, likeCount);
 		rankingService.addPointsForLikedPhoto(photoOwnerId);
 
 		if (!photo.getDeleted()) {
