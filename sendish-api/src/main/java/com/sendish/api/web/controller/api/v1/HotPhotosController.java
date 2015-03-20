@@ -2,8 +2,10 @@ package com.sendish.api.web.controller.api.v1;
 
 import java.util.List;
 
+import com.sendish.api.service.ResizePhotoService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,6 @@ import com.sendish.api.dto.PhotoTraveledDto;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.HotPhotoServiceImpl;
 import com.sendish.api.service.impl.PhotoServiceImpl;
-import com.sendish.api.service.impl.ResizedPhotoServiceImpl;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.repository.model.jpa.HotPhoto;
@@ -46,7 +47,8 @@ public class HotPhotosController {
     private PhotoServiceImpl photoService;
 	
 	@Autowired
-    private ResizedPhotoServiceImpl resizedPhotoService;
+    @Qualifier("retryableResizePhotoService")
+    private ResizePhotoService resizedPhotoService;
 
     @Autowired
     private FileStore fileStore;

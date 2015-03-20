@@ -7,10 +7,15 @@ import com.sendish.api.service.impl.UserServiceImpl;
 import com.sendish.api.web.controller.model.ValidationError;
 import com.sendish.api.dto.ChangePasswordDto;
 import com.sendish.api.dto.UserProfileDto;
+import com.sendish.api.web.controller.validator.ChangePasswordValidator;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import com.wordnik.swagger.annotations.Api;
@@ -24,6 +29,9 @@ public class UserProfileController {
 
     @Autowired
     private UserServiceImpl userService;
+
+    @Autowired
+    private ChangePasswordValidator changePasswordValidator;
 
     @RequestMapping(method = RequestMethod.GET)
     @ApiOperation(value = "Get the current user profile")
@@ -40,8 +48,15 @@ public class UserProfileController {
         @ApiResponse(code = 200, message = "Password change successful", response = Void.class),
         @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
     })
-    public void changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto, AuthUser authUser) {
-        // TODO: Implement me
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordDto changePassword, BindingResult bindingResult, AuthUser authUser) throws BindException {
+        changePassword.setUserId(authUser.getUserId());
+        changePasswordValidator.validate(changePassword, bindingResult);
+        if (bindingResult.hasErrors()) {
+            throw new BindException(bindingResult);
+        } else {
+            userService.changePassword(changePassword);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
     }
 
     @RequestMapping(value = "/update-location", method = RequestMethod.POST)

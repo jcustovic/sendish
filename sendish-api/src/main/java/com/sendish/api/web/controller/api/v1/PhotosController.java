@@ -2,7 +2,7 @@ package com.sendish.api.web.controller.api.v1;
 
 import com.sendish.api.dto.*;
 import com.sendish.api.security.userdetails.AuthUser;
-import com.sendish.api.service.impl.ResizedPhotoServiceImpl;
+import com.sendish.api.service.ResizePhotoService;
 import com.sendish.api.service.impl.UserServiceImpl;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
@@ -17,6 +17,7 @@ import com.wordnik.swagger.annotations.*;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -50,7 +51,8 @@ public class PhotosController {
     private UserServiceImpl userService;
 
     @Autowired
-    private ResizedPhotoServiceImpl resizedPhotoService;
+    @Qualifier("retryableResizePhotoService")
+    private ResizePhotoService resizedPhotoService;
 
     @Autowired
     private FileStore fileStore;

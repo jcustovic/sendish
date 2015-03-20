@@ -8,12 +8,14 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sendish.api.service.ResizePhotoService;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.Thumbnails.Builder;
 import net.coobird.thumbnailator.geometry.Positions;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -23,15 +25,15 @@ import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.thumbnailator.filter.GaussianBlurFilter;
 import com.sendish.api.thumbnailator.filter.TransparencyColorFilter;
-import com.sendish.api.util.RetryUtils;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.ResizedPhotoRepository;
 import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.ResizedPhoto;
 
 @Service
+@Primary
 @Transactional
-public class ResizedPhotoServiceImpl {
+public class ResizePhotoServiceImpl implements ResizePhotoService {
 
     public static final Map<String, int[]> KEY_SIZE_MAP;
 
@@ -60,15 +62,14 @@ public class ResizedPhotoServiceImpl {
     @Value("${app.image.overlay.sendish_logo}")
     private Resource logoOverlayPath;
 
+    @Override
     public ResizedPhoto getResizedPhoto(Long photoId, String sizeKey) {
-    	return RetryUtils.retry(() -> {
-    		ResizedPhoto resizedPhoto = resizedPhotoRepository.findByPhotoIdAndKey(photoId, sizeKey);
-            if (resizedPhoto == null) {
-            	resizedPhoto = resize(photoId, sizeKey);	
-            }
-            
-            return resizedPhoto;
-    	}, 3, 50);
+        ResizedPhoto resizedPhoto = resizedPhotoRepository.findByPhotoIdAndKey(photoId, sizeKey);
+        if (resizedPhoto == null) {
+            resizedPhoto = resize(photoId, sizeKey);
+        }
+
+        return resizedPhoto;
     }
 
     private ResizedPhoto resize(Long photoId, String sizeKey) throws DataIntegrityViolationException {

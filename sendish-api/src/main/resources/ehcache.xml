@@ -77,6 +77,13 @@
            timeToLiveSeconds="600"
            timeToIdleSeconds="600"
            overflowToDisk="true" />
+
+    <cache name="com.sendish.repository.model.jpa.ResizedPhoto"
+           maxElementsInMemory="50000"
+           eternal="false"
+           timeToLiveSeconds="6000"
+           timeToIdleSeconds="6000"
+           overflowToDisk="true" />
            
 	<cache name="com.sendish.repository.model.jpa.HotPhoto"
            maxElementsInMemory="10000"

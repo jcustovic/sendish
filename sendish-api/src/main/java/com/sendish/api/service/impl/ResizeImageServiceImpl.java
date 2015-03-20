@@ -1,5 +1,6 @@
 package com.sendish.api.service.impl;
 
+import com.sendish.api.service.ResizeImageService;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.api.util.RetryUtils;
@@ -12,6 +13,7 @@ import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.Thumbnails.Builder;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Primary
 @Transactional
-public class ResizedImageServiceImpl {
+public class ResizeImageServiceImpl implements ResizeImageService {
 
     public static final Map<String, int[]> KEY_SIZE_MAP;
 
@@ -42,6 +45,7 @@ public class ResizedImageServiceImpl {
     @Autowired
     private FileStore fileStore;
 
+    @Override
     public ResizedImage getResizedImage(Long imageId, String sizeKey) {
     	return RetryUtils.retry(() -> {
     		ResizedImage resizedImage = resizedImageRepository.findByImageIdAndKey(imageId, sizeKey);

@@ -17,7 +17,8 @@ spring:
             use_query_cache: false
 
 flyway:
-  locations = classpath:db/migrations,classpath:db/migrations/h2
+  locations: db/migration,db/h2/migration
+  validateOnMigrate: false
 
 sendish:
   batch:

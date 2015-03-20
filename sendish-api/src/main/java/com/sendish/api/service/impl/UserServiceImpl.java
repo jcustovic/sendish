@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import com.sendish.api.dto.ChangePasswordDto;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
@@ -213,5 +214,17 @@ public class UserServiceImpl {
 	public User findOne(Long userId) {
 		return userRepository.findOne(userId);
 	}
+
+    public void changePassword(ChangePasswordDto changePassword) {
+        User user = findOne(changePassword.getUserId());
+        user.setPassword(shaPasswordEncoder.encodePassword(changePassword.getNewPassword(), null));
+
+        String oldPass = shaPasswordEncoder.encodePassword(changePassword.getOldPassword(), null);
+        if (!oldPass.equals(user.getPassword())) {
+            throw new IllegalArgumentException("Old password doesn't match");
+        }
+
+        userRepository.save(user);
+    }
 
 }

@@ -1,7 +1,7 @@
 package com.sendish.api.web.controller.api.v1;
 
+import com.sendish.api.service.ResizeImageService;
 import com.sendish.api.service.impl.ImageServiceImpl;
-import com.sendish.api.service.impl.ResizedImageServiceImpl;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.repository.model.jpa.Image;
@@ -12,6 +12,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,8 @@ public class ImageController {
     private ImageServiceImpl imageService;
 
     @Autowired
-    private ResizedImageServiceImpl resizedImageService;
+    @Qualifier("retryableResizeImageService")
+    private ResizeImageService resizedImageService;
 
     @RequestMapping(value = "/{imageUUID}", method = RequestMethod.GET)
     @ApiOperation(value = "View image in original size")
