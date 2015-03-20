@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,9 +46,12 @@ public class RegistrationController {
     }
 
     @ApiIgnore
-    @RequestMapping(value = "/verify", method = { RequestMethod.POST, RequestMethod.GET })
+    @RequestMapping(value = "/verify", method = { RequestMethod.POST, RequestMethod.GET }) // TODO: It should be POST but for simplicity and be able to invoke as a <a href...>
     public ResponseEntity<?> verifyRegistration(@RequestParam String token, @RequestParam String username) {
-        boolean success = registrationService.verifyToken(token, username);
+        boolean success = false;
+        if (StringUtils.hasText(username) && StringUtils.hasText(token)) {
+            success = registrationService.verifyToken(token, username);
+        }
 
         if (success) {
             return new ResponseEntity<>(HttpStatus.OK);

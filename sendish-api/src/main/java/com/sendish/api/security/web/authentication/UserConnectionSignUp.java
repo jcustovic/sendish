@@ -1,5 +1,6 @@
 package com.sendish.api.security.web.authentication;
 
+import com.sendish.api.service.impl.NewUserAutomaticPhotoAndInboxSenderImpl;
 import com.sendish.api.service.impl.UserServiceImpl;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.User;
@@ -24,6 +25,9 @@ public class UserConnectionSignUp implements ConnectionSignUp {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private NewUserAutomaticPhotoAndInboxSenderImpl newUserAutomaticPhotoAndInboxSender;
+
     @Override
     public final String execute(final Connection<?> p_connection) {
         final UserProfile userProfile = p_connection.fetchUserProfile();
@@ -33,6 +37,7 @@ public class UserConnectionSignUp implements ConnectionSignUp {
         if (user == null) {
             final String randomPassword = UUID.randomUUID().toString();
             User newUser = userService.createUser(username, userProfile.getEmail(), randomPassword, null, false);
+            newUserAutomaticPhotoAndInboxSender.send(newUser);
 
             if (StringUtils.hasText(userProfile.getEmail())) {
                 newUser.setEmailConfirmed(true);

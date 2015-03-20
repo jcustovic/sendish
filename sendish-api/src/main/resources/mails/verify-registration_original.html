@@ -832,7 +832,7 @@
                                                     <table class="button">
                                                         <tr>
                                                             <td>
-                                                                <a th:href="${baseUrl + '/api/d/registration/verify?token=' + user.verificationCode + '&amp;username=' + user.username}" href="#">Confirm your email address</a>
+                                                                <a th:href="@{${baseUrl + '/api/d/registration/verify'}(token=${user.verificationCode},username=${user.username})}" href="#">Confirm your email address</a>
                                                             </td>
                                                         </tr>
                                                     </table>

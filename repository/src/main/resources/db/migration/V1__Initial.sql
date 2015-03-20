@@ -448,3 +448,56 @@ create table user_activity (
 );
 
 create index user_activity_user_idx on user_activity (ua_user_id);
+
+-- AutoSendingPhoto table
+create sequence auto_sending_photo_seq;
+
+create table auto_sending_photo (
+  asp_id int8 not null default nextval('auto_sending_photo_seq'),
+  asp_photo_id int8 not null,
+  asp_active boolean not null default true,
+  asp_city_id int8,
+  asp_country_id int8,
+
+  primary key (asp_id),
+  constraint auto_sending_photo_photo_id_fk foreign key (asp_photo_id) references photo,
+  constraint auto_sending_photo_city_id_fk foreign key (asp_city_id) references city,
+  constraint auto_sending_photo_country_id_fk foreign key (asp_country_id) references country
+);
+
+create index auto_sending_photo_city_idx on auto_sending_photo (asp_city_id);
+create index auto_sending_photo_country_idx on auto_sending_photo (asp_country_id);
+
+-- AutoSendingInboxMessage table
+create sequence auto_sending_inbox_message_seq;
+
+create table auto_sending_inbox_message (
+  asim_id int8 not null default nextval('auto_sending_inbox_message_seq'),
+  asim_im_id int8 not null,
+  asim_active boolean not null default true,
+  asim_priority int4 not null default 0,
+  asim_after_days int4,
+  asim_on_date date,
+  asim_city_id int8,
+  asim_country_id int8,
+
+  primary key (asim_id),
+  constraint auto_sending_inbox_message_im_id_fk foreign key (asim_im_id) references inbox_message,
+  constraint auto_sending_inbox_message_city_id_fk foreign key (asim_city_id) references city,
+  constraint auto_sending_inbox_message_country_id_fk foreign key (asim_country_id) references country
+);
+
+create index auto_sending_inbox_message_city_idx on auto_sending_inbox_message (asim_city_id);
+create index auto_sending_inbox_message_country_idx on auto_sending_inbox_message (asim_country_id);
+
+
+-- APP DATA
+-- auto_photo_sender user (DISABLED)
+INSERT INTO auth_user (au_id, au_username, au_password, au_modified_date, au_created_date, au_email_registration, au_disabled)
+  VALUES (nextval('auth_user_seq'), 'auto_photo_sender', 'auto_photo_sender', current_timestamp, current_timestamp, false, true);
+
+INSERT INTO auth_user_details (aud_user_id, aud_receive_limit_day, aud_send_limit_day, aud_receive_new_photo_not, aud_receive_comment_not)
+  VALUES(currval('auth_user_seq'), 0, 0, false, false);
+
+INSERT INTO auth_user_statistics (aus_user_id, aus_modified_date)
+  VALUES(currval('auth_user_seq'), current_timestamp);

@@ -19,7 +19,6 @@ import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.User;
 
 import org.springframework.util.StreamUtils;
-import org.springframework.util.StringUtils;
 
 @Service
 @Transactional
@@ -36,6 +35,9 @@ public class RegistrationServiceImpl {
 
     @Autowired
     private ApplicationContext context;
+
+    @Autowired
+    private NewUserAutomaticPhotoAndInboxSenderImpl newUserAutomaticPhotoAndInboxSender;
 	
 	@Value("${app.registration.mail.from}")
 	private String fromEmail;
@@ -72,16 +74,15 @@ public class RegistrationServiceImpl {
 	}
 
 	public boolean verifyToken(String token, String username) {
-        if (StringUtils.hasText(username)) {
-            final User user = userRepository.findByUsernameIgnoreCase(username);
-            if ((user == null) || Boolean.TRUE.equals(user.getEmailConfirmed())) {
-                return false;
-            } else if ((token != null) && token.equals(user.getVerificationCode())) {
-                user.setEmailConfirmed(true);
-                userRepository.save(user);
+        final User user = userRepository.findByUsernameIgnoreCase(username);
+        if (user == null || Boolean.TRUE.equals(user.getEmailConfirmed())) {
+            return false;
+        } else if (token != null && token.equals(user.getVerificationCode())) {
+            user.setEmailConfirmed(true);
+            userRepository.save(user);
+            newUserAutomaticPhotoAndInboxSender.send(user);
 
-                return true;
-            }
+            return true;
         }
 
         return false;
