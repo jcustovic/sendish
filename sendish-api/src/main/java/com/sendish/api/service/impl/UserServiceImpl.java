@@ -175,6 +175,7 @@ public class UserServiceImpl {
     public UserSettingsDto getSettings(Long userId) {
         UserDetails userDetails = getUserDetails(userId);
         UserSettingsDto userSettings = new UserSettingsDto();
+        userSettings.setNickname(userDetails.getUser().getNickname());
         userSettings.setReceiveLimitPerDay(userDetails.getReceiveLimitPerDay());
         userSettings.setReceiveNewPhotoNotifications(userDetails.getReceiveNewPhotoNotifications());
         userSettings.setReceiveCommentNotifications(userDetails.getReceiveCommentNotifications());
