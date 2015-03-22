@@ -71,6 +71,10 @@ public class PhotoSenderServiceImpl {
 
 	public void resendPhotoOnLike(Long photoId, Long photoReceiverId) {
 		PhotoSendingDetails photoSendingDetails = photoSendingDetailsRepository.findOne(photoId);
+		if (photoSendingDetails.getLastReceiver() == null) {
+			LOGGER.info("Photo with id {} doesn't have last receiver. It is probably auto sender photo!", photoId);
+			return;
+		}
 		Long lastPhotoReceiverId = photoSendingDetails.getLastReceiver().getId();
 		
 		if (lastPhotoReceiverId.equals(photoReceiverId)) {

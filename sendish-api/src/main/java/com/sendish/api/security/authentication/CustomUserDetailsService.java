@@ -41,7 +41,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         Collection<SimpleGrantedAuthority> roles = new ArrayList<>();
         roles.add(new SimpleGrantedAuthority("USER"));
 
-        final AuthUser userDetails = new AuthUser(user.getId(), user.getUsername(), user.getPassword(), !user.getDisabled(), true, true, !user.getDeleted(), roles);
+        boolean disabled = user.getDisabled() || (user.getEmailRegistration() && !user.getEmailConfirmed());
+        final AuthUser userDetails = new AuthUser(user.getId(), user.getUsername(), user.getPassword(), disabled, true, true, !user.getDeleted(), roles);
 
         return userDetails;
     }
