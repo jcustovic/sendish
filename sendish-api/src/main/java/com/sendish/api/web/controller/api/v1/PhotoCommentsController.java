@@ -99,8 +99,10 @@ public class PhotoCommentsController {
     	@ApiResponse(code = 200, message = "NOT USED! 201 will be returned", response = Void.class),
         @ApiResponse(code = 201, message = "Comment created")
     })
-	public ResponseEntity<Void> postNewComment(@RequestBody @Valid NewCommentDto newCommentDto, BindingResult result, AuthUser user) throws BindException {
+	public ResponseEntity<Void> postNewComment(@PathVariable Long photoId,
+			@RequestBody @Valid NewCommentDto newCommentDto, BindingResult result, AuthUser user) throws BindException {
 		newCommentDto.setUserId(user.getUserId());
+		newCommentDto.setPhotoId(photoId);
 		newCommentValidator.validate(newCommentDto, result);
 		if (result.hasErrors()) {
 			throw new BindException(result);
