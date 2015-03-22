@@ -27,23 +27,32 @@ public class RedisStatisticsRepository {
     // TODO: At some point of time also save stats to DB (User & Photo). Example when one hour elapsed from last update
     // or photo stops traveling etc. ... UserStatisticsRepository.java, PhotoStatisticsRepository.java
 
-    public Long likePhoto(Long photoId, Long photoOwnerId) {
-        photoStatistics(photoId).increment("likeCount", 1);
-        return userStatistics(photoOwnerId).increment("total.likeCount", 1);
+    public Long likePhoto(Long photoId) {
+        return photoStatistics(photoId).increment("likeCount", 1);
     }
 
-    public Long dislikePhoto(Long photoId, Long photoOwnerId) {
-        photoStatistics(photoId).increment("dislikeCount", 1);
-        return userStatistics(photoOwnerId).increment("total.dislikeCount", 1);
+    public Long dislikePhoto(Long photoId) {
+        return photoStatistics(photoId).increment("dislikeCount", 1);
     }
 
-    public void reportPhoto(Long photoId, Long photoOwnerId) {
-        photoStatistics(photoId).increment("reportCount", 1);
-        userStatistics(photoOwnerId).increment("total.reportCount", 1);
+    public Long reportPhoto(Long photoId) {
+        return photoStatistics(photoId).increment("reportCount", 1);
+    }
+    
+    public Long increaseTotalUserLikeCount(Long userId) {
+    	return userStatistics(userId).increment("total.likeCount", 1);    	
+    }
+    
+    public Long increaseTotalUserDislikeCount(Long userId) {
+    	return userStatistics(userId).increment("total.dislikeCount", 1);    	
+    }
+    
+    public Long increaseTotalUserReportCount(Long userId) {
+    	return userStatistics(userId).increment("total.reportCount", 1);    	
     }
 
-    public void increasePhotoCommentCount(Long photoId) {
-        photoStatistics(photoId).increment("commentCount", 1);
+    public Long increasePhotoCommentCount(Long photoId) {
+        return photoStatistics(photoId).increment("commentCount", 1);
     }
 
     public PhotoStatisticsDto getPhotoStatistics(Long photoId) {
@@ -100,7 +109,7 @@ public class RedisStatisticsRepository {
         return Long.valueOf(ObjectUtils.defaultIfNull(sentCountString, "0"));
     }
 
-    public void increaseDailyReceivedPhotoCount(Long userId, LocalDate date) {
+    public void increaseUserDailyReceivedPhotoCount(Long userId, LocalDate date) {
     	checkIfNewDayAndReset(userId, date);
 
         userStatistics(userId).increment("daily.receivedCount", 1);
@@ -148,11 +157,11 @@ public class RedisStatisticsRepository {
         return new CommentStatisticsDto(likeCount, dislikeCount);
     }
 
-    public void incrementUnseenCount(Long userId) {
+    public void incrementUserUnseenPhotoCount(Long userId) {
         userStatistics(userId).increment("total.unseenPhotoCount", 1);
     }
     
-    public void resetUnseenCount(Long userId) {
+    public void resetUserUnseenCount(Long userId) {
         userStatistics(userId).put("total.unseenPhotoCount", "0");
     }
     

@@ -74,33 +74,45 @@ public class RankingServiceImpl {
     }
     
     @Async
-    public void addPointsForNewSendish(Long userId) {
-    	increaseScore(userId, NEW_SENDISH_POINTS);
+    public void addPointsForNewSendish(User user) {
+    	if (user.isUserActive()) {
+    		increaseScore(user.getId(), NEW_SENDISH_POINTS);	
+    	}
     }
     
     @Async
-    public void addPointsForLikedPhoto(Long userId) {
-    	increaseScore(userId, LIKED_PHOTO_POINTS);
+    public void addPointsForLikedPhoto(User user) {
+    	if (user.isUserActive()) {
+    		increaseScore(user.getId(), LIKED_PHOTO_POINTS);
+    	}
     }
     
     @Async
-    public void removePointsForDislikedPhoto(Long userId) {
-    	increaseScore(userId, DISLIKED_PHOTO_POINTS);
+    public void removePointsForDislikedPhoto(User user) {
+    	if (user.isUserActive()) {
+    		increaseScore(user.getId(), DISLIKED_PHOTO_POINTS);
+    	}
     }
     
     @Async
-    public void removePointsForReportedPhoto(Long userId) {
-    	increaseScore(userId, REPORTED_PHOTO_POINTS);
+    public void removePointsForReportedPhoto(User user) {
+    	if (user.isUserActive()) {
+    		increaseScore(user.getId(), REPORTED_PHOTO_POINTS);
+    	}
     }
     
     @Async
-    public void addPointsForLikedComment(Long userId) {
-    	increaseScore(userId, LIKED_COMMENT_POINTS);
+    public void addPointsForLikedComment(User user) {
+    	if (user.isUserActive()) {
+    		increaseScore(user.getId(), LIKED_COMMENT_POINTS);
+    	}
     }
     
     @Async
-    public void removePointsForDislikedComment(Long userId) {
-    	increaseScore(userId, DISLIKED_COMMENT_POINTS);
+    public void removePointsForDislikedComment(User user) {
+    	if (user.isUserActive()) {
+    		increaseScore(user.getId(), DISLIKED_COMMENT_POINTS);
+    	}
     }
 
 	private void increaseScore(Long userId, double points) {

@@ -33,7 +33,6 @@ import com.sendish.api.notification.AsyncNotificationProvider;
 import com.sendish.api.photo.HotPhotoDecider;
 import com.sendish.api.photo.PhotoStopDecider;
 import com.sendish.api.redis.KeyUtils;
-import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.util.CityUtils;
 import com.sendish.api.util.ImageUtils;
@@ -91,7 +90,7 @@ public class PhotoServiceImpl {
     private PhotoCommentServiceImpl photoCommentService;
 
     @Autowired
-    private RedisStatisticsRepository statisticsRepository;
+    private StatisticsServiceImpl statisticsService;
 
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -157,7 +156,9 @@ public class PhotoServiceImpl {
         photo = photoRepository.save(photo);
         createPhotoStatistics(photo);
         userService.updateStatisticsForNewSentPhoto(userId, receivedDate, location, city);
-        rankingService.addPointsForNewSendish(userId);
+        
+        User user = userRepository.findOne(userId);
+        rankingService.addPointsForNewSendish(user);
         
         return photoSenderService.sendNewPhoto(photo.getId());
     }
@@ -182,7 +183,7 @@ public class PhotoServiceImpl {
         		new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
         
         if (page == 0) {
-			statisticsRepository.resetUnseenCount(userId);
+			statisticsService.resetUserUnseenCount(userId);
 		}
 
         return mapToReceivedPhotoDto(photos, MAX_LOCATION_NAME_LENGTH_PHOTO_LIST);
@@ -218,7 +219,7 @@ public class PhotoServiceImpl {
             City city = cityService.findNearest(location.getLatitude(), location.getLongitude());
             photoReceiver.setCity(city);
             photoReceiverRepository.save(photoReceiver);
-            statisticsRepository.trackReceivedPhotoOpened(photoId, userId, city.getId());
+            statisticsService.trackReceivedPhotoOpened(photoId, userId, city.getId());
         } else {
         	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
         	if (vote != null) {
@@ -254,9 +255,9 @@ public class PhotoServiceImpl {
 
 	private void savePhotoLike(Long photoId, Long userId) {
 		Photo photo = photoRepository.findOne(photoId);
-        Long photoOwnerId = photo.getUser().getId();
+        User photoOwner = photo.getUser();
 
-        if (photoOwnerId.equals(userId)) {
+        if (photoOwner.getId().equals(userId)) {
             throw new IllegalStateException("User cannot like his own photo. UserId: " + userId + ", PhotoId: " + photoId);
         }
 
@@ -267,17 +268,17 @@ public class PhotoServiceImpl {
 		vote.setUser(user);
 		vote.setLike(true);
 		photoVoteRepository.save(vote);
-
-		Long likeCount = statisticsRepository.likePhoto(photoId, photoOwnerId);
+		
+		Long likeCount = statisticsService.likePhoto(photoId, photoOwner);
 		hotPhotoDecider.decide(photoId, likeCount);
-		rankingService.addPointsForLikedPhoto(photoOwnerId);
-
+		rankingService.addPointsForLikedPhoto(photoOwner);
+		
 		if (!photo.getDeleted()) {
 			userActivityService.addPhotoLikedActivity(photo, user);
 		}
 	}
 
-    // TODO: Maybe allow changing like to dislike?
+	// TODO: Maybe allow changing like to dislike?
     public void dislikeReceived(Long photoId, Long userId) {
     	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
     	if (vote == null) {
@@ -301,9 +302,9 @@ public class PhotoServiceImpl {
 
 	private void savePhotoDislike(Long photoId, Long userId) {
 		Photo photo = photoRepository.findOne(photoId);
-        Long photoOwnerId = photo.getUser().getId();
+        User photoOwner = photo.getUser();
 
-        if (photoOwnerId.equals(userId)) {
+        if (photoOwner.getId().equals(userId)) {
             throw new IllegalStateException("User cannot dislike his own photo. UserId: " + userId + ", PhotoId: " + photoId);
         }
 
@@ -314,18 +315,18 @@ public class PhotoServiceImpl {
 		vote.setUser(user);
 		vote.setLike(false);
 		photoVoteRepository.save(vote);
-
-		rankingService.removePointsForDislikedPhoto(photoOwnerId);
-		statisticsRepository.dislikePhoto(photoId, photoOwnerId);
+		
+		statisticsService.dislikePhoto(photoId, photoOwner);
+		rankingService.removePointsForDislikedPhoto(photoOwner);	
 	}
 
     public void reportReceived(Long photoId, String reason, String reasonText, Long userId) {
     	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
     	if (vote == null) {
     		PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-            Long photoOwnerId = photoReceiver.getPhoto().getUser().getId();
+            User photoOwner = photoReceiver.getPhoto().getUser();
 
-            if (photoOwnerId.equals(userId)) {
+            if (photoOwner.getId().equals(userId)) {
                 throw new IllegalStateException("User cannot report his own photo. UserId: " + userId + ", PhotoId: " + photoId);
             }
     		
@@ -341,8 +342,8 @@ public class PhotoServiceImpl {
             photoReceiver.setDeleted(true);
             photoReceiverRepository.save(photoReceiver);
 
-            statisticsRepository.reportPhoto(photoId, photoOwnerId);
-            rankingService.removePointsForReportedPhoto(photoOwnerId);
+            statisticsService.reportPhoto(photoId, photoOwner);
+            rankingService.removePointsForReportedPhoto(photoOwner);
             
             if (photoStopDecider.checkToStop(photoId)) {
             	photoSenderService.stopSending(photoId, "Stopped after report check");
@@ -389,8 +390,8 @@ public class PhotoServiceImpl {
 
         // TODO: Move to separate method after PhotoReceiver has been saved and committed!
         usersReceivedPhotos(userId).add(photoId.toString());
-        statisticsRepository.incrementUnseenCount(userId);
-        statisticsRepository.increaseDailyReceivedPhotoCount(userId, now.toLocalDate());
+        statisticsService.incrementUserUnseenPhotoCount(userId);
+        statisticsService.increaseUserDailyReceivedPhotoCount(userId, now.toLocalDate());
         
         if (userDetails.getReceiveNewPhotoNotifications()) {
         	sendNewPhotoNotification(userId, photo);
@@ -470,7 +471,7 @@ public class PhotoServiceImpl {
         return dto;
     }
 
-    public BoundSetOperations<String, String> usersReceivedPhotos(long userId) {
+    private BoundSetOperations<String, String> usersReceivedPhotos(long userId) {
         return redisTemplate.boundSetOps(KeyUtils.userReceivedPhotos(userId));
     }
 

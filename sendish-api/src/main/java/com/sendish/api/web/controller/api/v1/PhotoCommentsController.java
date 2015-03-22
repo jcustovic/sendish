@@ -3,13 +3,19 @@ package com.sendish.api.web.controller.api.v1;
 import java.net.URI;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.repository.model.jpa.Photo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,8 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.sendish.api.dto.CommentDto;
+import com.sendish.api.dto.NewCommentDto;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.PhotoCommentServiceImpl;
+import com.sendish.api.web.controller.validator.NewCommentValidator;
 import com.sendish.repository.model.jpa.PhotoComment;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -35,6 +43,9 @@ public class PhotoCommentsController {
 
     @Autowired
     private PhotoServiceImpl photoService;
+    
+    @Autowired
+    private NewCommentValidator newCommentValidator;
 
     @RequestMapping(value = "/{photoId}/comments", method = RequestMethod.GET)
     @ApiOperation(value = "Get comments for a specific photo")
@@ -52,13 +63,15 @@ public class PhotoCommentsController {
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
     
+    @Deprecated
 	@RequestMapping(value = "/{photoId}", method = RequestMethod.POST)
     @ApiOperation(value = "Post a comment to specific photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created comment")
     @ApiResponses({
     	@ApiResponse(code = 200, message = "NOT USED! 201 will be returned", response = Void.class),
         @ApiResponse(code = 201, message = "Comment created")
     })
-    public ResponseEntity<String> newComment(@PathVariable Long photoId, @RequestParam String comment, AuthUser user) {
+	public ResponseEntity<String> newComment(@PathVariable Long photoId,
+			@RequestParam String comment, @RequestParam Long replyToId, AuthUser user) {
         Photo photo = photoService.findOne(photoId);
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -69,6 +82,31 @@ public class PhotoCommentsController {
         }
 
         PhotoComment photoComment = photoCommentService.save(photoId, comment, user.getUserId());
+    	
+    	final URI location = ServletUriComponentsBuilder
+                .fromCurrentServletMapping().path("/api/v1.0/photo-comments/{id}").build()
+                .expand(photoComment.getId()).toUri();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(location);
+
+        return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    }
+	
+	@RequestMapping(value = "/new/{photoId}", method = RequestMethod.POST)
+    @ApiOperation(value = "Post a comment to specific photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created comment")
+    @ApiResponses({
+    	@ApiResponse(code = 200, message = "NOT USED! 201 will be returned", response = Void.class),
+        @ApiResponse(code = 201, message = "Comment created")
+    })
+	public ResponseEntity<Void> postNewComment(@RequestBody @Valid NewCommentDto newCommentDto, BindingResult result, AuthUser user) throws BindException {
+		newCommentDto.setUserId(user.getUserId());
+		newCommentValidator.validate(newCommentDto, result);
+		if (result.hasErrors()) {
+			throw new BindException(result);
+		}
+		
+        PhotoComment photoComment = photoCommentService.save(newCommentDto);
     	
     	final URI location = ServletUriComponentsBuilder
                 .fromCurrentServletMapping().path("/api/v1.0/photo-comments/{id}").build()

@@ -31,7 +31,7 @@ public class UserActivity extends BaseEntity {
 	@JoinColumn(name = "ua_from_user_id")
 	private User fromUser;
 
-	@Column(name = "ua_text", nullable = false, length = 200)
+	@Column(name = "ua_text", nullable = false, length = 512)
 	private String text;
 
 	@Column(name = "ua_created_date", nullable = false)

@@ -23,6 +23,14 @@ public class PhotoComment extends BaseEntity {
 	@JoinColumn(name = "pc_user_id")
 	private User user;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "pc_parent_id")
+	private PhotoComment parent;
+
+	@ManyToOne
+	@JoinColumn(name = "pc_reply_to_id")
+	private PhotoComment replyTo;
+
 	@Column(name = "pc_likes_count", nullable = false)
 	private Integer likes = 0;
 
@@ -63,6 +71,22 @@ public class PhotoComment extends BaseEntity {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+
+	public PhotoComment getParent() {
+		return parent;
+	}
+
+	public void setParent(PhotoComment parent) {
+		this.parent = parent;
+	}
+
+	public PhotoComment getReplyTo() {
+		return replyTo;
+	}
+
+	public void setReplyTo(PhotoComment replyTo) {
+		this.replyTo = replyTo;
 	}
 
 	public Integer getLikes() {

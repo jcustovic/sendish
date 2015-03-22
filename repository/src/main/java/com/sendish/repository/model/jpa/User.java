@@ -105,6 +105,10 @@ public class User extends BaseEntity {
 	public final void updateModifyDate() {
 		modifiedDate = DateTime.now();
 	}
+	
+	public boolean isUserActive() {
+		return !(deleted || disabled);
+	}
 
 	// Getters & setters
 

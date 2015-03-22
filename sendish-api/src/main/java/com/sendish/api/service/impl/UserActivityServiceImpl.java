@@ -112,6 +112,21 @@ public class UserActivityServiceImpl {
 		addActivityToUserTimeline(photo.getUser().getId(), activity.getId());
 	}
 	
+	public void addReplyToPhotoCommentActivity(PhotoComment photoComment) {
+		Photo photo = photoComment.getPhoto();
+		UserActivity activity = new UserActivity();
+		activity.setFromUser(photoComment.getUser());
+		activity.setUser(photoComment.getReplyTo().getUser());
+		activity.setImageUuid(photo.getUuid());
+		activity.setReferenceType("PHOTO_COMMENT");
+		activity.setReferenceId(photo.getId().toString());
+        String text = StringUtils.trim(" replied: " + photoComment.getComment(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
+		activity.setText(text);
+		
+		activity = userActivityRepository.save(activity);
+		addActivityToUserTimeline(photoComment.getReplyTo().getUser().getId(), activity.getId());
+	}
+	
 	public void addPhotoLikedActivity(Photo photo, User user) {
 		UserActivity activity = new UserActivity();
 		activity.setFromUser(user);

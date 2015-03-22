@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.CommentDto;
+import com.sendish.api.dto.NewCommentDto;
 import com.sendish.api.notification.AsyncNotificationProvider;
 import com.sendish.api.redis.dto.CommentStatisticsDto;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
@@ -60,6 +61,7 @@ public class PhotoCommentServiceImpl {
     @Autowired
     private UserActivityServiceImpl userActivityService;
 
+    @Deprecated
 	public PhotoComment save(Long photoId, String comment, Long userId) {
         // TODO: Maybe restrict only to my photos or received photos?
 		Photo photo = photoRepository.findOne(photoId);
@@ -80,7 +82,39 @@ public class PhotoCommentServiceImpl {
 		return photoComment;
 	}
 	
+	public PhotoComment save(NewCommentDto commentDto) {
+		 // TODO: Maybe restrict only to my photos or received photos?
+		Photo photo = photoRepository.findOne(commentDto.getPhotoId());
+		User user = userRepository.findOne(commentDto.getUserId());
+		
+		PhotoComment photoComment = new PhotoComment();
+		photoComment.setPhoto(photo);
+		photoComment.setUser(user);
+		photoComment.setComment(commentDto.getComment());
+		if (commentDto.getReplyToId() != null) {
+			PhotoComment replyToComment = photoCommentRepository.findOne(commentDto.getReplyToId());
+			photoComment.setReplyTo(replyToComment);	
+			photoComment.setParent(replyToComment.getParent() == null ? replyToComment : replyToComment.getParent());
+		}
+
+        photoComment = photoCommentRepository.save(photoComment);
+        
+        statisticsRepository.increasePhotoCommentCount(commentDto.getPhotoId());
+        if (photoComment.getReplyTo() == null 
+        		&& !photo.getDeleted() 
+        		&& !photo.getUser().getId().equals(commentDto.getUserId())) {
+        	sendCommentNotificationToPhotoOwner(user, photo, commentDto.getComment());
+        	userActivityService.addPhotoCommentActivity(photoComment);
+        } else if (photoComment.getReplyTo() != null) {
+        	sendReplyToCommentNotification(photoComment);
+        	userActivityService.addReplyToPhotoCommentActivity(photoComment);
+        }
+
+		return photoComment;
+	}
+	
 	public List<CommentDto> findByPhotoId(Long photoId, Long userId, int page) {
+		// TODO: Query DSL optimization?
         List<PhotoComment> photoComments = photoCommentRepository.findByPhotoId(photoId, 
         		new PageRequest(page, COMMENT_PAGE_SIZE, Direction.DESC, "createdDate"));
 
@@ -122,14 +156,33 @@ public class PhotoCommentServiceImpl {
             newCommentFields.put("TYPE", "NEW_COMMENT");
             newCommentFields.put("REFERENCE_ID", photo.getId());
             
-            String notText = getNotificationText(user, comment);
+            String notText = getNewCommentNotificationText(user, comment);
             
         	notificationProvider.sendPlainTextNotification(notText, newCommentFields, photo.getUser().getId());	
         }
 	}
+    
+    private void sendReplyToCommentNotification(PhotoComment photoComment) {
+    	PhotoComment replyToComment = photoComment.getReplyTo();
+    	if (replyToComment.getUser().getDetails().getReceiveCommentNotifications()) {
+        	Map<String, Object> newCommentFields = new HashMap<>();
+            newCommentFields.put("TYPE", "NEW_COMMENT");
+            newCommentFields.put("REFERENCE_ID", photoComment.getPhoto().getId());
+            
+            String notText = getReplyOnCommentNotificationText(photoComment.getUser(), photoComment.getComment());
+            
+        	notificationProvider.sendPlainTextNotification(notText, newCommentFields, replyToComment.getUser().getId());	
+        }
+	}
 
-	private String getNotificationText(User user, String comment) {
+	private String getNewCommentNotificationText(User user, String comment) {
 		String text = UserUtils.getDisplayNameWithCity(user) + " said: " + comment;
+
+        return StringUtils.trim(text, 50, "...");
+	}
+	
+	private String getReplyOnCommentNotificationText(User user, String comment) {
+		String text = UserUtils.getDisplayNameWithCity(user) + " replied: " + comment;
 
         return StringUtils.trim(text, 50, "...");
 	}
@@ -142,6 +195,12 @@ public class PhotoCommentServiceImpl {
         commentDto.setUserName(UserUtils.getDisplayNameWithCity(comment.getUser()));
         commentDto.setComment(comment.getComment());
         commentDto.setTimeAgo(prettyTime.format(comment.getCreatedDate().toDate()));
+        if (comment.getReplyTo() != null) {
+        	commentDto.setReplyUsername(UserUtils.getDisplayName(comment.getReplyTo().getUser()));
+        }
+        boolean isPhotoOwner = comment.getPhoto().getUser().getId().equals(userId);
+        boolean isCommentOwner = comment.getUser().getId().equals(userId);
+        commentDto.setCanDelete(isCommentOwner || isPhotoOwner);
         
         // TODO: Can we somehow save a round trip to the database for each comment?
         PhotoCommentVote photoCommentVote = photoCommentVoteRepository.findOne(new PhotoCommentVoteId(userId, comment.getId()));
@@ -171,14 +230,14 @@ public class PhotoCommentServiceImpl {
 
             if (like) {
                 statisticsRepository.likeComment(photoCommentId);
-                rankingService.addPointsForLikedComment(comment.getUser().getId());
+                rankingService.addPointsForLikedComment(comment.getUser());
                 
                 if (!comment.getPhoto().getDeleted()) {
                 	userActivityService.addCommentLikedActivity(comment, user);
                 }
             } else {
                 statisticsRepository.dislikeComment(photoCommentId);
-                rankingService.removePointsForDislikedComment(comment.getUser().getId());
+                rankingService.removePointsForDislikedComment(comment.getUser());
             }
         }
     }

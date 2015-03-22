@@ -11,6 +11,8 @@ public class CommentDto extends BaseEntityDto {
 	private Long likes;
 	private Long dislikes;
 	private Boolean liked;
+	private Boolean canDelete;
+	private String replyUsername;
 
 	public Long getUserId() {
 		return userId;
@@ -66,6 +68,22 @@ public class CommentDto extends BaseEntityDto {
 
 	public void setLiked(Boolean liked) {
 		this.liked = liked;
+	}
+
+	public Boolean getCanDelete() {
+		return canDelete;
+	}
+
+	public void setCanDelete(Boolean canDelete) {
+		this.canDelete = canDelete;
+	}
+
+	public String getReplyUsername() {
+		return replyUsername;
+	}
+
+	public void setReplyUsername(String replyUsername) {
+		this.replyUsername = replyUsername;
 	}
 
 }

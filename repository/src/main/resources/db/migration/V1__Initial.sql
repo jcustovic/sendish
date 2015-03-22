@@ -183,6 +183,8 @@ create table photo_comment (
   pc_id int8 not null default nextval('photo_comment_seq'),
   pc_photo_id int8 not null,
   pc_user_id int8 not null,
+  pc_parent_id int8,
+  pc_reply_to_id int8,
   pc_comment varchar(200),
   pc_likes_count int4 not null default 0,
   pc_dislikes_count int4 not null default 0,
@@ -192,11 +194,14 @@ create table photo_comment (
 
   primary key (pc_id),
   constraint photo_comment_user_id_fk foreign key (pc_user_id) references auth_user,
-  constraint photo_comment_photo_id_fk foreign key (pc_photo_id) references photo
+  constraint photo_comment_photo_id_fk foreign key (pc_photo_id) references photo,
+  constraint photo_comment_parent_id_fk foreign key (pc_parent_id) references photo_comment,
+  constraint photo_comment_reply_to_id_fk foreign key (pc_reply_to_id) references photo_comment
 );
 
 create index photo_comment_user_idx on photo_comment (pc_user_id);
 create index photo_comment_photo_idx on photo_comment (pc_photo_id);
+create index photo_comment_parent_idx on photo_comment (pc_parent_id);
 
 -- PhotoCommentVote table
 create table photo_comment_vote (
@@ -436,7 +441,7 @@ create table user_activity (
   ua_id int8 not null default nextval('user_activity_seq'),
   ua_user_id int8 not null,
   ua_from_user_id int8,
-  ua_text varchar(200) not null,
+  ua_text varchar(512) not null,
   ua_image_uuid varchar(36),
   ua_reference_type varchar(32) not null,
   ua_reference_id varchar(32),
