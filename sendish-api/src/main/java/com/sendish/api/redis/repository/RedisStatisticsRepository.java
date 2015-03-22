@@ -39,21 +39,25 @@ public class RedisStatisticsRepository {
         return photoStatistics(photoId).increment("reportCount", 1);
     }
     
-    public Long increaseTotalUserLikeCount(Long userId) {
+    public Long incrementTotalUserLikeCount(Long userId) {
     	return userStatistics(userId).increment("total.likeCount", 1);    	
     }
     
-    public Long increaseTotalUserDislikeCount(Long userId) {
+    public Long incrementTotalUserDislikeCount(Long userId) {
     	return userStatistics(userId).increment("total.dislikeCount", 1);    	
     }
     
-    public Long increaseTotalUserReportCount(Long userId) {
+    public Long incrementTotalUserReportCount(Long userId) {
     	return userStatistics(userId).increment("total.reportCount", 1);    	
     }
 
-    public Long increasePhotoCommentCount(Long photoId) {
+    public Long incrementPhotoCommentCount(Long photoId) {
         return photoStatistics(photoId).increment("commentCount", 1);
     }
+    
+    public Long decrementPhotoCommentCount(Long photoId) {
+    	return photoStatistics(photoId).increment("commentCount", -1);
+	}
 
     public PhotoStatisticsDto getPhotoStatistics(Long photoId) {
         List<String> fields = Arrays.asList("openedCount", "likeCount", "dislikeCount", "commentCount", "reportCount");
@@ -93,7 +97,7 @@ public class RedisStatisticsRepository {
 				totalCityCount, hasNewActivities);
     }
 
-    public Long increaseUserDailySentPhotoCount(Long userId, LocalDate date) {
+    public Long incrementUserDailySentPhotoCount(Long userId, LocalDate date) {
         checkIfNewDayAndReset(userId, date);
 
         return userStatistics(userId).increment("daily.sentCount", 1);
@@ -109,7 +113,7 @@ public class RedisStatisticsRepository {
         return Long.valueOf(ObjectUtils.defaultIfNull(sentCountString, "0"));
     }
 
-    public Long increaseUserDailyReceivedPhotoCount(Long userId, LocalDate date) {
+    public Long incrementUserDailyReceivedPhotoCount(Long userId, LocalDate date) {
     	checkIfNewDayAndReset(userId, date);
 
         return userStatistics(userId).increment("daily.receivedCount", 1);

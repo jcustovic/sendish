@@ -162,7 +162,7 @@ public class UserServiceImpl {
         userDetails.setCurrentCity(city);
         userDetails.setLastInteractionTime(photoDate);
 
-        Long currentCount = statisticsService.increaseUserDailySentPhotoCount(userId, photoDate.toLocalDate());
+        Long currentCount = statisticsService.incrementUserDailySentPhotoCount(userId, photoDate.toLocalDate());
 
         if (currentCount >= userDetails.getSendLimitPerDay()) {
             userDetails.setSendAllowedTime(photoDate.withTimeAtStartOfDay().plusDays(1));

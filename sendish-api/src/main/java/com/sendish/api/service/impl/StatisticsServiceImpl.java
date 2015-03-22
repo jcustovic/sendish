@@ -19,20 +19,20 @@ public class StatisticsServiceImpl {
 	private RedisStatisticsRepository statisticsRepository;
 	
 	public Long likePhoto(Long photoId, User photoOwner) {
-		statisticsRepository.increaseTotalUserLikeCount(photoOwner.getId());	
+		statisticsRepository.incrementTotalUserLikeCount(photoOwner.getId());	
 		
 		return statisticsRepository.likePhoto(photoId);
 	}
 
 	public Long dislikePhoto(Long photoId, User photoOwner) {
-		statisticsRepository.increaseTotalUserDislikeCount(photoOwner.getId());	
+		statisticsRepository.incrementTotalUserDislikeCount(photoOwner.getId());	
 		
 		return statisticsRepository.dislikePhoto(photoId);
 		
 	}
 
 	public Long reportPhoto(Long photoId, User photoOwner) {
-		statisticsRepository.increaseTotalUserReportCount(photoOwner.getId());	
+		statisticsRepository.incrementTotalUserReportCount(photoOwner.getId());	
 		
 		return statisticsRepository.reportPhoto(photoId);
 	}
@@ -50,7 +50,7 @@ public class StatisticsServiceImpl {
 	}
 
 	public Long increaseUserDailyReceivedPhotoCount(Long userId, LocalDate now) {
-		return statisticsRepository.increaseUserDailyReceivedPhotoCount(userId, now);
+		return statisticsRepository.incrementUserDailyReceivedPhotoCount(userId, now);
 	}
 
 	public PhotoStatisticsDto getPhotoStatistics(Long photoId) {
@@ -65,12 +65,16 @@ public class StatisticsServiceImpl {
 		return statisticsRepository.getCommentStatistics(photoCommentId);
 	}
 
-	public Long increaseUserDailySentPhotoCount(Long userId, LocalDate now) {
-		return statisticsRepository.increaseUserDailySentPhotoCount(userId, now);
+	public Long incrementUserDailySentPhotoCount(Long userId, LocalDate now) {
+		return statisticsRepository.incrementUserDailySentPhotoCount(userId, now);
 	}
 
-	public void increasePhotoCommentCount(Long photoId) {
-		statisticsRepository.increasePhotoCommentCount(photoId);
+	public void incrementPhotoCommentCount(Long photoId) {
+		statisticsRepository.incrementPhotoCommentCount(photoId);
+	}
+	
+	public void decrementPhotoCommentCount(Long photoId) {
+		statisticsRepository.decrementPhotoCommentCount(photoId);
 	}
 
 	public void likeComment(Long photoCommentId) {

@@ -72,7 +72,7 @@ public class PhotoCommentServiceImpl {
 		photoComment.setComment(comment);
 
         photoComment = photoCommentRepository.save(photoComment);
-        statisticsService.increasePhotoCommentCount(photoId);
+        statisticsService.incrementPhotoCommentCount(photoId);
         if (!photo.getDeleted() && !photo.getUser().getId().equals(userId)) {
         	sendCommentNotificationToPhotoOwner(user, photo, comment);
         	userActivityService.addPhotoCommentActivity(photoComment);
@@ -98,7 +98,7 @@ public class PhotoCommentServiceImpl {
 
         photoComment = photoCommentRepository.save(photoComment);
         
-        statisticsService.increasePhotoCommentCount(commentDto.getPhotoId());
+        statisticsService.incrementPhotoCommentCount(commentDto.getPhotoId());
         if (photoComment.getReplyTo() == null 
         		&& !photo.getDeleted() 
         		&& !photo.getUser().getId().equals(commentDto.getUserId())) {
@@ -143,6 +143,8 @@ public class PhotoCommentServiceImpl {
         PhotoComment photoComment = photoCommentRepository.findOne(photoCommentId);
         photoComment.setDeleted(true);
         photoCommentRepository.save(photoComment);
+        
+        statisticsService.decrementPhotoCommentCount(photoComment.getPhoto().getId());
     }
 
     private List<CommentDto> mapToCommentDto(List<PhotoComment> comments, Long userId) {
