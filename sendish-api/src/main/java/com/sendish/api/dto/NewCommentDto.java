@@ -2,7 +2,6 @@ package com.sendish.api.dto;
 
 import java.io.Serializable;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -11,14 +10,14 @@ public class NewCommentDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@NotNull
-	private Long photoId;
-
 	@Size(min = 1, max = 200)
 	@NotBlank
 	private String comment;
 
 	private Long replyToId;
+	
+	// NOTE: Manually populated
+	private Long photoId;
 	private Long userId;
 	
 	// Getters & setters
