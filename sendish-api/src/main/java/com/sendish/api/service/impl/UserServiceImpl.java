@@ -190,7 +190,7 @@ public class UserServiceImpl {
         userDetails.setReceiveCommentNotifications(userSettings.getReceiveCommentNotifications());
         
         if (StringUtils.hasText(userSettings.getNickname())) {
-        	userDetails.getUser().setNickname(userSettings.getNickname());
+        	userDetails.getUser().setNickname(userSettings.getNickname().trim());
         	userRepository.save(userDetails.getUser());
         }
 
