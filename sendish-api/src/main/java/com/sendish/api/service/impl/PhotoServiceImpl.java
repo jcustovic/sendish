@@ -38,7 +38,6 @@ import com.sendish.api.util.CityUtils;
 import com.sendish.api.util.ImageUtils;
 import com.sendish.repository.PhotoReceiverRepository;
 import com.sendish.repository.PhotoRepository;
-import com.sendish.repository.PhotoStatisticsRepository;
 import com.sendish.repository.PhotoVoteRepository;
 import com.sendish.repository.UserRepository;
 import com.sendish.repository.model.jpa.City;
@@ -46,7 +45,6 @@ import com.sendish.repository.model.jpa.Location;
 import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoReceiver;
 import com.sendish.repository.model.jpa.PhotoSendingDetails;
-import com.sendish.repository.model.jpa.PhotoStatistics;
 import com.sendish.repository.model.jpa.PhotoVote;
 import com.sendish.repository.model.jpa.PhotoVoteId;
 import com.sendish.repository.model.jpa.User;
@@ -81,7 +79,7 @@ public class PhotoServiceImpl {
     private FileStore fileStore;
 
     @Autowired
-    private PhotoStatisticsRepository photoStatisticsRepository;
+    private PhotoStatisticsServiceImpl photoStatisticsService;
 
     @Autowired
     private UserServiceImpl userService;
@@ -126,8 +124,8 @@ public class PhotoServiceImpl {
         return photoRepository.findOne(photoId);
     }
 
-    public PhotoSendingDetails processNewImage(LocationBasedFileUpload upload, Long userId) {
-        DateTime receivedDate = DateTime.now();
+    public PhotoSendingDetails processNewPhoto(LocationBasedFileUpload upload, Long userId) {
+        DateTime uploadedDate = DateTime.now();
         MultipartFile file = upload.getImage();
         Photo photo = mapToPhoto(upload, userId, file);
 
@@ -154,8 +152,8 @@ public class PhotoServiceImpl {
         photo.setCity(city);
 
         photo = photoRepository.save(photo);
-        createPhotoStatistics(photo);
-        userService.updateStatisticsForNewSentPhoto(userId, receivedDate, location, city);
+        photoStatisticsService.createNew(photo.getId());
+        userService.updateStatisticsForNewSentPhoto(userId, uploadedDate, location, city);
         
         User user = userRepository.findOne(userId);
         rankingService.addPointsForNewSendish(user);
@@ -402,7 +400,7 @@ public class PhotoServiceImpl {
     
     private void sendNewPhotoNotification(Long userId, Photo photo) {
 		Map<String, Object> photoReceivedFields = new HashMap<>();
-        photoReceivedFields.put("TYPE", "RECEIVED_PHOTO");
+        photoReceivedFields.put("TYPE", "OPEN_RECEIVED_PHOTO");
         photoReceivedFields.put("REFERENCE_ID", photo.getId());
         notificationProvider.sendPlainTextNotification(CityUtils.getTrimmedLocationName(photo.getCity()), photoReceivedFields, userId);
 	}
@@ -417,12 +415,6 @@ public class PhotoServiceImpl {
         photo.setUuid(UUID.randomUUID().toString());
 
         return photo;
-    }
-
-    private void createPhotoStatistics(Photo photo) {
-        PhotoStatistics photoStatistics = new PhotoStatistics();
-        photoStatistics.setPhotoId(photo.getId());
-        photoStatisticsRepository.save(photoStatistics);
     }
 
     private void mapPhotoDetailsDto(Photo photo, PhotoDetailsDto photoDetailsDto, Long userId) {

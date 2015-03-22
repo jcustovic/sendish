@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.redis.dto.PhotoStatisticsDto;
-import com.sendish.api.redis.repository.RedisStatisticsRepository;
+import com.sendish.api.service.impl.StatisticsServiceImpl;
 import com.sendish.api.util.CityUtils;
 import com.sendish.repository.model.jpa.HotPhoto;
 import com.sendish.repository.model.jpa.Photo;
@@ -21,7 +21,7 @@ public class PhotoDtoMapper {
 	private static PrettyTime prettyTime = new PrettyTime();
 	
 	@Autowired
-    private RedisStatisticsRepository statisticsRepository;
+	private StatisticsServiceImpl statisticsService;
 	
 	public List<PhotoDto> mapHotToPhotoDto(List<HotPhoto> photos, int maxLocationNameLength) {
         return photos.stream().map(photo -> mapToPhotoDto(photo.getPhoto(), maxLocationNameLength)).collect(Collectors.toList());
@@ -45,7 +45,7 @@ public class PhotoDtoMapper {
         photoDto.setTimeAgo(getPrettyTime(photo.getCreatedDate()));
         photoDto.setUuid(photo.getUuid());
 
-        PhotoStatisticsDto stats = statisticsRepository.getPhotoStatistics(photo.getId());
+        PhotoStatisticsDto stats = statisticsService.getPhotoStatistics(photo.getId());
         photoDto.setCityCount(stats.getCityCount());
         photoDto.setCommentCount(stats.getCommentCount());
         photoDto.setLikeCount(stats.getLikeCount());

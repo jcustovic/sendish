@@ -4,16 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sendish.api.redis.dto.PhotoStatisticsDto;
-import com.sendish.api.redis.repository.RedisStatisticsRepository;
+import com.sendish.api.service.impl.StatisticsServiceImpl;
 
 @Component
 public class PhotoStopDecider {
 	
 	@Autowired
-	private RedisStatisticsRepository statisticsRepository;
+	private StatisticsServiceImpl statisticsService;
 
 	public boolean checkToStop(Long photoId) {
-		PhotoStatisticsDto photoStatistics = statisticsRepository.getPhotoStatistics(photoId);
+		PhotoStatisticsDto photoStatistics = statisticsService.getPhotoStatistics(photoId);
 		
 		double minLikePercent = 0;
 		long maxAllowedReport = Long.MAX_VALUE;

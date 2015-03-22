@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import com.sendish.api.dto.ChangePasswordDto;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
@@ -12,11 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.sendish.api.dto.ChangePasswordDto;
 import com.sendish.api.dto.UserProfileDto;
 import com.sendish.api.dto.UserRankDto;
 import com.sendish.api.dto.UserSettingsDto;
 import com.sendish.api.redis.dto.UserStatisticsDto;
-import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.api.util.CityUtils;
 import com.sendish.repository.UserDetailsRepository;
 import com.sendish.repository.UserRepository;
@@ -51,7 +50,7 @@ public class UserServiceImpl {
     private ShaPasswordEncoder shaPasswordEncoder;
 
     @Autowired
-    private RedisStatisticsRepository statisticsRepository;
+    private StatisticsServiceImpl statisticsService;
     
     @Autowired
     private RankingServiceImpl rankingService;
@@ -112,7 +111,7 @@ public class UserServiceImpl {
             userProfileDto.setRank(userRank.toString());
         }
         
-        UserStatisticsDto userStatistics = statisticsRepository.getUserStatistics(userId);
+        UserStatisticsDto userStatistics = statisticsService.getUserStatistics(userId);
         userProfileDto.setTotalDislikes(userStatistics.getTotalDislikeCount());
         userProfileDto.setTotalLikes(userStatistics.getTotalLikeCount());
         userProfileDto.setCitiesCount(userStatistics.getTotalCityCount());
@@ -163,7 +162,7 @@ public class UserServiceImpl {
         userDetails.setCurrentCity(city);
         userDetails.setLastInteractionTime(photoDate);
 
-        Long currentCount = statisticsRepository.increaseDailySentPhotoCount(userId, photoDate.toLocalDate());
+        Long currentCount = statisticsService.increaseUserDailySentPhotoCount(userId, photoDate.toLocalDate());
 
         if (currentCount >= userDetails.getSendLimitPerDay()) {
             userDetails.setSendAllowedTime(photoDate.withTimeAtStartOfDay().plusDays(1));

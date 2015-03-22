@@ -16,7 +16,6 @@ import com.sendish.api.dto.CommentDto;
 import com.sendish.api.dto.NewCommentDto;
 import com.sendish.api.notification.AsyncNotificationProvider;
 import com.sendish.api.redis.dto.CommentStatisticsDto;
-import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.api.util.StringUtils;
 import com.sendish.api.util.UserUtils;
 import com.sendish.repository.PhotoCommentRepository;
@@ -50,7 +49,7 @@ public class PhotoCommentServiceImpl {
     private PhotoCommentVoteRepository photoCommentVoteRepository;
 
     @Autowired
-    private RedisStatisticsRepository statisticsRepository;
+    private StatisticsServiceImpl statisticsService;
     
     @Autowired
     private AsyncNotificationProvider notificationProvider;
@@ -73,7 +72,7 @@ public class PhotoCommentServiceImpl {
 		photoComment.setComment(comment);
 
         photoComment = photoCommentRepository.save(photoComment);
-        statisticsRepository.increasePhotoCommentCount(photoId);
+        statisticsService.increasePhotoCommentCount(photoId);
         if (!photo.getDeleted() && !photo.getUser().getId().equals(userId)) {
         	sendCommentNotificationToPhotoOwner(user, photo, comment);
         	userActivityService.addPhotoCommentActivity(photoComment);
@@ -99,7 +98,7 @@ public class PhotoCommentServiceImpl {
 
         photoComment = photoCommentRepository.save(photoComment);
         
-        statisticsRepository.increasePhotoCommentCount(commentDto.getPhotoId());
+        statisticsService.increasePhotoCommentCount(commentDto.getPhotoId());
         if (photoComment.getReplyTo() == null 
         		&& !photo.getDeleted() 
         		&& !photo.getUser().getId().equals(commentDto.getUserId())) {
@@ -153,7 +152,7 @@ public class PhotoCommentServiceImpl {
     private void sendCommentNotificationToPhotoOwner(User user, Photo photo, String comment) {
         if (user.getDetails().getReceiveCommentNotifications()) {
         	Map<String, Object> newCommentFields = new HashMap<>();
-            newCommentFields.put("TYPE", "NEW_COMMENT");
+            newCommentFields.put("TYPE", "OPEN_SENT_PHOTO");
             newCommentFields.put("REFERENCE_ID", photo.getId());
             
             String notText = getNewCommentNotificationText(user, comment);
@@ -166,7 +165,11 @@ public class PhotoCommentServiceImpl {
     	PhotoComment replyToComment = photoComment.getReplyTo();
     	if (replyToComment.getUser().getDetails().getReceiveCommentNotifications()) {
         	Map<String, Object> newCommentFields = new HashMap<>();
-            newCommentFields.put("TYPE", "NEW_COMMENT");
+        	if (photoComment.getPhoto().getUser().getId().equals(photoComment.getUser().getId())) {
+        		newCommentFields.put("TYPE", "OPEN_SENT_PHOTO");	
+        	} else {
+        		newCommentFields.put("TYPE", "OPEN_RECEIVED_PHOTO");	
+        	}
             newCommentFields.put("REFERENCE_ID", photoComment.getPhoto().getId());
             
             String notText = getReplyOnCommentNotificationText(photoComment.getUser(), photoComment.getComment());
@@ -209,7 +212,7 @@ public class PhotoCommentServiceImpl {
         }
 
         // TODO: Maybe get from database when we will store it there so we save on trip to Redis.
-        CommentStatisticsDto commentStatistics = statisticsRepository.getCommentStatistics(comment.getId());
+        CommentStatisticsDto commentStatistics = statisticsService.getCommentStatistics(comment.getId());
         commentDto.setLikes(commentStatistics.getLikeCount());
         commentDto.setDislikes(commentStatistics.getDislikeCount());
 
@@ -229,14 +232,14 @@ public class PhotoCommentServiceImpl {
             photoCommentVoteRepository.save(newVote);
 
             if (like) {
-                statisticsRepository.likeComment(photoCommentId);
+                statisticsService.likeComment(photoCommentId);
                 rankingService.addPointsForLikedComment(comment.getUser());
                 
                 if (!comment.getPhoto().getDeleted()) {
                 	userActivityService.addCommentLikedActivity(comment, user);
                 }
             } else {
-                statisticsRepository.dislikeComment(photoCommentId);
+                statisticsService.dislikeComment(photoCommentId);
                 rankingService.removePointsForDislikedComment(comment.getUser());
             }
         }

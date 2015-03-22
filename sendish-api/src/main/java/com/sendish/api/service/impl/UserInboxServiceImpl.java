@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.sendish.api.util.StringUtils;
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.InboxItemDto;
 import com.sendish.api.notification.AsyncNotificationProvider;
-import com.sendish.api.redis.repository.RedisStatisticsRepository;
+import com.sendish.api.util.StringUtils;
 import com.sendish.repository.InboxMessageRepository;
 import com.sendish.repository.UserInboxItemRepository;
 import com.sendish.repository.UserRepository;
@@ -40,7 +39,7 @@ public class UserInboxServiceImpl {
     private InboxMessageRepository inboxMessageRepository;
     
     @Autowired
-    private RedisStatisticsRepository statisticsRepository;
+    private StatisticsServiceImpl statisticsService;
     
     @Autowired
     private AsyncNotificationProvider notificationProvider;
@@ -90,7 +89,7 @@ public class UserInboxServiceImpl {
     	userInboxItem = userInboxItemRepository.save(userInboxItem);
 
     	// TODO: Move after transaction for save is done!
-    	statisticsRepository.incrementUnreadInboxItemCount(userId);
+    	statisticsService.incrementUnreadInboxItemCount(userId);
     	sendNewInboxItemNotification(userInboxItem);
     	
     	return userInboxItem;
@@ -105,7 +104,7 @@ public class UserInboxServiceImpl {
     public void markRead(Long itemId, Long userId) {
         UserInboxItem userInboxItem = userInboxItemRepository.findByIdAndUserId(itemId, userId);
         if (!userInboxItem.getRead()) {
-        	statisticsRepository.decrementUnreadInboxItemCount(userInboxItem.getUser().getId());
+        	statisticsService.decrementUnreadInboxItemCount(userInboxItem.getUser().getId());
         }
         userInboxItem.setRead(true);
         userInboxItemRepository.save(userInboxItem);
@@ -114,7 +113,7 @@ public class UserInboxServiceImpl {
     public void markUnread(Long itemId, Long userId) {
         UserInboxItem userInboxItem = userInboxItemRepository.findByIdAndUserId(itemId, userId);
         if (userInboxItem.getRead()) {
-        	statisticsRepository.incrementUnreadInboxItemCount(userInboxItem.getUser().getId());
+        	statisticsService.incrementUnreadInboxItemCount(userInboxItem.getUser().getId());
         }
         userInboxItem.setRead(false);
         userInboxItemRepository.save(userInboxItem);
@@ -125,7 +124,7 @@ public class UserInboxServiceImpl {
             userInboxItem.setFirstOpenedDate(DateTime.now());
         }
         if (!userInboxItem.getRead()) {
-        	statisticsRepository.decrementUnreadInboxItemCount(userInboxItem.getUser().getId());
+        	statisticsService.decrementUnreadInboxItemCount(userInboxItem.getUser().getId());
         }
         userInboxItem.setRead(true);
         
@@ -137,7 +136,7 @@ public class UserInboxServiceImpl {
     private void sendNewInboxItemNotification(UserInboxItem userInboxItem) {
         InboxMessage inboxMsg = userInboxItem.getInboxMessage();
 		Map<String, Object> customFields = new HashMap<>();
-        customFields.put("TYPE", "NEW_INBOX_ITEM");
+        customFields.put("TYPE", "OPEN_INBOX_ITEM");
         customFields.put("REFERENCE_ID", inboxMsg.getId());
         notificationProvider.sendPlainTextNotification(StringUtils.trim(inboxMsg.getShortTitle(), 50), customFields, userInboxItem.getUser().getId());
 	}

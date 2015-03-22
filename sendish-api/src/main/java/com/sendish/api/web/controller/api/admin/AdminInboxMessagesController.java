@@ -26,7 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/inbox-messages")
 @Api(value = "inbox-messages", description = "Manage inbox messages")
-public class AdminInboxMessageController {
+public class AdminInboxMessagesController {
 
     @Autowired
     private InboxMessageServiceImpl inboxMessageService;

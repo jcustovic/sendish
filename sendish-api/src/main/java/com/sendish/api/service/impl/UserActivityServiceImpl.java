@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.sendish.api.util.StringUtils;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.ActivityItemDto;
 import com.sendish.api.redis.KeyUtils;
-import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.api.util.CityUtils;
+import com.sendish.api.util.StringUtils;
 import com.sendish.api.util.UserUtils;
 import com.sendish.repository.UserActivityRepository;
 import com.sendish.repository.model.jpa.Photo;
@@ -43,7 +42,7 @@ public class UserActivityServiceImpl {
 	private UserActivityRepository userActivityRepository;
 	
 	@Autowired
-	private RedisStatisticsRepository statisticsRepository;
+	private StatisticsServiceImpl statisticsService;
 	
 	@Autowired
     private StringRedisTemplate template;
@@ -51,7 +50,7 @@ public class UserActivityServiceImpl {
 	public List<ActivityItemDto> getActivitites(Long userId, Integer page) {
 		List<UserActivity> activity = findUserActivity(userId, page);
 		if (page == 0) {
-			statisticsRepository.markActivitiesAsRead(userId);
+			statisticsService.markActivitiesAsRead(userId);
 		}
 		
 		return activity.stream().map(a -> mapToActivityItemDto(a)).collect(Collectors.toList());
@@ -99,67 +98,75 @@ public class UserActivityServiceImpl {
 
 	public void addPhotoCommentActivity(PhotoComment photoComment) {
 		Photo photo = photoComment.getPhoto();
-		UserActivity activity = new UserActivity();
-		activity.setFromUser(photoComment.getUser());
-		activity.setUser(photo.getUser());
-		activity.setImageUuid(photo.getUuid());
-		activity.setReferenceType("PHOTO_COMMENT");
-		activity.setReferenceId(photo.getId().toString());
-        String text = StringUtils.trim(" commented on your photo: " + photoComment.getComment(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
-		activity.setText(text);
-		
-		activity = userActivityRepository.save(activity);
-		addActivityToUserTimeline(photo.getUser().getId(), activity.getId());
+		if (photo.getUser().isUserActive()) {
+			UserActivity activity = new UserActivity();
+			activity.setFromUser(photoComment.getUser());
+			activity.setUser(photo.getUser());
+			activity.setImageUuid(photo.getUuid());
+			activity.setReferenceType("PHOTO_COMMENT");
+			activity.setReferenceId(photo.getId().toString());
+	        String text = StringUtils.trim(" commented on your photo: " + photoComment.getComment(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
+			activity.setText(text);
+			
+			activity = userActivityRepository.save(activity);
+			addActivityToUserTimeline(photo.getUser().getId(), activity.getId());
+		}
 	}
 	
 	public void addReplyToPhotoCommentActivity(PhotoComment photoComment) {
-		Photo photo = photoComment.getPhoto();
-		UserActivity activity = new UserActivity();
-		activity.setFromUser(photoComment.getUser());
-		activity.setUser(photoComment.getReplyTo().getUser());
-		activity.setImageUuid(photo.getUuid());
-		activity.setReferenceType("PHOTO_COMMENT");
-		activity.setReferenceId(photo.getId().toString());
-        String text = StringUtils.trim(" replied: " + photoComment.getComment(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
-		activity.setText(text);
-		
-		activity = userActivityRepository.save(activity);
-		addActivityToUserTimeline(photoComment.getReplyTo().getUser().getId(), activity.getId());
+		if (photoComment.getReplyTo().getUser().isUserActive()) {
+			Photo photo = photoComment.getPhoto();
+			UserActivity activity = new UserActivity();
+			activity.setFromUser(photoComment.getUser());
+			activity.setUser(photoComment.getReplyTo().getUser());
+			activity.setImageUuid(photo.getUuid());
+			activity.setReferenceType("PHOTO_COMMENT");
+			activity.setReferenceId(photo.getId().toString());
+	        String text = StringUtils.trim(" replied: " + photoComment.getComment(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
+			activity.setText(text);
+			
+			activity = userActivityRepository.save(activity);
+			addActivityToUserTimeline(photoComment.getReplyTo().getUser().getId(), activity.getId());
+		}
 	}
 	
 	public void addPhotoLikedActivity(Photo photo, User user) {
-		UserActivity activity = new UserActivity();
-		activity.setFromUser(user);
-		activity.setUser(photo.getUser());
-		activity.setImageUuid(photo.getUuid());
-		activity.setReferenceType("PHOTO_LIKED");
-		activity.setReferenceId(photo.getId().toString());
-		activity.setText(" liked your photo");
-		
-		activity = userActivityRepository.save(activity);
-		addActivityToUserTimeline(photo.getUser().getId(), activity.getId());
+		if (photo.getUser().isUserActive()) {
+			UserActivity activity = new UserActivity();
+			activity.setFromUser(user);
+			activity.setUser(photo.getUser());
+			activity.setImageUuid(photo.getUuid());
+			activity.setReferenceType("PHOTO_LIKED");
+			activity.setReferenceId(photo.getId().toString());
+			activity.setText(" liked your photo");
+			
+			activity = userActivityRepository.save(activity);
+			addActivityToUserTimeline(photo.getUser().getId(), activity.getId());
+		}
 	}
 	
 	public void addCommentLikedActivity(PhotoComment comment, User user) {
-		User photoOwner = comment.getPhoto().getUser();
-		String referenceType;
-		if  (photoOwner.getId().equals(comment.getUser().getId())) {
-			referenceType = "PHOTO_SENT_COMMENT_LIKED";
-		} else {
-			referenceType = "PHOTO_RECEIVED_COMMENT_LIKED";
+		if (comment.getUser().isUserActive()) {
+			User photoOwner = comment.getPhoto().getUser();
+			String referenceType;
+			if  (photoOwner.getId().equals(comment.getUser().getId())) {
+				referenceType = "PHOTO_SENT_COMMENT_LIKED";
+			} else {
+				referenceType = "PHOTO_RECEIVED_COMMENT_LIKED";
+			}
+			
+			UserActivity activity = new UserActivity();
+			activity.setFromUser(user);
+			activity.setUser(comment.getUser());
+			activity.setImageUuid(comment.getPhoto().getUuid());
+			activity.setReferenceType(referenceType);
+			activity.setReferenceId(comment.getPhoto().getId().toString());
+	        String text = StringUtils.trim(" liked your comment: " + comment.getComment(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
+	        activity.setText(text);
+			
+			activity = userActivityRepository.save(activity);
+			addActivityToUserTimeline(comment.getUser().getId(), activity.getId());
 		}
-		
-		UserActivity activity = new UserActivity();
-		activity.setFromUser(user);
-		activity.setUser(comment.getUser());
-		activity.setImageUuid(comment.getPhoto().getUuid());
-		activity.setReferenceType(referenceType);
-		activity.setReferenceId(comment.getPhoto().getId().toString());
-        String text = StringUtils.trim(" liked your comment: " + comment.getComment(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
-        activity.setText(text);
-		
-		activity = userActivityRepository.save(activity);
-		addActivityToUserTimeline(comment.getUser().getId(), activity.getId());
 	}
 	
 	public List<UserActivity> findUserActivity(Long userId, int page) {
@@ -187,7 +194,7 @@ public class UserActivityServiceImpl {
 		BoundListOperations<String, String> userTimeline = userTimeline(userId);
 		userTimeline.leftPush(activityId.toString());
 		userTimeline.trim(0, MAX_ACTIVITY_PER_USER - 1);
-		statisticsRepository.newActivity(userId);
+		statisticsService.setNewActivityFlag(userId);
 	}
 	
 	private BoundListOperations<String, String> userTimeline(Long userId) {

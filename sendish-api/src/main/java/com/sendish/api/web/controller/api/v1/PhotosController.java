@@ -311,7 +311,7 @@ public class PhotosController {
         if (userService.isSentLimitReached(user.getUserId())) {
             return new ResponseEntity<>(HttpStatus.TOO_MANY_REQUESTS);
         }
-        PhotoSendingDetails photoSendingDetails = photoService.processNewImage(locationBasedFileUpload, user.getUserId());
+        PhotoSendingDetails photoSendingDetails = photoService.processNewPhoto(locationBasedFileUpload, user.getUserId());
 
         // TODO: Maybe return also the locations where the image was sent if available!
         final URI location = ServletUriComponentsBuilder

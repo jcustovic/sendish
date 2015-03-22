@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sendish.api.redis.dto.CommentStatisticsDto;
+import com.sendish.api.redis.dto.PhotoStatisticsDto;
+import com.sendish.api.redis.dto.UserStatisticsDto;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
 import com.sendish.repository.model.jpa.User;
 
@@ -46,8 +49,52 @@ public class StatisticsServiceImpl {
 		statisticsRepository.incrementUserUnseenPhotoCount(userId);
 	}
 
-	public void increaseUserDailyReceivedPhotoCount(Long userId, LocalDate now) {
-		statisticsRepository.increaseUserDailyReceivedPhotoCount(userId, now);
+	public Long increaseUserDailyReceivedPhotoCount(Long userId, LocalDate now) {
+		return statisticsRepository.increaseUserDailyReceivedPhotoCount(userId, now);
+	}
+
+	public PhotoStatisticsDto getPhotoStatistics(Long photoId) {
+		return statisticsRepository.getPhotoStatistics(photoId);
+	}
+
+	public UserStatisticsDto getUserStatistics(Long userId) {
+		return statisticsRepository.getUserStatistics(userId);
+	}
+	
+	public CommentStatisticsDto getCommentStatistics(Long photoCommentId) {
+		return statisticsRepository.getCommentStatistics(photoCommentId);
+	}
+
+	public Long increaseUserDailySentPhotoCount(Long userId, LocalDate now) {
+		return statisticsRepository.increaseUserDailySentPhotoCount(userId, now);
+	}
+
+	public void increasePhotoCommentCount(Long photoId) {
+		statisticsRepository.increasePhotoCommentCount(photoId);
+	}
+
+	public void likeComment(Long photoCommentId) {
+		statisticsRepository.likeComment(photoCommentId);
+	}
+
+	public void dislikeComment(Long photoCommentId) {
+		statisticsRepository.dislikeComment(photoCommentId);
+	}
+
+	public void markActivitiesAsRead(Long userId) {
+		statisticsRepository.markActivitiesAsRead(userId);
+	}
+
+	public void setNewActivityFlag(Long userId) {
+		statisticsRepository.setNewActivityFlag(userId);
+	}
+
+	public void incrementUnreadInboxItemCount(Long userId) {
+		statisticsRepository.incrementUnreadInboxItemCount(userId);
+	}
+
+	public void decrementUnreadInboxItemCount(Long userId) {
+		statisticsRepository.decrementUnreadInboxItemCount(userId);
 	}
 
 }

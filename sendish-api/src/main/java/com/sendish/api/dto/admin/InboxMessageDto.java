@@ -5,7 +5,9 @@ import org.joda.time.DateTime;
 
 public class InboxMessageDto extends BaseEntityDto {
 
-    private String shortTitle;
+	private static final long serialVersionUID = 1L;
+	
+	private String shortTitle;
     private String title;
     private String message;
     private String url;

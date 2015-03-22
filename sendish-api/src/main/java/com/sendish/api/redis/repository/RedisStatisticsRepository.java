@@ -93,7 +93,7 @@ public class RedisStatisticsRepository {
 				totalCityCount, hasNewActivities);
     }
 
-    public Long increaseDailySentPhotoCount(Long userId, LocalDate date) {
+    public Long increaseUserDailySentPhotoCount(Long userId, LocalDate date) {
         checkIfNewDayAndReset(userId, date);
 
         return userStatistics(userId).increment("daily.sentCount", 1);
@@ -109,10 +109,10 @@ public class RedisStatisticsRepository {
         return Long.valueOf(ObjectUtils.defaultIfNull(sentCountString, "0"));
     }
 
-    public void increaseUserDailyReceivedPhotoCount(Long userId, LocalDate date) {
+    public Long increaseUserDailyReceivedPhotoCount(Long userId, LocalDate date) {
     	checkIfNewDayAndReset(userId, date);
 
-        userStatistics(userId).increment("daily.receivedCount", 1);
+        return userStatistics(userId).increment("daily.receivedCount", 1);
     }
 
 	public Long getDailyReceivedPhotoCount(Long userId, LocalDate date) {
@@ -180,7 +180,7 @@ public class RedisStatisticsRepository {
     	userCities(userId).add(cityString);
 	}
     
-    public void newActivity(Long userId) {
+    public void setNewActivityFlag(Long userId) {
     	userStatistics(userId).putIfAbsent("hasNewActivities", "1");
     }
     
