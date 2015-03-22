@@ -32,9 +32,7 @@ public class UserActivityServiceImpl {
 	
 	private static final int PAGE_SIZE = 20;
 	private static final int MAX_ACTIVITY_PER_USER = 50;
-    private static final int MAX_ACTIVITY_TEXT_LENGTH = 50;
-    // Max chars we want in the end is MAX_ACTIVITY_TEXT_LENGTH and we suspect that users display name will be cca 10.
-    private static final int MAX_ACTIVITY_TEXT_IN_DB_LENGTH = MAX_ACTIVITY_TEXT_LENGTH - 10;
+    private static final int MAX_ACTIVITY_TEXT_IN_DB_LENGTH = 512;
 	
 	private static PrettyTime prettyTime = new PrettyTime();
 	
@@ -60,7 +58,7 @@ public class UserActivityServiceImpl {
 		ActivityItemDto activityItem = new ActivityItemDto();
         String displayName = getDisplayName(userActivity.getReferenceType(), userActivity.getFromUser());
 		activityItem.setDisplayName(displayName);
-		activityItem.setDescription(StringUtils.trim(userActivity.getText(), MAX_ACTIVITY_TEXT_LENGTH - displayName.length(), "..."));
+		activityItem.setDescription(userActivity.getText());
 		activityItem.setReferenceId(userActivity.getReferenceId());
 		activityItem.setReferenceType(getDtoReferenceType(userActivity.getReferenceType()));
 		activityItem.setImageUuid(userActivity.getImageUuid());
@@ -72,9 +70,10 @@ public class UserActivityServiceImpl {
 	private String getDtoReferenceType(String referenceType) {
 		if ("PHOTO_LIKED".equals(referenceType)) {
 			return "PHOTO_SENT";
-		} else if ("PHOTO_COMMENT".equals(referenceType) || "PHOTO_SENT_COMMENT_LIKED".equals(referenceType)) {
+		} else if ("PHOTO_COMMENT".equals(referenceType) || "PHOTO_SENT_COMMENT_LIKED".equals(referenceType) 
+				|| "SENT_PHOTO_REPLY_COMMENT".equals(referenceType)) {
 			return "PHOTO_SENT_COMMENT";
-		} else if ("PHOTO_RECEIVED_COMMENT_LIKED".equals(referenceType)) {
+		} else if ("PHOTO_RECEIVED_COMMENT_LIKED".equals(referenceType) || "RECEIVED_PHOTO_REPLY_COMMENT".equals(referenceType)) {
 			return "PHOTO_RECEIVED_COMMENT";
 		} else if ("INBOX_ITEM".equals(referenceType)) {
 			return "INBOX_ITEM";
@@ -120,7 +119,11 @@ public class UserActivityServiceImpl {
 			activity.setFromUser(photoComment.getUser());
 			activity.setUser(photoComment.getReplyTo().getUser());
 			activity.setImageUuid(photo.getUuid());
-			activity.setReferenceType("PHOTO_COMMENT");
+			if (photo.getUser().getId().equals(photoComment.getUser().getId())) {
+				activity.setReferenceType("SENT_PHOTO_REPLY_COMMENT");
+			} else {
+				activity.setReferenceType("RECEIVED_PHOTO_REPLY_COMMENT");
+			}
 			activity.setReferenceId(photo.getId().toString());
 	        String text = StringUtils.trim(" replied: " + photoComment.getComment(), MAX_ACTIVITY_TEXT_IN_DB_LENGTH);
 			activity.setText(text);
