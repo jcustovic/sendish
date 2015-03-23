@@ -1,6 +1,7 @@
 package com.sendish.api.web.controller.api.v1;
 
 import com.sendish.api.dto.*;
+import com.sendish.api.exception.ResizeFailedException;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.ResizePhotoService;
 import com.sendish.api.service.impl.UserServiceImpl;
@@ -156,9 +157,7 @@ public class PhotosController {
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            ResizedPhoto resizedPhoto = resizedPhotoService.getResizedPhoto(photo.getId(), sizeKey);
-
-            return viewPhoto(webRequest, resizedPhoto.getCreatedDate(), photo.getContentType(), resizedPhoto.getSize(), resizedPhoto.getStorageId());
+            return returnResizedPhoto(sizeKey, webRequest, photo);
         }
     }
 
@@ -292,9 +291,7 @@ public class PhotosController {
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            ResizedPhoto resizedPhoto = resizedPhotoService.getResizedPhoto(photo.getId(), sizeKey);
-
-            return viewPhoto(webRequest, resizedPhoto.getCreatedDate(), photo.getContentType(), resizedPhoto.getSize(), resizedPhoto.getStorageId());
+            return returnResizedPhoto(sizeKey, webRequest, photo);
         }
     }
 
@@ -323,6 +320,16 @@ public class PhotosController {
 
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
+    
+    private ResponseEntity<InputStreamResource> returnResizedPhoto(String sizeKey, WebRequest webRequest, Photo photo) {
+		try {
+			ResizedPhoto resizedPhoto = resizedPhotoService.getResizedPhoto(photo.getId(), sizeKey);
+			
+			return viewPhoto(webRequest, resizedPhoto.getCreatedDate(), photo.getContentType(), resizedPhoto.getSize(), resizedPhoto.getStorageId());
+		} catch (ResizeFailedException e) {
+			return viewPhoto(webRequest, photo.getCreatedDate(), photo.getContentType(), photo.getSize(), photo.getStorageId());
+		}
+	}
 
     private ResponseEntity<InputStreamResource> viewPhoto(WebRequest webRequest, DateTime createdDate, String contentType, Long size, String storageId) {
         if (webRequest.checkNotModified(createdDate.getMillis())) {

@@ -2,8 +2,6 @@ package com.sendish.api.util;
 
 import java.util.function.Supplier;
 
-import org.springframework.dao.DataIntegrityViolationException;
-
 public class RetryUtils {
 	
 	public static <T> T retry(Supplier<T> logic, int retryCount, int sleepMillis) {
@@ -12,7 +10,7 @@ public class RetryUtils {
 		        return logic.get();
     		} catch (Exception e) {
     			if (--retryCount == 0) {
-    				throw new DataIntegrityViolationException("Retry limit reached", e);
+    				throw e;
     			} else {
     				try {
 						Thread.sleep(sleepMillis);

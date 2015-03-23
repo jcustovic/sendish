@@ -3,6 +3,7 @@ package com.sendish.api.web.controller.api.v1;
 import java.util.List;
 
 import com.sendish.api.service.ResizePhotoService;
+
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,6 +23,7 @@ import org.springframework.web.context.request.WebRequest;
 import com.sendish.api.dto.HotPhotoDetailsDto;
 import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.dto.PhotoTraveledDto;
+import com.sendish.api.exception.ResizeFailedException;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.HotPhotoServiceImpl;
 import com.sendish.api.service.impl.PhotoServiceImpl;
@@ -102,15 +104,21 @@ public class HotPhotosController {
     })
     public ResponseEntity<InputStreamResource> view(@PathVariable String photoUUID, @PathVariable String sizeKey, 
     		WebRequest webRequest) {
-        HotPhoto photo = hotPhotoService.findPhotoByPhotoUuid(photoUUID);
+        HotPhoto hotPhoto = hotPhotoService.findPhotoByPhotoUuid(photoUUID);
 
-        if (photo == null) {
+        if (hotPhoto == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            ResizedPhoto resizedPhoto = resizedPhotoService.getResizedPhoto(photo.getPhotoId(), sizeKey);
-
-			return viewPhoto(webRequest, resizedPhoto.getCreatedDate(), photo.getPhoto().getContentType(), 
-					resizedPhoto.getSize(), resizedPhoto.getStorageId());
+			try {
+				ResizedPhoto resizedPhoto = resizedPhotoService.getResizedPhoto(hotPhoto.getPhotoId(), sizeKey);
+				
+				return viewPhoto(webRequest, resizedPhoto.getCreatedDate(), hotPhoto.getPhoto().getContentType(), 
+						resizedPhoto.getSize(), resizedPhoto.getStorageId());
+			} catch (ResizeFailedException e) {
+				Photo photo = hotPhoto.getPhoto();
+				
+	            return viewPhoto(webRequest, photo.getCreatedDate(), photo.getContentType(), photo.getSize(), photo.getStorageId());
+			}
         }
     }
 

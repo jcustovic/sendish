@@ -45,7 +45,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
     private static final int OAUTH1_PARAM_LENGTH = 3;
     private static final int OAUTH2_PARAM_LENGTH = 5;
 
-    private static final Logger logger = LoggerFactory.getLogger(SocialAuthenticationFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SocialAuthenticationFilter.class);
 
     // ~ Instance fields 
     // ================================================================================================
@@ -90,7 +90,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
 
         // Check for header
         if (!StringUtils.hasText(header)) {
-            logger.debug("SocialAuthorization header not found");
+            LOGGER.debug("SocialAuthorization header not found");
             p_chain.doFilter(request, response);
             return;
         }
@@ -98,7 +98,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
         final String[] socialAuth = header.split(":");
 
         if (socialAuth.length < 2) {
-            logger.info("Insufficient SocialAuthorization params");
+            LOGGER.info("Insufficient SocialAuthorization params");
             authenticationEntryPoint.commence(request, response, new InsufficientAuthenticationException("Insufficient SocialAuthorization params"));
             return;
         }
@@ -115,7 +115,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
         try {
             connectionFactory = connectionFactoryLocator.getConnectionFactory(providerId);
         } catch (final IllegalArgumentException e) {
-            logger.info("Social connection factory not found for provider " + providerId);
+            LOGGER.info("Social connection factory not found for provider " + providerId);
             authenticationEntryPoint.commence(request, response, new InsufficientAuthenticationException("Social connection factory not found for provider " + providerId));
             return;
         }
@@ -136,7 +136,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
             final UsernamePasswordAuthenticationToken authResult = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authResult);
         } else {
-            logger.error("Found more than one user from connection -> {}", userIds);
+            LOGGER.error("Found more than one user from connection -> {}", userIds);
         }
 
         p_chain.doFilter(request, response);
@@ -148,7 +148,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
 		try {
 			if (connectionFactory instanceof OAuth1ConnectionFactory) {
 			    if (socialAuth.length != OAUTH1_PARAM_LENGTH) {
-			        logger.info("Insufficient SocialAuthorization params for OAuth1");
+			        LOGGER.info("Insufficient SocialAuthorization params for OAuth1");
 			        authenticationEntryPoint.commence(request, response, new InsufficientAuthenticationException("Insufficient SocialAuthorization params for OAuth1"));
 			        return null;
 			    }
@@ -156,7 +156,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
                 connection = getOAuth1Connection(socialAuth, (OAuth1ConnectionFactory<?>) connectionFactory);
             } else if (connectionFactory instanceof OAuth2ConnectionFactory) {
 			    if (socialAuth.length != OAUTH2_PARAM_LENGTH) {
-			        logger.info("Insufficient SocialAuthorization params for OAuth2");
+			        LOGGER.info("Insufficient SocialAuthorization params for OAuth2");
 			        authenticationEntryPoint.commence(request, response, new InsufficientAuthenticationException("Insufficient SocialAuthorization params for OAuth2"));
 			        return null;
 			    }
@@ -166,7 +166,7 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
 			    authenticationEntryPoint.commence(request, response, new ProviderNotFoundException("Connection provider not supported"));
 			}
 		} catch (final NotAuthorizedException e) {
-            logger.info(e.getMessage());
+            LOGGER.info(e.getMessage());
             authenticationEntryPoint.commence(request, response, new BadCredentialsException("Invalid OAuth access token."));
         }
 		
