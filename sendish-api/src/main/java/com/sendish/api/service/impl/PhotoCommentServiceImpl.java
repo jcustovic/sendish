@@ -164,10 +164,10 @@ public class PhotoCommentServiceImpl {
 	}
     
     private void sendReplyToCommentNotification(PhotoComment photoComment) {
-    	PhotoComment replyToComment = photoComment.getReplyTo();
-    	if (replyToComment.getUser().getDetails().getReceiveCommentNotifications()) {
+    	User replyToUser = photoComment.getReplyTo().getUser();
+    	if (replyToUser.getDetails().getReceiveCommentNotifications()) {
         	Map<String, Object> newCommentFields = new HashMap<>();
-        	if (photoComment.getPhoto().getUser().getId().equals(photoComment.getUser().getId())) {
+        	if (photoComment.getPhoto().getUser().getId().equals(replyToUser.getId())) {
         		newCommentFields.put("TYPE", "OPEN_SENT_PHOTO");	
         	} else {
         		newCommentFields.put("TYPE", "OPEN_RECEIVED_PHOTO");	
@@ -176,7 +176,7 @@ public class PhotoCommentServiceImpl {
             
             String notText = getReplyOnCommentNotificationText(photoComment.getUser(), photoComment.getComment());
             
-        	notificationProvider.sendPlainTextNotification(notText, newCommentFields, replyToComment.getUser().getId());	
+        	notificationProvider.sendPlainTextNotification(notText, newCommentFields, replyToUser.getId());
         }
 	}
 
