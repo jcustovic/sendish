@@ -113,13 +113,14 @@ public class UserActivityServiceImpl {
 	}
 	
 	public void addReplyToPhotoCommentActivity(PhotoComment photoComment) {
-		if (photoComment.getReplyTo().getUser().isUserActive()) {
+        User replyToUser = photoComment.getReplyTo().getUser();
+		if (replyToUser.isUserActive()) {
 			Photo photo = photoComment.getPhoto();
 			UserActivity activity = new UserActivity();
 			activity.setFromUser(photoComment.getUser());
-			activity.setUser(photoComment.getReplyTo().getUser());
+			activity.setUser(replyToUser);
 			activity.setImageUuid(photo.getUuid());
-			if (photo.getUser().getId().equals(photoComment.getUser().getId())) {
+			if (photo.getUser().getId().equals(replyToUser.getId())) {
 				activity.setReferenceType("SENT_PHOTO_REPLY_COMMENT");
 			} else {
 				activity.setReferenceType("RECEIVED_PHOTO_REPLY_COMMENT");
@@ -129,7 +130,7 @@ public class UserActivityServiceImpl {
 			activity.setText(text);
 			
 			activity = userActivityRepository.save(activity);
-			addActivityToUserTimeline(photoComment.getReplyTo().getUser().getId(), activity.getId());
+			addActivityToUserTimeline(replyToUser.getId(), activity.getId());
 		}
 	}
 	
