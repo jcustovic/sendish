@@ -29,7 +29,8 @@ public class TravelingPhotoResenderScheduler {
     @Scheduled(fixedDelay = ONE_MINUTE_DELAY)
     @Transactional
     public void resendTravelingPhotos() {
-    	Page<Long> photoIds = photoSendingDetailsRepository.findTravelingPhotoIdsByLastSentGreatherThan(DateTime.now().minusMinutes(15), new PageRequest(0, 1000));
+    	// TODO: Maybe some ordering
+    	Page<Long> photoIds = photoSendingDetailsRepository.findTravelingPhotoIdsByLastSentGreatherThan(DateTime.now().minusMinutes(15), new PageRequest(0, 10000));
     	
     	LOGGER.info("Found {} photos that need to be resent.", photoIds.getTotalElements());
     	

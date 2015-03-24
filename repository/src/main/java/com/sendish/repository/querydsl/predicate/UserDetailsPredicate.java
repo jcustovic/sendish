@@ -20,7 +20,7 @@ public class UserDetailsPredicate {
                 .and(qUserDetails.lastInteractionTime.gt(now.minusDays(1))));
 
         andPredicates.add(qUserDetails.receiveAllowedTime.isNull()
-                .or(qUserDetails.receiveAllowedTime.goe(now)));
+                .or(qUserDetails.receiveAllowedTime.loe(now)));
 
         if (latestUserPhotoReceivedDate != null)  {
             andPredicates.add(qUserDetails.lastReceivedTime.isNull()
@@ -42,7 +42,7 @@ public class UserDetailsPredicate {
                 .and(qUserDetails.lastInteractionTime.gt(now.minusDays(1))));
 
         andPredicates.add(qUserDetails.receiveAllowedTime.isNull()
-                .or(qUserDetails.receiveAllowedTime.goe(now)));
+                .or(qUserDetails.receiveAllowedTime.loe(now)));
 
         andPredicates.add(qUserDetails.lastReceivedTime.isNotNull()
                 .and(qUserDetails.lastReceivedTime.lt(oldestUserPhotoReceivedDate)));
