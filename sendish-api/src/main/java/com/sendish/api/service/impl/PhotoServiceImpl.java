@@ -124,6 +124,10 @@ public class PhotoServiceImpl {
         return photoRepository.findOne(photoId);
     }
 
+    public Photo findByUuid(String photoUuid) {
+        return photoRepository.findByUuid(photoUuid);
+    }
+
     public PhotoSendingDetails processNewPhoto(LocationBasedFileUpload upload, Long userId) {
         DateTime uploadedDate = DateTime.now();
         MultipartFile file = upload.getImage();

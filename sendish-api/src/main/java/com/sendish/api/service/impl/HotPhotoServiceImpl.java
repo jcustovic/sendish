@@ -2,6 +2,7 @@ package com.sendish.api.service.impl;
 
 import java.util.List;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -37,6 +38,9 @@ public class HotPhotoServiceImpl {
 	@Autowired
     private PhotoVoteRepository photoVoteRepository;
 
+    @Autowired
+    private UserInboxServiceImpl userInboxService;
+
 	public List<PhotoDto> findAllActive(Integer page) {
 		List<HotPhoto> photos = hotPhotoRepository.findAllActive(new PageRequest(page, HOT_PHOTO_PAGE_SIZE, Direction.DESC, "selectedTime"));
 		
@@ -66,5 +70,25 @@ public class HotPhotoServiceImpl {
 		
 		return photoDetails;
 	}
+
+    public void addNewPhoto(Long photoId) {
+        HotPhoto hotPhoto = new HotPhoto();
+        hotPhoto.setPhotoId(photoId);
+        hotPhoto.setSelectedTime(DateTime.now());
+
+        hotPhoto = hotPhotoRepository.save(hotPhoto);
+        sendCongratsInboxItem(hotPhoto);
+    }
+
+    private void sendCongratsInboxItem(HotPhoto hotPhoto) {
+        // TODO: Create new InboxMessage and send it to the photo owner.
+    }
+
+    public void remove(Long photoId) {
+        HotPhoto hotPhoto = hotPhotoRepository.findOne(photoId);
+        hotPhoto.setRemovedTime(DateTime.now());
+
+        hotPhotoRepository.save(hotPhoto);
+    }
 
 }

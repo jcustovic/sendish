@@ -24,4 +24,6 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
     //@Query("SELECT p FROM Photo p WHERE p.id = ?1 AND p.user.id = ?2 AND p.deleted = false")
     Photo findByIdAndUserId(Long photoId, Long userId);
 
+    Photo findByUuid(String photoUuid);
+
 }

@@ -55,4 +55,8 @@ public class ImageServiceImpl {
         return imageRepository.save(image);
     }
 
+    public Image findOne(Long imageId) {
+        return imageRepository.findOne(imageId);
+    }
+
 }

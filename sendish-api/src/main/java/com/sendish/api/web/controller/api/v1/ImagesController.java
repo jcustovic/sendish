@@ -27,7 +27,7 @@ import org.springframework.web.context.request.WebRequest;
 @RestController
 @RequestMapping("/api/v1.0/images")
 @Api(value = "images", description = "Get images (not photos!)")
-public class ImageController {
+public class ImagesController {
 
     @Autowired
     private FileStore fileStore;
