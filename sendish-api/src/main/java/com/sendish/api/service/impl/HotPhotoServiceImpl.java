@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -38,8 +39,11 @@ public class HotPhotoServiceImpl {
 	@Autowired
     private PhotoVoteRepository photoVoteRepository;
 
-    @Autowired
-    private UserInboxServiceImpl userInboxService;
+    public List<PhotoDto> findAll(Integer page) {
+        Page<HotPhoto> photos = hotPhotoRepository.findAll(new PageRequest(page, HOT_PHOTO_PAGE_SIZE, Direction.DESC, "selectedTime"));
+
+        return photoDtoMapper.mapHotToPhotoDto(photos.getContent(), MAX_LOCATION_NAME_LENGTH_PHOTO_LIST);
+    }
 
 	public List<PhotoDto> findAllActive(Integer page) {
 		List<HotPhoto> photos = hotPhotoRepository.findAllActive(new PageRequest(page, HOT_PHOTO_PAGE_SIZE, Direction.DESC, "selectedTime"));

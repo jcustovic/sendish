@@ -46,8 +46,8 @@ public class AdminImagesController {
     @RequestMapping(value = "/view/{imageId}", method = RequestMethod.GET)
     @ApiOperation(value = "View image in original size")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<InputStreamResource> viewPhoto(@PathVariable Long imageId, WebRequest webRequest) {
         Image image = imageService.findOne(imageId);
@@ -58,8 +58,8 @@ public class AdminImagesController {
     @RequestMapping(value = "/view/{imageUUID}/uuid", method = RequestMethod.GET)
     @ApiOperation(value = "View image in original size")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<InputStreamResource> viewPhoto(@PathVariable String imageUUID, WebRequest webRequest) {
         Image image = imageService.findByUuid(imageUUID);
@@ -70,8 +70,8 @@ public class AdminImagesController {
     @RequestMapping(value = "/view/{imageId}/{sizeKey}", method = RequestMethod.GET)
     @ApiOperation(value = "View image in different size")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<InputStreamResource> viewResizedPhoto(@PathVariable Long imageId, @PathVariable String sizeKey, WebRequest webRequest) {
         Image image = imageService.findOne(imageId);
@@ -82,8 +82,8 @@ public class AdminImagesController {
     @RequestMapping(value = "/view/{imageUUID}/uuid/{sizeKey}", method = RequestMethod.GET)
     @ApiOperation(value = "View image in different size")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<InputStreamResource> viewResizedPhoto(@PathVariable String imageUUID, @PathVariable String sizeKey, WebRequest webRequest) {
         Image image = imageService.findByUuid(imageUUID);
