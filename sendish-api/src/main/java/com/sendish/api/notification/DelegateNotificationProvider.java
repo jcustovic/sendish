@@ -120,14 +120,13 @@ public class DelegateNotificationProvider implements AsyncNotificationProvider {
         } else {
             LOG.debug("Sending notification which will not be persisted");
 
-            final List<Long> notifiedUserIds = new LinkedList<>();
             for (final NotificationProvider notifyProvider : notifyProviders) {
                 LOG.debug("\t --> invoking provider {}", notifyProvider.getClass().getName());
                 final NotificationResult result = notifyProvider.pushPlainTextMessage(p_notificationText, p_customData, p_queryHolder);
                 results.add(result);
             }
 
-            LOG.debug("Sending notification finished. Notified {} unique user.", notifiedUserIds.size());
+            LOG.debug("Sending notification finished.");
         }
 
         return results;

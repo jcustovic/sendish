@@ -24,9 +24,6 @@ public class RedisStatisticsRepository {
     @Autowired
     private StringRedisTemplate template;
 
-    // TODO: At some point of time also save stats to DB (User & Photo). Example when one hour elapsed from last update
-    // or photo stops traveling etc. ... UserStatisticsRepository.java, PhotoStatisticsRepository.java
-
     public Long likePhoto(Long photoId) {
         return photoStatistics(photoId).increment("likeCount", 1);
     }

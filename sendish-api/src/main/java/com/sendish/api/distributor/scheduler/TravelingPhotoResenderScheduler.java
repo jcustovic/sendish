@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +30,7 @@ public class TravelingPhotoResenderScheduler {
     @Scheduled(fixedDelay = ONE_MINUTE_DELAY)
     @Transactional
     public void resendTravelingPhotos() {
-    	// TODO: Maybe some ordering
-    	Page<Long> photoIds = photoSendingDetailsRepository.findTravelingPhotoIdsByLastSentGreatherThan(DateTime.now().minusMinutes(15), new PageRequest(0, 10000));
+    	Page<Long> photoIds = photoSendingDetailsRepository.findTravelingPhotoIdsByLastSentGreatherThan(DateTime.now().minusMinutes(15), new PageRequest(0, 10000, Sort.Direction.DESC, "photoId"));
     	
     	LOGGER.info("Found {} photos that need to be resent.", photoIds.getTotalElements());
     	
