@@ -1,7 +1,11 @@
 package com.sendish.api.service.impl;
 
 import java.util.List;
+import java.util.UUID;
 
+import com.sendish.repository.ImageRepository;
+import com.sendish.repository.InboxMessageRepository;
+import com.sendish.repository.model.jpa.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,9 +19,6 @@ import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
 import com.sendish.repository.HotPhotoRepository;
 import com.sendish.repository.PhotoVoteRepository;
-import com.sendish.repository.model.jpa.HotPhoto;
-import com.sendish.repository.model.jpa.PhotoVote;
-import com.sendish.repository.model.jpa.PhotoVoteId;
 
 @Service
 @Transactional
@@ -38,6 +39,15 @@ public class HotPhotoServiceImpl {
 	
 	@Autowired
     private PhotoVoteRepository photoVoteRepository;
+
+    @Autowired
+    private ImageRepository imageRepository;
+
+    @Autowired
+    private UserInboxServiceImpl userInboxService;
+
+    @Autowired
+    private InboxMessageRepository inboxMessageRepository;
 
     public List<PhotoDto> findAll(Integer page) {
         Page<HotPhoto> photos = hotPhotoRepository.findAll(new PageRequest(page, HOT_PHOTO_PAGE_SIZE, Direction.DESC, "selectedTime"));
@@ -85,7 +95,27 @@ public class HotPhotoServiceImpl {
     }
 
     private void sendCongratsInboxItem(HotPhoto hotPhoto) {
-        // TODO: Create new InboxMessage and send it to the photo owner.
+        InboxMessage inboxMessage = new InboxMessage();
+        inboxMessage.setShortTitle("Your photo ended on hot list!");
+        inboxMessage.setTitle("Congrats! Your photo is on hot list");
+        inboxMessage.setMessage("Woho! Know everybody can see your photo!");
+        inboxMessage.setImage(createImageOutOfPhoto(hotPhoto.getPhoto()));
+
+        inboxMessage = inboxMessageRepository.save(inboxMessage);
+        userInboxService.sendInboxMessage(inboxMessage.getId(), hotPhoto.getPhoto().getUser().getId());
+    }
+
+    private Image createImageOutOfPhoto(Photo photo) {
+        Image image = new Image();
+        image.setContentType(photo.getContentType());
+        image.setHeight(photo.getHeight());
+        image.setWidth(photo.getWidth());
+        image.setSize(photo.getSize());
+        image.setUuid(UUID.randomUUID().toString());
+        image.setStorageId(photo.getStorageId());
+        image.setName(photo.getName());
+
+        return imageRepository.save(image);
     }
 
     public void remove(Long photoId) {
