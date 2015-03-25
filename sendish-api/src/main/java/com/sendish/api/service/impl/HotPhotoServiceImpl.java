@@ -3,8 +3,7 @@ package com.sendish.api.service.impl;
 import java.util.List;
 import java.util.UUID;
 
-import com.sendish.repository.ImageRepository;
-import com.sendish.repository.InboxMessageRepository;
+import com.sendish.repository.*;
 import com.sendish.repository.model.jpa.*;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.sendish.api.dto.HotPhotoDetailsDto;
 import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
-import com.sendish.repository.HotPhotoRepository;
-import com.sendish.repository.PhotoVoteRepository;
 
 @Service
 @Transactional
@@ -48,6 +45,9 @@ public class HotPhotoServiceImpl {
 
     @Autowired
     private InboxMessageRepository inboxMessageRepository;
+
+    @Autowired
+    private PhotoRepository photoRepository;
 
     public List<PhotoDto> findAll(Integer page) {
         Page<HotPhoto> photos = hotPhotoRepository.findAll(new PageRequest(page, HOT_PHOTO_PAGE_SIZE, Direction.DESC, "selectedTime"));
@@ -90,19 +90,21 @@ public class HotPhotoServiceImpl {
         hotPhoto.setPhotoId(photoId);
         hotPhoto.setSelectedTime(DateTime.now());
 
-        hotPhoto = hotPhotoRepository.save(hotPhoto);
-        sendCongratsInboxItem(hotPhoto);
+        hotPhotoRepository.save(hotPhoto);
+
+        Photo photo = photoRepository.findOne(photoId);
+        sendCongratsInboxItem(photo);
     }
 
-    private void sendCongratsInboxItem(HotPhoto hotPhoto) {
+    private void sendCongratsInboxItem(Photo photo) {
         InboxMessage inboxMessage = new InboxMessage();
         inboxMessage.setShortTitle("Your photo ended on hot list!");
         inboxMessage.setTitle("Congrats! Your photo is on hot list");
         inboxMessage.setMessage("Woho! Know everybody can see your photo!");
-        inboxMessage.setImage(createImageOutOfPhoto(hotPhoto.getPhoto()));
+        inboxMessage.setImage(createImageOutOfPhoto(photo));
 
         inboxMessage = inboxMessageRepository.save(inboxMessage);
-        userInboxService.sendInboxMessage(inboxMessage.getId(), hotPhoto.getPhoto().getUser().getId());
+        userInboxService.sendInboxMessage(inboxMessage.getId(), photo.getUser().getId());
     }
 
     private Image createImageOutOfPhoto(Photo photo) {
