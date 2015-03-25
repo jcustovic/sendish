@@ -184,7 +184,9 @@ public class UserServiceImpl {
 
     public void updateSettings(UserSettingsDto userSettings, Long userId) {
         UserDetails userDetails = getUserDetails(userId);
-        userDetails.setReceiveLimitPerDay(userSettings.getReceiveLimitPerDay());
+        if (userSettings.getReceiveLimitPerDay() != null) {
+            userDetails.setReceiveLimitPerDay(userSettings.getReceiveLimitPerDay());
+        }
         userDetails.setReceiveNewPhotoNotifications(userSettings.getReceiveNewPhotoNotifications());
         userDetails.setReceiveCommentNotifications(userSettings.getReceiveCommentNotifications());
         

@@ -13,7 +13,7 @@ public class UserSettingsDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@NotNull
+	//@NotNull
 	@Min(5)
 	@Max(100)
 	private Integer receiveLimitPerDay;
