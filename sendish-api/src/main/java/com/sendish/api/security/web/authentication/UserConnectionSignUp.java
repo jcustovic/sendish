@@ -37,7 +37,6 @@ public class UserConnectionSignUp implements ConnectionSignUp {
         if (user == null) {
             final String randomPassword = UUID.randomUUID().toString();
             User newUser = userService.createUser(username, userProfile.getEmail(), randomPassword, null, false);
-            newUserAutomaticPhotoAndInboxSender.send(newUser);
 
             if (StringUtils.hasText(userProfile.getEmail())) {
                 newUser.setEmailConfirmed(true);
@@ -51,6 +50,7 @@ public class UserConnectionSignUp implements ConnectionSignUp {
 
             LOG.info("Creating user {} with connectionKey {}", username, p_connection.getKey().toString());
             user = userRepository.save(newUser);
+            newUserAutomaticPhotoAndInboxSender.send(newUser);
         } else {
             // If email was not confirmed we should now confirm it
             if (StringUtils.hasText(userProfile.getEmail()) && !user.getEmailConfirmed()) {
