@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -52,7 +54,7 @@ import com.sendish.repository.model.jpa.UserDetails;
 @Transactional
 public class PhotoServiceImpl {
 	
-	// private static final Logger LOGGER = LoggerFactory.getLogger(PhotoServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PhotoServiceImpl.class);
 
     private static final int PHOTO_PAGE_SIZE = 20;
     private static final int PHOTO_LOCATION_PAGE_SIZE = 20;
@@ -382,10 +384,12 @@ public class PhotoServiceImpl {
         photoReceiverRepository.save(photoReceiver);
 
         UserDetails userDetails = userService.getUserDetails(userId);
+        LOGGER.info("--------------------------- {}", userDetails);
         userDetails.setLastReceivedTime(photoReceiver.getCreatedDate());
         userService.saveUserDetails(userDetails);
 
         // TODO: Move to separate method after PhotoReceiver has been saved and committed!
+        LOGGER.info("--------------------------- {} {}", userId, photoId);
         usersReceivedPhotos(userId).add(photoId.toString());
         statisticsService.incrementUserUnseenPhotoCount(userId);
         statisticsService.increaseUserDailyReceivedPhotoCount(userId, photoReceiver.getCreatedDate().toLocalDate());
