@@ -16,11 +16,11 @@ public class PhotoComment extends BaseEntity {
 	private static final long serialVersionUID = 1L;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "pc_photo_id")
+	@JoinColumn(name = "pc_photo_id", nullable = false)
 	private Photo photo;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "pc_user_id")
+	@JoinColumn(name = "pc_user_id", nullable = false)
 	private User user;
 
 	@ManyToOne(fetch = FetchType.LAZY)

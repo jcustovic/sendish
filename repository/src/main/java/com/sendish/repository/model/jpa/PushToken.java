@@ -20,7 +20,7 @@ public abstract class PushToken extends BaseEntity {
     private Date              modifiedDate;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "pt_user_id")
+    @JoinColumn(name = "pt_user_id", nullable = false)
     private User              user;
 
     @Column(name = "pt_dev_token", nullable = false)

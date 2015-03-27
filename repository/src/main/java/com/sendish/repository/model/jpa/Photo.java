@@ -30,7 +30,7 @@ public class Photo extends BaseEntity implements LocationAware {
     private String description;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "p_user_id")
+    @JoinColumn(name = "p_user_id", nullable = false)
     private User user;
 
     @Column(name = "p_deleted", nullable = false)
@@ -67,7 +67,7 @@ public class Photo extends BaseEntity implements LocationAware {
     private Location originLocation;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "p_city_id")
+    @JoinColumn(name = "p_city_id", nullable = false)
     private City city;
 
     @PrePersist

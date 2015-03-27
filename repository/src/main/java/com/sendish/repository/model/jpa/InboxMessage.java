@@ -32,7 +32,7 @@ public class InboxMessage extends BaseEntity {
     private String urlText;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "im_image_id")
+    @JoinColumn(name = "im_image_id", nullable = false)
     private Image image;
 
     @Column(name = "im_created_date", nullable = false)

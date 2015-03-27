@@ -16,7 +16,7 @@ public class NotificationPartialResult extends BaseEntity {
     private static final long        serialVersionUID = 1L;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "npr_notification_msg_id")
+    @JoinColumn(name = "npr_notification_msg_id", nullable = false)
     private NotificationMessage      notification;
 
     @Column(name = "npr_send_date", nullable = false)

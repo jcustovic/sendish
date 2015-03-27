@@ -16,7 +16,7 @@ public class ResizedPhoto extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "rp_photo_id")
+    @JoinColumn(name = "rp_photo_id", nullable = false)
     private Photo photo;
 
     @Column(name = "rp_key", nullable = false)

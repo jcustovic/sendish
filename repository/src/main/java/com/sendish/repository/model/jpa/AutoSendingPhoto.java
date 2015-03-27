@@ -14,7 +14,7 @@ public class AutoSendingPhoto extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "asp_photo_id")
+    @JoinColumn(name = "asp_photo_id", nullable = false)
     private Photo photo;
 
     @Column(name = "asp_active", nullable = false)

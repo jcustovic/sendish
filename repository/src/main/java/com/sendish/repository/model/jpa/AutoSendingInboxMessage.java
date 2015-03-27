@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class AutoSendingInboxMessage extends BaseEntity {
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "asim_im_id")
+    @JoinColumn(name = "asim_im_id", nullable = false)
     private InboxMessage inboxMessage;
 
     @Column(name = "asim_active", nullable = false)

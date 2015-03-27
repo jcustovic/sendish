@@ -16,11 +16,11 @@ public class UserInboxItem extends BaseEntity {
 	private static final long serialVersionUID = 1L;
 
 	@ManyToOne(optional = false)
-    @JoinColumn(name = "uii_user_id")
+    @JoinColumn(name = "uii_user_id", nullable = false)
     private User user;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "uii_inbox_message_id")
+    @JoinColumn(name = "uii_inbox_message_id", nullable = false)
     private InboxMessage inboxMessage;
 
     @Column(name = "uii_first_opened_date", nullable = false)
