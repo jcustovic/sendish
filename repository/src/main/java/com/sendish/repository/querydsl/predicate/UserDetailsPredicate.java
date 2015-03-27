@@ -11,6 +11,8 @@ import java.util.List;
 
 public class UserDetailsPredicate {
 
+    public static final int MINUTES_BETWEEN_RECEIVED_PHOTOS = 10;
+
     public static Predicate searchUsersForSendingPool(DateTime latestUserPhotoReceivedDate) {
         DateTime now = DateTime.now();
         QUserDetails qUserDetails = QUserDetails.userDetails;
@@ -25,6 +27,7 @@ public class UserDetailsPredicate {
         if (latestUserPhotoReceivedDate != null)  {
             andPredicates.add(qUserDetails.lastReceivedTime.isNull()
                     .or(qUserDetails.lastReceivedTime.goe(latestUserPhotoReceivedDate)));
+            andPredicates.add(qUserDetails.lastReceivedTime.lt(now.minusMinutes(MINUTES_BETWEEN_RECEIVED_PHOTOS)));
         }
 
         andPredicates.add(qUserDetails.user.deleted.isFalse());
@@ -46,6 +49,7 @@ public class UserDetailsPredicate {
 
         andPredicates.add(qUserDetails.lastReceivedTime.isNotNull()
                 .and(qUserDetails.lastReceivedTime.lt(oldestUserPhotoReceivedDate)));
+        andPredicates.add(qUserDetails.lastReceivedTime.lt(now.minusMinutes(MINUTES_BETWEEN_RECEIVED_PHOTOS)));
 
         andPredicates.add(qUserDetails.user.deleted.isFalse());
         andPredicates.add(qUserDetails.user.disabled.isFalse());

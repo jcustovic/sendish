@@ -1,7 +1,6 @@
 package com.sendish.api.service.impl;
 
 import com.sendish.api.distributor.PhotoDistributor;
-import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.PhotoSendingDetailsRepository;
 import com.sendish.repository.model.jpa.*;
 
@@ -16,9 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PhotoSenderServiceImpl {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PhotoSenderServiceImpl.class);
-
-    @Autowired
-    private PhotoRepository photoRepository;
 
     @Autowired
     private PhotoSendingDetailsRepository photoSendingDetailsRepository;

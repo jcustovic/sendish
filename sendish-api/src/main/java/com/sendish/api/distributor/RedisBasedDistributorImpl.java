@@ -2,7 +2,6 @@ package com.sendish.api.distributor;
 
 import com.sendish.api.redis.KeyUtils;
 import com.sendish.api.service.impl.PhotoServiceImpl;
-import com.sendish.api.service.impl.UserServiceImpl;
 import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoReceiver;
 
@@ -22,9 +21,6 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 
     @Autowired
     private UserPool userPool;
-
-    @Autowired
-    private UserServiceImpl userService;
 
     @Autowired
     private PhotoServiceImpl photoService;
@@ -63,13 +59,11 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
             } else if (lockUser(userId)) {
                 if (photoService.hasAlreadyReceivedPhoto(photoId, userId)) {
                     unlockUser(userId);
-                } else if (userService.canReceivePhoto(userId)) {
+                } else {
                     PhotoReceiver photoReceiver = photoService.sendPhotoToUser(photoId, userId);
                     userPool.remove(userIdString);
 
                     return photoReceiver;
-                } else {
-                	unlockUser(userId);
                 }
             }
         }
