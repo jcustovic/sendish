@@ -44,6 +44,10 @@ public class StatisticsServiceImpl {
 		statisticsRepository.resetUserUnseenCount(userId);
 	}
 
+	public void resetUnreadInboxItemCount(Long userId) {
+		statisticsRepository.resetUnreadInboxItemCount(userId);
+	}
+
 	public void trackReceivedPhotoOpened(Long photoId, Long userId, Long cityId) {
 		statisticsRepository.trackReceivedPhotoOpened(photoId, userId, cityId);
 	}

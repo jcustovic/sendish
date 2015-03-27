@@ -49,7 +49,13 @@ public class UserInboxServiceImpl {
     public List<InboxItemDto> findAll(Long userId, Integer page) {
         List<UserInboxItem> inboxItems = userInboxItemRepository.findByUserId(userId, new PageRequest(page, INBOX_PAGE_SIZE, Sort.Direction.DESC, "createdDate"));
 
-        return mapToInboxItemDto(inboxItems);
+        List<InboxItemDto> result = mapToInboxItemDto(inboxItems);
+
+        if (page == 0) {
+            statisticsService.resetUnreadInboxItemCount(userId);
+        }
+
+        return result;
     }
 
     public UserInboxItem findOne(Long itemId, Long userId) {

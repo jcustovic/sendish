@@ -165,6 +165,10 @@ public class RedisStatisticsRepository {
     public void resetUserUnseenCount(Long userId) {
         userStatistics(userId).put("total.unseenPhotoCount", "0");
     }
+
+    public void resetUnreadInboxItemCount(Long userId) {
+        userStatistics(userId).put("total.unreadInboxItemCount", "0");
+    }
     
     public void incrementUnreadInboxItemCount(Long userId) {
         userStatistics(userId).increment("total.unreadInboxItemCount", 1);
