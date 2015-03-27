@@ -21,12 +21,12 @@ public class PhotoReceiver extends BaseEntity {
 	private static final long serialVersionUID = 1L;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "pr_photo_id")
+	@JoinColumn(name = "pr_photo_id", nullable = false)
 	@Fetch(FetchMode.JOIN)
 	private Photo photo;
 
-	@ManyToOne(optional = false, cascade = CascadeType.PERSIST)
-	@JoinColumn(name = "pr_user_id")
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "pr_user_id", nullable = false)
 	private User user;
 
 	@Column(name = "pr_deleted", nullable = false)
