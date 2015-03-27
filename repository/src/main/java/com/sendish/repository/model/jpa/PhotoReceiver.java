@@ -25,7 +25,7 @@ public class PhotoReceiver extends BaseEntity {
 	@Fetch(FetchMode.JOIN)
 	private Photo photo;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, cascade = CascadeType.PERSIST)
 	@JoinColumn(name = "pr_user_id")
 	private User user;
 

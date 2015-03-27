@@ -37,12 +37,9 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
      * STEP 2: Has user received a photo?
      *
      * STEP 3a: Yes: Unlock and try next user!
-     * STEP 3b: No : Can we send to that user (check all conditions; limits, already received etc.)
+     * STEP 3b: No: Send photo, remove user from the list and return true
      *
-     * STEP 4a: No : Remove the user from the list because some limit exceeded!
-     * STEP 4b: Yes: Send photo, remove user from the list and return true
-     *
-     * NOTE: If we don't find any user return false!
+     * NOTE: If we don't find any user return null!
      */
     @Override
     public PhotoReceiver sendPhoto(Long photoId) {

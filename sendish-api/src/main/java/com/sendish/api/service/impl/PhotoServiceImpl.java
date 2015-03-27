@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -54,7 +52,7 @@ import com.sendish.repository.model.jpa.UserDetails;
 @Transactional
 public class PhotoServiceImpl {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(PhotoServiceImpl.class);
+	// private static final Logger LOGGER = LoggerFactory.getLogger(PhotoServiceImpl.class);
 
     private static final int PHOTO_PAGE_SIZE = 20;
     private static final int PHOTO_LOCATION_PAGE_SIZE = 20;
@@ -227,9 +225,6 @@ public class PhotoServiceImpl {
         	if (vote != null) {
         		photoDetailsDto.setLike(vote.getLike());
                 photoDetailsDto.setReport(vote.getReport());		
-        	} else {
-        		// TODO: Remove this. I use it just to see how often this happens
-        		LOGGER.error("Photo with id {} was opened by user with id {} but vote not found", photoId, userId);
         	}
         }
         
