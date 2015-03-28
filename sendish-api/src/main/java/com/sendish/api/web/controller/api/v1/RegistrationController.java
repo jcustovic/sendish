@@ -47,10 +47,10 @@ public class RegistrationController {
 
     @ApiIgnore
     @RequestMapping(value = "/verify", method = { RequestMethod.POST, RequestMethod.GET }) // TODO: It should be POST but for simplicity and be able to invoke as a <a href...>
-    public ResponseEntity<?> verifyRegistration(@RequestParam String token, @RequestParam String username) {
+    public ResponseEntity<Void> verifyRegistration(@RequestParam String token, @RequestParam String username) {
         boolean success = false;
         if (StringUtils.hasText(username) && StringUtils.hasText(token)) {
-            success = registrationService.verifyToken(token, username);
+            success = registrationService.verifyRegistrationToken(token, username);
         }
 
         if (success) {
@@ -65,8 +65,25 @@ public class RegistrationController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "Reset password email is sent (NOTE: Only if a user exists in the system).", response = Void.class)
     })
-    public void resetPassword(@PathVariable String username) {
+    public void sendResetPasswordEmail(@PathVariable String username) {
         // TODO: Implement me, send email with reset link
+    }
+    
+    @RequestMapping(value = "/reset-password/change", method = RequestMethod.POST)
+    @ApiOperation(value = "Submit change password", notes = "After user click on reset password link via email.")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Password is changed", response = Void.class),
+        @ApiResponse(code = 400, message = "Valildation errors.", response = Void.class),
+        @ApiResponse(code = 404, message = "Invalid user", response = Void.class)
+    })
+    public ResponseEntity<Void> resetPassword(@RequestParam String username, @RequestParam String token, @RequestParam String newPassword) {
+    	boolean success = registrationService.verifyChangePasswordToken(token, username);
+    	
+    	if (success) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 }

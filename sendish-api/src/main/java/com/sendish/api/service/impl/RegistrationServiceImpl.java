@@ -73,12 +73,13 @@ public class RegistrationServiceImpl {
 		}
 	}
 
-	public boolean verifyToken(String token, String username) {
+	public boolean verifyRegistrationToken(String token, String username) {
         final User user = userRepository.findByUsernameIgnoreCase(username);
         if (user == null || Boolean.TRUE.equals(user.getEmailConfirmed())) {
             return false;
         } else if (token != null && token.equals(user.getVerificationCode())) {
             user.setEmailConfirmed(true);
+            user.setVerificationCode(null);
             userRepository.save(user);
             newUserAutomaticPhotoAndInboxSender.send(user);
 
@@ -87,5 +88,14 @@ public class RegistrationServiceImpl {
 
         return false;
     }
+
+	public boolean verifyChangePasswordToken(String token, String username) {
+		final User user = userRepository.findByUsernameIgnoreCase(username);
+		if (user == null) {
+			return false;
+		}
+		
+		return token.equals(user.getVerificationCode());
+	}
 
 }
