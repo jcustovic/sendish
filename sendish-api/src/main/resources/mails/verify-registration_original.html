@@ -776,101 +776,90 @@
 <table class="body">
     <tr>
         <td class="center" align="center" valign="top">
-            <center>
+           <table class="row header">
+               <tr>
+                   <td class="center" align="center">
+                      <table class="container">
+                          <tr>
+                              <td class="wrapper last">
 
-                <table class="row header">
-                    <tr>
-                        <td class="center" align="center">
-                            <center>
+                                  <table class="twelve columns">
+                                      <tr>
+                                          <td class="six sub-columns">
+                                              <img class="center" th:src="'cid:logoImage'" src="../web/static/images/sendish_mustache_white_150x78.png" />
+                                          </td>
+                                      </tr>
+                                  </table>
 
-                                <table class="container">
-                                    <tr>
-                                        <td class="wrapper last">
+                              </td>
+                          </tr>
+                      </table>
+                   </td>
+               </tr>
+           </table>
 
-                                            <table class="twelve columns">
-                                                <tr>
-                                                    <td class="six sub-columns">
-                                                        <img class="center" th:src="'cid:logoImage'" src="../web/static/images/sendish_mustache_white_150x78.png" />
-                                                    </td>
-                                                </tr>
-                                            </table>
+           <br />
+           <table class="container">
+               <tr>
+                   <td>
 
-                                        </td>
-                                    </tr>
-                                </table>
+                       <!-- content start -->
+                       <table class="row">
+                           <tr>
+                               <td class="wrapper last">
 
-                            </center>
-                        </td>
-                    </tr>
-                </table>
+                                   <table class="twelve columns">
+                                       <tr>
+                                           <td>
+                                               <h1 th:if="${!#strings.isEmpty(user.nickname)}" th:text="${'Welcome to Sendish, ' + user.nickname + '!'}">Welcome to Sendish, Nickname!</h1>
+                                               <h1 th:unless="${!#strings.isEmpty(user.nickname)}" th:text="${'Welcome to Sendish, ' + user.email}">Welcome to Sendish, Nickname!</h1>
+                                               <p>Confirm your email address by clicking on the button bellow and start sendish your photos.</p>
+                                           </td>
+                                           <td class="expander"></td>
+                                       </tr>
+                                   </table>
 
-                <br>
+                                   <table class="six columns">
+                                       <tr>
+                                           <td>
+                                               <table class="button">
+                                                   <tr>
+                                                       <td>
+                                                           <a th:href="@{https://www.sendish.com/verify-email(token=${user.verificationCode},username=${user.username})}" href="#">Confirm your email address</a>
+                                                       </td>
+                                                   </tr>
+                                               </table>
+                                           </td>
+                                       </tr>
+                                   </table>
+                               </td>
+                           </tr>
+                       </table>
 
-                <table class="container">
-                    <tr>
-                        <td>
+                       <br />
+                       <br />
+                       <!-- Legal + Unsubscribe -->
+                       <table class="row">
+                           <tr>
+                               <td class="wrapper last">
 
-                            <!-- content start -->
-                            <table class="row">
-                                <tr>
-                                    <td class="wrapper last">
+                                   <table class="twelve columns">
+                                       <tr>
+                                           <td align="center">
+                                               <p style="text-align:center;"><a href="http://www.sendish.com/terms">Terms</a> | <a href="http://www.sendish.com/privacy">Privacy</a></p>
+                                           </td>
+                                           <td class="expander"></td>
+                                       </tr>
+                                   </table>
 
-                                        <table class="twelve columns">
-                                            <tr>
-                                                <td>
-                                                    <h1 th:if="${!#strings.isEmpty(user.nickname)}" th:text="${'Welcome to Sendish, ' + user.nickname + '!'}">Welcome to Sendish, Nickname!</h1>
-                                                    <h1 th:unless="${!#strings.isEmpty(user.nickname)}" th:text="${'Welcome to Sendish, ' + user.email}">Welcome to Sendish, Nickname!</h1>
-                                                    <p>Confirm your email address by clicking on the button bellow and start sendish your photos.</p>
-                                                </td>
-                                                <td class="expander"></td>
-                                            </tr>
-                                        </table>
+                               </td>
+                           </tr>
+                       </table>
 
-                                        <table class="six columns">
-                                            <tr>
-                                                <td>
-                                                    <table class="button">
-                                                        <tr>
-                                                            <td>
-                                                                <a th:href="@{https://www.sendish.com/verify-email(token=${user.verificationCode},username=${user.username})}" href="#">Confirm your email address</a>
-                                                            </td>
-                                                        </tr>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <br>
-                            <br>
-                            <!-- Legal + Unsubscribe -->
-                            <table class="row">
-                                <tr>
-                                    <td class="wrapper last">
-
-                                        <table class="twelve columns">
-                                            <tr>
-                                                <td align="center">
-                                                    <center>
-                                                        <p style="text-align:center;"><a href="http://www.sendish.com/terms">Terms</a> | <a href="http://www.sendish.com/privacy">Privacy</a></p>
-                                                    </center>
-                                                </td>
-                                                <td class="expander"></td>
-                                            </tr>
-                                        </table>
-
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <!-- container end below -->
-                        </td>
-                    </tr>
-                </table>
-
-            </center>
+                       <!-- container end below -->
+                   </td>
+               </tr>
+           </table>
         </td>
     </tr>
 </table>

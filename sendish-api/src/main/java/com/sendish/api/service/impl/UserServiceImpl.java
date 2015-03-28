@@ -66,7 +66,7 @@ public class UserServiceImpl {
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
-        user.setPassword(shaPasswordEncoder.encodePassword(password, null));
+        user.setPassword(encodePassword(password));
         user.setNickname(nickname);
         user.setEmailRegistration(emailRegistration);
 
@@ -211,14 +211,18 @@ public class UserServiceImpl {
 
     public void changePassword(ChangePasswordDto changePassword) {
         User user = findOne(changePassword.getUserId());
-        user.setPassword(shaPasswordEncoder.encodePassword(changePassword.getNewPassword(), null));
+        user.setPassword(encodePassword(changePassword.getNewPassword()));
 
-        String oldPass = shaPasswordEncoder.encodePassword(changePassword.getOldPassword(), null);
+        String oldPass = encodePassword(changePassword.getOldPassword());
         if (!oldPass.equals(user.getPassword())) {
             throw new IllegalArgumentException("Old password doesn't match");
         }
 
         userRepository.save(user);
+    }
+    
+    public String encodePassword(String password) {
+    	return shaPasswordEncoder.encodePassword(password, null);
     }
 
 }

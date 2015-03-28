@@ -1,7 +1,5 @@
 package com.sendish.api.service.impl;
 
-import javax.validation.ConstraintViolationException;
-
 import com.sendish.api.exception.ResizeFailedException;
 import com.sendish.api.service.ResizePhotoService;
 import com.sendish.repository.model.jpa.ResizedPhoto;
@@ -9,6 +7,7 @@ import com.sendish.repository.model.jpa.ResizedPhoto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service("retryableResizePhotoService")
@@ -24,7 +23,7 @@ public class RetryableResizePhotoServiceImpl implements ResizePhotoService {
     	try {
 	    	try {
 	    		return resizePhotoService.getResizedPhoto(photoId, sizeKey);
-	    	} catch (ConstraintViolationException e) {
+	    	} catch (DataIntegrityViolationException e) {
 	    		// Multiple request at the same time can do a resize. The second time it should work!
 	    		return resizePhotoService.getResizedPhoto(photoId, sizeKey);
 	    	}

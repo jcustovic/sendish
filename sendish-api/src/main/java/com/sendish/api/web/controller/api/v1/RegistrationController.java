@@ -1,19 +1,28 @@
 package com.sendish.api.web.controller.api.v1;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.mangofactory.swagger.annotations.ApiIgnore;
-import com.sendish.api.web.controller.model.ValidationError;
-import com.sendish.api.web.controller.validator.UserRegistrationValidator;
 import com.sendish.api.dto.UserRegistration;
 import com.sendish.api.service.impl.RegistrationServiceImpl;
+import com.sendish.api.web.controller.model.ValidationError;
+import com.sendish.api.web.controller.validator.UserRegistrationValidator;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
@@ -23,6 +32,8 @@ import com.wordnik.swagger.annotations.ApiResponses;
 @RequestMapping("/api/v1.0/registration")
 @Api(value = "registration", description = "Email registration, forgotten password")
 public class RegistrationController {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationController.class);
 
     @Autowired
     private UserRegistrationValidator userRegistrationValidator;
@@ -65,8 +76,14 @@ public class RegistrationController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "Reset password email is sent (NOTE: Only if a user exists in the system).", response = Void.class)
     })
-    public void sendResetPasswordEmail(@PathVariable String username) {
-        // TODO: Implement me, send email with reset link
+    public ResponseEntity<Void> sendResetPasswordEmail(@PathVariable String username) {
+    	try {
+			registrationService.sendResetPasswordEmail(username);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (MessagingException e) {
+			LOGGER.error("Error resetting password", e);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
     }
     
     @RequestMapping(value = "/reset-password/change", method = RequestMethod.POST)
@@ -77,7 +94,7 @@ public class RegistrationController {
         @ApiResponse(code = 404, message = "Invalid user", response = Void.class)
     })
     public ResponseEntity<Void> resetPassword(@RequestParam String username, @RequestParam String token, @RequestParam String newPassword) {
-    	boolean success = registrationService.verifyChangePasswordToken(token, username);
+    	boolean success = registrationService.verifyTokenaAndChangePassword(token, username, newPassword);
     	
     	if (success) {
             return new ResponseEntity<>(HttpStatus.OK);

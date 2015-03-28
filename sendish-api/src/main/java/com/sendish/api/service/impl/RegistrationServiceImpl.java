@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.mail.MessagingException;
 
@@ -47,10 +48,8 @@ public class RegistrationServiceImpl {
 		Map<String, Object> variables = new HashMap<>();
 		variables.put("user", user);
 		
-		Map<String, byte[]> inlineImages = getInlineImages();
-		
 		try {
-			mailSenderService.sendEmail(user.getEmail(), fromEmail, "Welcome to Sendish", variables, "verify-registration", inlineImages);
+			mailSenderService.sendEmail(user.getEmail(), fromEmail, "Welcome to Sendish", variables, "verify-registration", getInlineImages());
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);
 		}
@@ -89,13 +88,28 @@ public class RegistrationServiceImpl {
         return false;
     }
 
-	public boolean verifyChangePasswordToken(String token, String username) {
+	public boolean verifyTokenaAndChangePassword(String token, String username, String newPassword) {
 		final User user = userRepository.findByUsernameIgnoreCase(username);
-		if (user == null) {
+		if (user == null || !token.equals(user.getVerificationCode())) {
 			return false;
 		}
+		user.setPassword(userService.encodePassword(newPassword));
+		user.setVerificationCode(null);
+		userRepository.save(user);
 		
-		return token.equals(user.getVerificationCode());
+		return true;
+	}
+
+	public void sendResetPasswordEmail(String username) throws MessagingException {
+		final User user = userRepository.findByUsernameIgnoreCase(username);
+		if (user != null) {
+			user.setVerificationCode(UUID.randomUUID().toString());
+			userRepository.save(user);
+			
+			Map<String, Object> variables = new HashMap<>();
+			variables.put("user", user);
+			mailSenderService.sendEmail(user.getEmail(), fromEmail, "Sendish reset password", variables, "reset-password", getInlineImages());
+		}
 	}
 
 }
