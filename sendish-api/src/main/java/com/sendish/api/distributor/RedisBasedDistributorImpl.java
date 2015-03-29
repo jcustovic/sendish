@@ -59,7 +59,9 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
     private List<PhotoReceiver> sendPhoto(Long photoId, boolean checkForAlreadyReceived, int receiverCount) {
     	UserBlock userBlock = getUserBlock(receiverCount);
         try {
-        	LOGGER.debug("Got user block {} for photo {}", userBlock, photoId);
+        	if (LOGGER.isDebugEnabled()) {
+        		LOGGER.debug("Got user block {} for photo {} (Pool size: {})", userBlock, photoId, userPool.getPoolSize());	
+        	}
         	Photo photo = photoService.findOne(photoId);
         	String photoOwnerIdString = photo.getUser().getId().toString();
 	    	Collection<String> users = userBlock.getUsers();
