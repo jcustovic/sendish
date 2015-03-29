@@ -30,9 +30,11 @@ public class UserRegistrationValidator implements Validator {
     		}
     	}
     	
-    	User user = userService.findByUsernameIgnoreCaseOrEmailIgnoreCase(userReg.getEmail(), userReg.getEmail());
-    	if (user != null) {
-    		errors.rejectValue("email", null, "Email already exists");
+    	if (!errors.hasFieldErrors("email")) {
+	    	User user = userService.findByUsernameIgnoreCaseOrEmailIgnoreCase(userReg.getEmail(), userReg.getEmail());
+	    	if (user != null) {
+	    		errors.rejectValue("email", null, "Email already exists");
+	    	}
     	}
     }
 

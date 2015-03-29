@@ -3,8 +3,10 @@ package com.sendish.repository;
 import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoReceiver;
 
+import org.joda.time.DateTime;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,5 +26,9 @@ public interface PhotoReceiverRepository extends JpaRepository<PhotoReceiver, Lo
     PhotoReceiver findByPhotoIdAndUserId(Long photoId, Long userId);
 
     List<PhotoReceiver> findByPhotoIdAndOpenedDateNotNull(Long photoId, Pageable pageRequest);
+
+    @Modifying
+    @Query("UPDATE PhotoReceiver pr SET pr.deleted = true WHERE pr.openedDate IS NULL AND pr.createdDate < ?1")
+	Integer deleteUnopenedOlderThan(DateTime olderThan);
 
 }

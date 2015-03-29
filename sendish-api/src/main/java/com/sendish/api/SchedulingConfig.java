@@ -20,7 +20,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     public ThreadPoolTaskScheduler taskScheduler()  {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(20);
-        scheduler.setThreadNamePrefix("task-");
+        scheduler.setThreadNamePrefix("scheduled-task-");
         scheduler.setAwaitTerminationSeconds(60);
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
 
