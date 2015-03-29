@@ -141,6 +141,9 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 
 	private int getBestSlotForBlockSize(Integer blockSize) {
 		int[] possibleSlots = slotMap.putIfAbsent(blockSize, new int[MAX_USER_FOR_SLOT_CALCULATION / blockSize]);
+		if (possibleSlots == null) {
+			possibleSlots = slotMap.get(blockSize);
+		}
 		synchronized (possibleSlots) {
 			int minOccupancy = Integer.MAX_VALUE;
 			int minIndex = 0;

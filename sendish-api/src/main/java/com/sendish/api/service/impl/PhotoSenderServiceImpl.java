@@ -56,7 +56,7 @@ public class PhotoSenderServiceImpl {
         }
 
         List<PhotoReceiver> receivers = photoDistributor.resendPhoto(photoId);
-        if (receivers == null) {
+        if (receivers.isEmpty()) {
             photoSendingDetails.setSendStatus(PhotoSendStatus.NO_USER);
         } else {
         	photoSendingDetails.setPhotoStatus(PhotoStatus.TRAVELING);
