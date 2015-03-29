@@ -9,9 +9,16 @@ public interface UserPool {
 
     String getNext();
 
-    Collection<String> getNext(int n);
+    Collection<String> getNext(int size);
 
-    Collection<String> getNextWithOffset(int offset, int n);
+    /**
+     * start and end are inclusive ranges, so for example  "0 1" will return both the first and the second element of the pool.
+     * 
+     * @param start
+     * @param end
+     * @return
+     */
+    Collection<String> getNext(int start, int end);
 
     UserWithScore getLastWithScore();
     

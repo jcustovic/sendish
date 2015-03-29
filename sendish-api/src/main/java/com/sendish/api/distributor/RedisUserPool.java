@@ -39,13 +39,13 @@ public class RedisUserPool implements UserPool {
     }
 
     @Override
-    public Collection<String> getNext(int n) {
-        return userPool.range(0, n);
+    public Collection<String> getNext(int size) {
+        return userPool.range(0, size - 1);
     }
 
     @Override
-    public Collection<String> getNextWithOffset(int offset, int n) {
-        return userPool.range(offset, n);
+    public Collection<String> getNext(int start, int end) {
+        return userPool.range(start, end);
     }
 
     @Override

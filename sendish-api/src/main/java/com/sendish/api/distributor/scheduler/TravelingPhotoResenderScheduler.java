@@ -35,6 +35,7 @@ public class TravelingPhotoResenderScheduler {
     	LOGGER.info("Found {} photos that need to be resent.", photoIds.getTotalElements());
     	
     	photoIds.getContent().stream().forEach(p -> photoSenderService.resendPhoto(p));
+    	LOGGER.info("Sending finished.");
     }
 
 }

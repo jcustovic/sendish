@@ -30,11 +30,13 @@ public class NewNotSentPhotoScheduler {
     @Scheduled(fixedDelay = HALF_MINUTE_DELAY)
     @Transactional
     public void resendNewUnsentPhotos() {
-    	Page<Long> photoIds = photoSendingDetailsRepository.findIdsByPhotoStatusAndSendStatus(PhotoStatus.NEW, PhotoSendStatus.NO_USER, new PageRequest(0, 1000));
+    	Page<Long> photoIds = photoSendingDetailsRepository.findIdsByPhotoStatusAndSendStatus(PhotoStatus.NEW, PhotoSendStatus.NO_USER, new PageRequest(0, 10000));
     	
     	LOGGER.info("Found {} new photos that were not sent immediately.", photoIds.getTotalElements());
     	
     	photoIds.getContent().stream().forEach(p -> photoSenderService.resendPhoto(p));
+    	
+    	LOGGER.info("Sending finished.");
     }
 
 }

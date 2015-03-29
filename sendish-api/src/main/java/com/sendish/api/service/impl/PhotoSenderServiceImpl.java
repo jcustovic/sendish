@@ -1,5 +1,7 @@
 package com.sendish.api.service.impl;
 
+import java.util.List;
+
 import com.sendish.api.distributor.PhotoDistributor;
 import com.sendish.repository.PhotoSendingDetailsRepository;
 import com.sendish.repository.model.jpa.*;
@@ -31,14 +33,14 @@ public class PhotoSenderServiceImpl {
         photoSendingDetails = new PhotoSendingDetails();
         photoSendingDetails.setPhotoId(photoId);
 
-        PhotoReceiver result = photoDistributor.sendPhoto(photoId);
-        if (result == null) {
+        List<PhotoReceiver> receivers = photoDistributor.sendNewPhoto(photoId);
+        if (receivers.isEmpty()) {
             photoSendingDetails.setPhotoStatus(PhotoStatus.NEW);
             photoSendingDetails.setSendStatus(PhotoSendStatus.NO_USER);
         } else {
             photoSendingDetails.setPhotoStatus(PhotoStatus.TRAVELING);
             photoSendingDetails.setSendStatus(PhotoSendStatus.SENT);
-            photoSendingDetails.setLastReceiver(result);
+            photoSendingDetails.setLastReceiver(receivers.get(receivers.size() - 1));
         }
 
         return photoSendingDetailsRepository.save(photoSendingDetails);
@@ -53,13 +55,13 @@ public class PhotoSenderServiceImpl {
         	return;
         }
 
-        PhotoReceiver result = photoDistributor.sendPhoto(photoId);
-        if (result == null) {
+        List<PhotoReceiver> receivers = photoDistributor.resendPhoto(photoId);
+        if (receivers == null) {
             photoSendingDetails.setSendStatus(PhotoSendStatus.NO_USER);
         } else {
         	photoSendingDetails.setPhotoStatus(PhotoStatus.TRAVELING);
             photoSendingDetails.setSendStatus(PhotoSendStatus.SENT);
-            photoSendingDetails.setLastReceiver(result);
+            photoSendingDetails.setLastReceiver(receivers.get(receivers.size() - 1));
         }
         
         photoSendingDetailsRepository.save(photoSendingDetails);
@@ -71,6 +73,8 @@ public class PhotoSenderServiceImpl {
 			LOGGER.info("Photo with id {} doesn't have last receiver. It is probably auto sender photo!", photoId);
 			return;
 		}
+		
+		// TODO: Maybe resend on every like! How to cope with PhotoSendingDetails @Version?
 		Long lastPhotoReceiverId = photoSendingDetails.getLastReceiver().getId();
 		
 		if (lastPhotoReceiverId.equals(photoReceiverId)) {

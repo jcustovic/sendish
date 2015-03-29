@@ -65,7 +65,7 @@ public class UserProfileController {
         @ApiResponse(code = 200, message = "User location was updated", response = Void.class),
         @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
     })
-    public void resetPassword(@Valid @RequestBody LocationDto newLocation, AuthUser authUser) {
+    public void updateLocation(@Valid @RequestBody LocationDto newLocation, AuthUser authUser) {
         userService.updateLocation(authUser.getUserId(), newLocation.getLongitude(), newLocation.getLatitude());
     }
 

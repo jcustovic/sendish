@@ -153,7 +153,7 @@ public class UserServiceImpl {
         }
     }
 
-    public void updateStatisticsForNewSentPhoto(Long userId, DateTime photoDate, Location location, City city) {
+    public void updateUserLocationAndStatistics(Long userId, DateTime photoDate, Location location, City city) {
         UserDetails userDetails = getUserDetails(userId);
         userDetails.setLastSentTime(photoDate);
         userDetails.setLastLocationTime(photoDate);

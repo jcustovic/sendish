@@ -155,7 +155,7 @@ public class PhotoServiceImpl {
 
         photo = photoRepository.save(photo);
         photoStatisticsService.createNew(photo.getId());
-        userService.updateStatisticsForNewSentPhoto(userId, uploadedDate, location, city);
+        userService.updateUserLocationAndStatistics(userId, uploadedDate, location, city);
         
         User user = userRepository.findOne(userId);
         rankingService.addPointsForNewSendish(user);
