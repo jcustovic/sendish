@@ -24,11 +24,12 @@ public class RetryableResizePhotoServiceImpl implements ResizePhotoService {
 	    	try {
 	    		return resizePhotoService.getResizedPhoto(photoId, sizeKey);
 	    	} catch (DataIntegrityViolationException e) {
+	    		LOGGER.info("Photo {} resize attempt failed (Error: {}). Retrying...", photoId, e.getMessage());
 	    		// Multiple request at the same time can do a resize. The second time it should work!
 	    		return resizePhotoService.getResizedPhoto(photoId, sizeKey);
 	    	}
     	} catch (Exception e) {
-    		LOGGER.error("Resize failed exception", e);
+    		LOGGER.error("Resize photo " + photoId + " for key " + sizeKey + " failed exception", e);
     		throw new ResizeFailedException(e);
     	}
     }

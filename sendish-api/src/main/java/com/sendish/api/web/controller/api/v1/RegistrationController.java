@@ -90,17 +90,21 @@ public class RegistrationController {
     @ApiOperation(value = "Submit change password", notes = "After user click on reset password link via email.")
     @ApiResponses({
         @ApiResponse(code = 200, message = "Password is changed", response = Void.class),
-        @ApiResponse(code = 400, message = "Valildation errors.", response = Void.class),
+        @ApiResponse(code = 400, message = "Password must not be empty", response = Void.class),
         @ApiResponse(code = 404, message = "Invalid user", response = Void.class)
     })
     public ResponseEntity<Void> resetPassword(@RequestParam String username, @RequestParam String token, @RequestParam String newPassword) {
-    	boolean success = registrationService.verifyTokenaAndChangePassword(token, username, newPassword);
-    	
-    	if (success) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    	if (StringUtils.hasText(newPassword)) {
+    		boolean success = registrationService.verifyTokenaAndChangePassword(token, username, newPassword);
+        	
+        	if (success) {
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }	
+    	} else {
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
     }
 
 }
