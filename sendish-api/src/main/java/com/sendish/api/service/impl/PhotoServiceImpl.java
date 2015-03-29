@@ -456,7 +456,7 @@ public class PhotoServiceImpl {
         	dto.setLiked(vote.getLike());
         }
         dto.setLocation(CityUtils.getTrimmedLocationName(photoReceiver.getCity()));
-        dto.setTimeAgo(prettyTime.format(photoReceiver.getCreatedDate().toDate()));
+        dto.setTimeAgo(prettyTime.format(photoReceiver.getOpenedDate().toDate()));
         dto.setId(photoReceiver.getId());
 
         return dto;

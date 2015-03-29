@@ -137,7 +137,7 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 	
 	private void releaseUserBlock(UserBlock userBlock) {
 		int[] slots = slotMap.get(userBlock.getBlockSize());
-		int newOccupancy = slots[userBlock.getSlot()]--;
+		int newOccupancy = --slots[userBlock.getSlot()];
 		LOGGER.trace("Released slot {} (new occupancy: {}) for block size {}", userBlock.getSlot(), newOccupancy, userBlock.getBlockSize());
 	}
 
