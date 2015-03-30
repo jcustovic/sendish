@@ -15,7 +15,7 @@ public class AsyncConfig extends AsyncConfigurerSupport {
 	@Override
 	public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor scheduler = new ThreadPoolTaskExecutor();
-        scheduler.setCorePoolSize(5);
+        scheduler.setCorePoolSize(20);
         scheduler.setMaxPoolSize(30);
         scheduler.setThreadNamePrefix("async-task-");
         scheduler.setAwaitTerminationSeconds(60);

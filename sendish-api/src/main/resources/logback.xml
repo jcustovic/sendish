@@ -45,7 +45,7 @@
 
     <logger name="com.sendish.api" level="debug" />
     <logger name="com.sendish.api.security" level="info" />
-    <logger name="com.sendish.api.distributor" level="trace" />
+    <logger name="com.sendish.api.distributor" level="debug" />
 
     <logger name="com.mangofactory.swagger" level="warn" />
     <logger name="org.springframework.boot.actuate" level="warn" />
