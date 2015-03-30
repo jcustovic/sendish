@@ -5,6 +5,7 @@ import java.util.concurrent.Executor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurerSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 @Configuration
@@ -13,8 +14,9 @@ public class AsyncConfig extends AsyncConfigurerSupport {
 
 	@Override
 	public Executor getAsyncExecutor() {
-		ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(30);
+        ThreadPoolTaskExecutor scheduler = new ThreadPoolTaskExecutor();
+        scheduler.setCorePoolSize(5);
+        scheduler.setMaxPoolSize(30);
         scheduler.setThreadNamePrefix("async-task-");
         scheduler.setAwaitTerminationSeconds(60);
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
