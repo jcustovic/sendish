@@ -57,11 +57,10 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 	}
 
     private List<PhotoReceiver> sendPhoto(Long photoId, boolean checkForAlreadyReceived, int receiverCount) {
-    	UserBlock userBlock = getUserBlock(receiverCount);
+		Long poolSize = userPool.getPoolSize(); // TODO: Maybe local caching for few min?
+    	UserBlock userBlock = getUserBlock(receiverCount, poolSize);
         try {
-        	if (LOGGER.isDebugEnabled()) {
-        		LOGGER.debug("Got user block {} for photo {} (Pool size: {})", userBlock, photoId, userPool.getPoolSize());	
-        	}
+			LOGGER.debug("Got user block {} for photo {} (Pool size: {})", userBlock, photoId, userPool.getPoolSize());
         	Photo photo = photoService.findOne(photoId);
         	String photoOwnerIdString = photo.getUser().getId().toString();
 	    	Collection<String> users = userBlock.getUsers();
@@ -116,13 +115,13 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 		return null;
 	}
 
-	private UserBlock getUserBlock(int requiredSize) {
+	private UserBlock getUserBlock(int requiredSize, Long poolSize) {
     	int blockSize = requiredSize * 2;
     	if (blockSize > MAX_USER_FOR_SLOT_CALCULATION) {
     		throw new IllegalArgumentException("Required size must not be greater than " + MAX_USER_FOR_SLOT_CALCULATION / 2);
     	}
     	LOGGER.trace("Trying to get slot for block size {}", blockSize);
-    	int slot = getBestSlotForBlockSize(blockSize);
+    	int slot = getBestSlotForBlockSize(blockSize, poolSize);
     	LOGGER.trace("Slot {} found for block size {}", slot, blockSize);
     	
     	int start = slot * blockSize;
@@ -141,15 +140,20 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 		LOGGER.trace("Released slot {} (new occupancy: {}) for block size {}", userBlock.getSlot(), newOccupancy, userBlock.getBlockSize());
 	}
 
-	private int getBestSlotForBlockSize(Integer blockSize) {
+	private int getBestSlotForBlockSize(Integer blockSize, Long maxUserSize) {
 		int[] possibleSlots = slotMap.putIfAbsent(blockSize, new int[MAX_USER_FOR_SLOT_CALCULATION / blockSize]);
 		if (possibleSlots == null) {
 			possibleSlots = slotMap.get(blockSize);
 		}
+		int maxPossibleSlotIndex = (int) (maxUserSize / blockSize);
+		if (maxPossibleSlotIndex == 0) {
+			maxPossibleSlotIndex++;
+		}
+		int maxSlotIndex = Math.min(maxPossibleSlotIndex, possibleSlots.length);
 		synchronized (possibleSlots) {
 			int minOccupancy = Integer.MAX_VALUE;
 			int minIndex = 0;
-			for (int index = 0; index < possibleSlots.length; index++) {
+			for (int index = 0; index < maxSlotIndex - 1; index++) {
 				int currentSlotOccupancy = possibleSlots[index];
 				if (currentSlotOccupancy == 0) {
 					possibleSlots[index]++;
