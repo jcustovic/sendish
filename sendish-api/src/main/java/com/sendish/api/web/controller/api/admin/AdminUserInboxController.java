@@ -35,7 +35,8 @@ public class AdminUserInboxController {
     @RequestMapping(value = "/{userId}/send/{inboxMessageId}", method = RequestMethod.POST)
     @ApiOperation(value = "Send inbox message to specific user")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "OK"),
         @ApiResponse(code = 400, message = "User already received specified inbox item"),
         @ApiResponse(code = 404, message = "User or inbox message not found")
     })
@@ -57,7 +58,7 @@ public class AdminUserInboxController {
 
         userInboxService.sendInboxMessage(inboxMessageId, userId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

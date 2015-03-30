@@ -164,7 +164,8 @@ public class PhotosController {
     @RequestMapping(value = "/received/{photoId}/like", method = RequestMethod.PUT)
     @ApiOperation(value = "Like received given photo")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "OK")
     })
     public ResponseEntity<Void> like(@PathVariable Long photoId, AuthUser user) {
         PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
@@ -172,14 +173,15 @@ public class PhotosController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             photoService.likeReceived(photoId, user.getUserId());
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 
     @RequestMapping(value = "/received/{photoId}/dislike", method = RequestMethod.PUT)
     @ApiOperation(value = "Dislike received given photo")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "OK")
     })
     public ResponseEntity<Void> dislike(@PathVariable Long photoId, AuthUser user) {
         PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
@@ -187,14 +189,15 @@ public class PhotosController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             photoService.dislikeReceived(photoId, user.getUserId());
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 
     @RequestMapping(value = "/received/{photoId}/report", method = RequestMethod.PUT)
     @ApiOperation(value = "Report received given photo", notes = "Reason must be provided and reasonText is optional")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "OK")
     })
     public ResponseEntity<Void> report(@PathVariable Long photoId, @RequestParam String reason, @RequestParam(required = false) String reasonText, AuthUser user) {
         PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
@@ -202,7 +205,7 @@ public class PhotosController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             photoService.reportReceived(photoId, reason, reasonText, user.getUserId());
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 

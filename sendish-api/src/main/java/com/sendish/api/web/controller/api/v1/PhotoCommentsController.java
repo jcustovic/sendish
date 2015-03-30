@@ -68,7 +68,9 @@ public class PhotoCommentsController {
     @ApiOperation(value = "Post a comment to specific photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created comment")
     @ApiResponses({
     	@ApiResponse(code = 200, message = "NOT USED! 201 will be returned", response = Void.class),
-        @ApiResponse(code = 201, message = "Comment created")
+        @ApiResponse(code = 201, message = "Comment created"),
+        @ApiResponse(code = 400, message = "Validation errors or bad request"),
+        @ApiResponse(code = 404, message = "Photo not found")
     })
 	public ResponseEntity<String> newComment(@PathVariable Long photoId,
 			@RequestParam String comment, @RequestParam Long replyToId, AuthUser user) {
@@ -142,7 +144,8 @@ public class PhotoCommentsController {
     @RequestMapping(value = "/comment/{photoCommentId}/like", method = RequestMethod.PUT)
     @ApiOperation(value = "Like a comment")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "OK"),
         @ApiResponse(code = 400, message = "You vote on your own comment or validation error (bad request)")
     })
     public ResponseEntity<Void> like(@PathVariable Long photoCommentId, AuthUser user) {
@@ -155,13 +158,14 @@ public class PhotoCommentsController {
 
         photoCommentService.like(photoCommentId, user.getUserId());
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @RequestMapping(value = "/comment/{photoCommentId}/dislike", method = RequestMethod.PUT)
     @ApiOperation(value = "Dislike a comment")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "OK"),
         @ApiResponse(code = 400, message = "You vote on your own comment or validation error (bad request)")
     })
     public ResponseEntity<Void> dislike(@PathVariable Long photoCommentId, AuthUser user) {
@@ -174,7 +178,7 @@ public class PhotoCommentsController {
 
     	photoCommentService.dislike(photoCommentId, user.getUserId());
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

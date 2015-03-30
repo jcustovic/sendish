@@ -26,12 +26,14 @@ public class PushNotificationController {
 
     @RequestMapping(value = "/apns/token/{token}", method = RequestMethod.PUT)
     @ApiOperation(value = "Register APNS token")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public final void registerApns(@ApiParam("APNS Token") @PathVariable final String token, @RequestParam(defaultValue = "false") Boolean devToken, AuthUser user) {
         notificationService.registerApns(token, user.getUserId(), devToken);
     }
 
     @RequestMapping(value = "/gcm/token/{token}", method = RequestMethod.PUT)
     @ApiOperation(value = "Register GCM token")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void registerGcm(@ApiParam("GCM Token") @PathVariable final String token, AuthUser user) {
         notificationService.registerGcm(token, user.getUserId());
     }
@@ -39,7 +41,7 @@ public class PushNotificationController {
     @RequestMapping(value = "/apns/token/{token}", method = RequestMethod.DELETE)
     @ApiOperation(value = "Unregister APNS token")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Token unregistered"),
+        @ApiResponse(code = 204, message = "Token unregistered"),
         @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<Void> unregisterApns(@ApiParam("APNS Token") @PathVariable final String token, AuthUser user) {
@@ -48,14 +50,14 @@ public class PushNotificationController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             notificationService.unregisterApns(token, user.getUserId());
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 
     @RequestMapping(value = "/gcm/token/{token}", method = RequestMethod.DELETE)
     @ApiOperation(value = "Unregister GCM token")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Token unregistered"),
+        @ApiResponse(code = 204, message = "Token unregistered"),
         @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<Void> unregisterGcm(@ApiParam("GCM Token") @PathVariable final String token, AuthUser user) {
@@ -64,12 +66,13 @@ public class PushNotificationController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             notificationService.unregisterGcm(token, user.getUserId());
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 
     @RequestMapping(value = "/test-push", method = RequestMethod.POST)
     @ApiOperation(value = "Send test notification to all users devices")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void sendTestNotification(@RequestParam final String message, @RequestBody Map<String, Object> customFields, AuthUser user) {
         if (customFields == null || customFields.isEmpty()) {
             notificationProvider.sendPlainTextNotification(message, user.getUserId());

@@ -82,7 +82,7 @@ public class UserInboxController {
     @RequestMapping(value = "/{itemId}/mark-read", method = RequestMethod.PUT)
     @ApiOperation(value = "Mark item as read")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 204, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<Void> markRead(@PathVariable Long itemId, AuthUser authUser) {
@@ -98,8 +98,8 @@ public class UserInboxController {
     @RequestMapping(value = "/{itemId}/mark-unread", method = RequestMethod.PUT)
     @ApiOperation(value = "Mark item as unread")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 204, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<Void> markUnread(@PathVariable Long itemId, AuthUser authUser) {
         UserInboxItem userInboxItem = userInboxService.findOne(itemId, authUser.getUserId());

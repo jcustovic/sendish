@@ -66,10 +66,10 @@ public class AdminInboxMessagesController {
     @RequestMapping(value = "/", method = RequestMethod.POST)
     @ApiOperation(value = "Upload new photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created photo", response = Void.class)
     @ApiResponses({
-            @ApiResponse(code = 200, message = "NOT USED! 201 will be returned"),
-            @ApiResponse(code = 201, message = "Image upload is successful and the resource is created"),
-            @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class),
-            @ApiResponse(code = 429, message = "Upload limit exceeded")
+        @ApiResponse(code = 200, message = "NOT USED! 201 will be returned"),
+        @ApiResponse(code = 201, message = "Image upload is successful and the resource is created"),
+        @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class),
+        @ApiResponse(code = 429, message = "Upload limit exceeded")
     })
     public ResponseEntity<Void> createNew(@Valid @ModelAttribute CreateInboxMessage createInboxMessage,
                                        MultipartFile image) { // FIXME: MultipartFile image is also specified here because of swagger!

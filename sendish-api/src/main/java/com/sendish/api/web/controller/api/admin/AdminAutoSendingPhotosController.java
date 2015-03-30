@@ -34,7 +34,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 @RequestMapping("/api/admin/auto-sending-photos")
 @Api(value = "auto-sending-photos", description = "Manage automatic photo sending")
 public class AdminAutoSendingPhotosController {
-	
+
 	@Autowired
 	private AutoSendingPhotoServiceImpl autoSendingPhotoService;
 	
@@ -81,7 +81,8 @@ public class AdminAutoSendingPhotosController {
 	@RequestMapping(value = "/add/photo/{photoId}", method = RequestMethod.POST)
     @ApiOperation(value = "Add uploaded photo to auto sending list")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Added"),
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "Added"),
         @ApiResponse(code = 404, message = "Photo not found")
     })
     public ResponseEntity<Void> addToAutoSending(@PathVariable Long photoId) {
@@ -92,13 +93,14 @@ public class AdminAutoSendingPhotosController {
         
         autoSendingPhotoService.addNewPhoto(photoId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 	
 	@RequestMapping(value = "/deactivate/{autoSendingPhotoId}", method = RequestMethod.POST)
     @ApiOperation(value = "Deactivate auto sending photo")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Deactivated"),
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "Deactivated"),
         @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<Void> deactivate(@PathVariable Long autoSendingPhotoId) {
@@ -109,13 +111,14 @@ public class AdminAutoSendingPhotosController {
         
         autoSendingPhotoService.deactivate(autoSendingPhotoId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 	
 	@RequestMapping(value = "/activate/{autoSendingPhotoId}", method = RequestMethod.POST)
     @ApiOperation(value = "Deactivate auto sending photo")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Activated"),
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "Activated"),
         @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<Void> activate(@PathVariable Long autoSendingPhotoId) {
@@ -126,7 +129,7 @@ public class AdminAutoSendingPhotosController {
         
         autoSendingPhotoService.activate(autoSendingPhotoId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

@@ -40,7 +40,8 @@ public class AdminHotPhotosController {
     @RequestMapping(value = "/add/photo/{photoId}", method = RequestMethod.POST)
     @ApiOperation(value = "Add photo to hot list")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Added"),
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "Added"),
         @ApiResponse(code = 400, message = "Photo is already on hot list"),
         @ApiResponse(code = 404, message = "Photo not found")
     })
@@ -57,13 +58,14 @@ public class AdminHotPhotosController {
 
         hotPhotoService.addNewPhoto(photoId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @RequestMapping(value = "/{photoId}", method = RequestMethod.DELETE)
     @ApiOperation(value = "Remove photo from hot photo list")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Removed"),
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "Removed"),
         @ApiResponse(code = 400, message = "Already removed"),
         @ApiResponse(code = 404, message = "Not found")
     })
@@ -77,7 +79,7 @@ public class AdminHotPhotosController {
 
         hotPhotoService.remove(photoId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

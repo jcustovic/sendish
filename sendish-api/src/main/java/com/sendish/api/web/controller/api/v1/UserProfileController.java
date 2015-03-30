@@ -45,7 +45,8 @@ public class UserProfileController {
     @RequestMapping(value = "/change-password", method = RequestMethod.POST)
     @ApiOperation(value = "Change user password", notes = "Only if the user signed with email registration!")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Password change successful", response = Void.class),
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "Password change successful", response = Void.class),
         @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
     })
     public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordDto changePassword, BindingResult bindingResult, AuthUser authUser) throws BindException {
@@ -55,16 +56,17 @@ public class UserProfileController {
             throw new BindException(bindingResult);
         } else {
             userService.changePassword(changePassword);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
 
     @RequestMapping(value = "/update-location", method = RequestMethod.POST)
     @ApiOperation(value = "Update user location")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "User location was updated", response = Void.class),
+        @ApiResponse(code = 204, message = "User location was updated", response = Void.class),
         @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
     })
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateLocation(@Valid @RequestBody LocationDto newLocation, AuthUser authUser) {
         userService.updateLocation(authUser.getUserId(), newLocation.getLongitude(), newLocation.getLatitude());
     }
@@ -81,9 +83,10 @@ public class UserProfileController {
     @RequestMapping(value = "/settings", method = RequestMethod.PUT)
     @ApiOperation(value = "Update user settings")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "User settings were updated", response = Void.class),
+        @ApiResponse(code = 204, message = "User settings were updated", response = Void.class),
         @ApiResponse(code = 400, message = "Malformed JSON or validation error (model is provided in case of validation error)", response = ValidationError.class)
     })
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateSettings(@Valid @RequestBody UserSettingsDto userSettings, AuthUser authUser) {
         userService.updateSettings(userSettings, authUser.getUserId());
     }
