@@ -28,7 +28,7 @@ public class DeleteUnopenedPhotoReceiver {
         DateTime olderThan = DateTime.now().minusDays(2);
         Integer deleteCount = photoReceiverRepository.deleteUnopenedOlderThan(olderThan);
         
-        LOG.debug("Unopened photo receiver and deleted {} entires", deleteCount);
+        LOG.debug("Unopened photo receiver finished and deleted {} unopened photos older than {}", deleteCount, olderThan);
     }
 
 }
