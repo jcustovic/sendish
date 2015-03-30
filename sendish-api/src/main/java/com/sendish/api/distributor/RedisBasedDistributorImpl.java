@@ -143,29 +143,30 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 	}
 
 	private int getBestSlotForBlockSize(Integer blockSize, Long maxUserSize) {
-		int[] possibleSlots = slotMap.putIfAbsent(blockSize, new int[MAX_USER_FOR_SLOT_CALCULATION / blockSize]);
-		if (possibleSlots == null) {
-			possibleSlots = slotMap.get(blockSize);
+		int[] slots = slotMap.putIfAbsent(blockSize, new int[MAX_USER_FOR_SLOT_CALCULATION / blockSize]);
+		if (slots == null) {
+			slots = slotMap.get(blockSize);
 		}
 		int maxPossibleSlotIndex = (int) (maxUserSize / blockSize);
 		if (maxPossibleSlotIndex == 0) {
 			maxPossibleSlotIndex++;
 		}
-		int maxSlotIndex = Math.min(maxPossibleSlotIndex, possibleSlots.length);
-		synchronized (possibleSlots) {
+		int maxSlotIndex = Math.min(maxPossibleSlotIndex, slots.length);
+		synchronized (slots) {
 			int minOccupancy = Integer.MAX_VALUE;
 			int minIndex = 0;
 			for (int index = 0; index < maxSlotIndex - 1; index++) {
-				int currentSlotOccupancy = possibleSlots[index];
+				int currentSlotOccupancy = slots[index];
 				if (currentSlotOccupancy == 0) {
-					possibleSlots[index]++;
+					slots[index]++;
 					return index;
 				} else if (currentSlotOccupancy < minOccupancy) {
 					minOccupancy = currentSlotOccupancy;
 					minIndex = index;
 				}
 			}
-			
+			slots[minIndex]++;
+
 			return minIndex;
 		}
 	}
