@@ -28,7 +28,7 @@ public interface PhotoReceiverRepository extends JpaRepository<PhotoReceiver, Lo
     List<PhotoReceiver> findByPhotoIdAndOpenedDateNotNull(Long photoId, Pageable pageRequest);
 
     @Modifying
-    @Query("UPDATE PhotoReceiver pr SET pr.deleted = true WHERE pr.openedDate IS NULL AND pr.createdDate < ?1")
+    @Query("UPDATE PhotoReceiver pr SET pr.deleted = true WHERE pr.openedDate IS NULL AND pr.createdDate < ?1 AND pr.deleted = false")
 	Integer deleteUnopenedOlderThan(DateTime olderThan);
 
 }
