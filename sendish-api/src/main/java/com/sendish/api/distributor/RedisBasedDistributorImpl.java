@@ -42,7 +42,7 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
     @Autowired
     public RedisBasedDistributorImpl(StringRedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
-        slotMap = Collections.synchronizedMap(new HashMap<Integer, int[]>());
+        slotMap = Collections.synchronizedMap(new HashMap<>());
     }
     
     
@@ -88,13 +88,18 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
     }
 
     /**
-     * STEP 1: Try to lock (with timeout 60s)
-     * STEP 2: Has user received a photo if check is required?
+	 * STEP 1: Do we need to check for already received?
+	 *
+	 * STEP 2a: Yes - Has user received a photo?
+	 * STEP 2aa: Yes - return NULL because user we cannot sent photo to user that already got it
+	 * STEP 2ab: No - proceed with step 3.
+	 * STEP 2b: No - proceed with step 3.
+	 *
+	 * STEP 3: Try to lock (with timeout 60s). Do we have a lock?
      *
-     * STEP 3a: Yes: Unlock and try next user!
-     * STEP 3b: No: Send photo, remove user from the list and return true
+	 * STEP 3a: Yes: Send photo and return the result.
+     * STEP 3b: No: return NULL!
      *
-     * NOTE: If we don't find any user return null!
      */
 	private PhotoReceiver trySendingPhotoToUser(Long photoId, boolean checkForAlreadyReceived, String userIdString) {
 		Long userId = Long.valueOf(userIdString);
@@ -180,10 +185,6 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 			return minIndex;
 		}
 	}
-
-	private void unlockUser(Long userId) {
-        redisTemplate.delete(KeyUtils.usersPoolLock(userId));
-    }
 
     private boolean lockUser(Long userId) {
         // TODO: Replace with "SET key value [EX seconds] [PX milliseconds] [NX|XX]" (Starting with Redis 2.6.12)
