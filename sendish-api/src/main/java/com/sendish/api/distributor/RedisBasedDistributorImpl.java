@@ -98,21 +98,31 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
      */
 	private PhotoReceiver trySendingPhotoToUser(Long photoId, boolean checkForAlreadyReceived, String userIdString) {
 		Long userId = Long.valueOf(userIdString);
-		
-		if (lockUser(userId)) {
-		    if (checkForAlreadyReceived && photoService.hasAlreadyReceivedPhoto(photoId, userId)) {
-		        unlockUser(userId);
-		    } else {
-		        PhotoReceiver photoReceiver = photoService.sendPhotoToUser(photoId, userId);
-		        userPool.remove(userIdString);
 
-		        return photoReceiver;
-		    }
+		if (checkForAlreadyReceived) {
+			boolean hasAlreadyReceived = photoService.hasAlreadyReceivedPhoto(photoId, userId);
+			if (hasAlreadyReceived) {
+				LOGGER.debug("User {} already received photo {}", userIdString, photoId);
+			} else if (lockUser(userId)) {
+				return sendPhotoToUser(photoId, userIdString, userId);
+			} else {
+				LOGGER.debug("Failed to lock user {} for photo {}", userIdString, photoId);
+			}
 		} else {
+			if (lockUser(userId)) {
+				return sendPhotoToUser(photoId, userIdString, userId);
+			}
 			LOGGER.debug("Failed to lock user {} for photo {}", userIdString, photoId);
 		}
 		
 		return null;
+	}
+
+	private PhotoReceiver sendPhotoToUser(Long photoId, String userIdString, Long userId) {
+		PhotoReceiver photoReceiver = photoService.sendPhotoToUser(photoId, userId);
+		userPool.remove(userIdString);
+
+		return photoReceiver;
 	}
 
 	private UserBlock getUserBlock(int requiredSize, Long poolSize) {
