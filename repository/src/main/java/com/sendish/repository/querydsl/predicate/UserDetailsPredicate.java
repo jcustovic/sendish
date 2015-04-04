@@ -25,9 +25,18 @@ public class UserDetailsPredicate {
                 .or(qUserDetails.receiveAllowedTime.loe(now)));
 
         if (latestUserPhotoReceivedDate != null)  {
-            andPredicates.add(qUserDetails.lastReceivedTime.isNull()
-                    .or(qUserDetails.lastReceivedTime.goe(latestUserPhotoReceivedDate)));
-            andPredicates.add(qUserDetails.lastReceivedTime.lt(now.minusMinutes(MINUTES_BETWEEN_RECEIVED_PHOTOS)));
+            andPredicates.add(
+        		qUserDetails.lastReceivedTime.isNull()
+                	.or(
+                		qUserDetails.lastReceivedTime.lt(now.minusMinutes(MINUTES_BETWEEN_RECEIVED_PHOTOS))
+                        .and(qUserDetails.lastReceivedTime.goe(latestUserPhotoReceivedDate))
+                    )
+            );
+        } else {
+        	andPredicates.add(
+    			qUserDetails.lastReceivedTime.isNull()
+    				.or(qUserDetails.lastReceivedTime.lt(now.minusMinutes(MINUTES_BETWEEN_RECEIVED_PHOTOS)))
+            );
         }
 
         andPredicates.add(qUserDetails.user.deleted.isFalse());
@@ -47,8 +56,8 @@ public class UserDetailsPredicate {
         andPredicates.add(qUserDetails.receiveAllowedTime.isNull()
                 .or(qUserDetails.receiveAllowedTime.loe(now)));
 
-        andPredicates.add(qUserDetails.lastReceivedTime.isNotNull()
-                .and(qUserDetails.lastReceivedTime.lt(oldestUserPhotoReceivedDate)));
+        andPredicates.add(qUserDetails.lastReceivedTime.isNotNull());
+		andPredicates.add(qUserDetails.lastReceivedTime.lt(oldestUserPhotoReceivedDate));
         andPredicates.add(qUserDetails.lastReceivedTime.lt(now.minusMinutes(MINUTES_BETWEEN_RECEIVED_PHOTOS)));
 
         andPredicates.add(qUserDetails.user.deleted.isFalse());
