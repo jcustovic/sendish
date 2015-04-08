@@ -213,7 +213,7 @@ public class PhotoCommentServiceImpl {
         	commentDto.setLiked(photoCommentVote.getLike());
         }
 
-        // TODO: Maybe get from database when we will store it there so we save on trip to Redis.
+        // TODO: Maybe get from database (since we have it on comment object) when we will store it there so we save on trip to Redis.
         CommentStatisticsDto commentStatistics = statisticsService.getCommentStatistics(comment.getId());
         commentDto.setLikes(commentStatistics.getLikeCount());
         commentDto.setDislikes(commentStatistics.getDislikeCount());
