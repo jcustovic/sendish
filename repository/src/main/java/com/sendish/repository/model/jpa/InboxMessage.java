@@ -21,7 +21,6 @@ public class InboxMessage extends BaseEntity {
     @Column(name = "im_title", nullable = false, length = 256)
     private String title;
 
-    @Lob
     @Column(name = "im_message", nullable = false, columnDefinition = "TEXT")
     private String message;
 
