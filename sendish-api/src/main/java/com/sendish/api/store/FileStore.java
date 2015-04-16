@@ -7,7 +7,9 @@ import java.io.InputStream;
 
 public interface FileStore {
 
-    String save(InputStream p_inputStream) throws IOException;
+    String save(InputStream inputStream) throws IOException;
+
+    String save(InputStream inputStream, String tag) throws IOException;
 
     void delete(String resourceId) throws ResourceNotFoundException;
 

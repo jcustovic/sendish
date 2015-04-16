@@ -90,7 +90,7 @@ public class ResizeImageServiceImpl implements ResizeImageService {
         resizedImage.setHeight(height);
         resizedImage.setSize((long) content.length);
 
-        String storeId = fileStore.save(new ByteArrayInputStream(content));
+        String storeId = fileStore.save(new ByteArrayInputStream(content), "image_resized");
 
         resizedImage.setStorageId(storeId);
 

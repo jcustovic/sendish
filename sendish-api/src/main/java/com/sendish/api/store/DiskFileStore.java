@@ -37,12 +37,23 @@ public class DiskFileStore implements FileStore {
     }
 
     @Override
-    public String save(InputStream p_inputStream) throws IOException {
+    public String save(InputStream inputStream) throws IOException {
+        return save(inputStream, dataFolder);
+    }
+
+    @Override
+    public String save(InputStream inputStream, String tag) throws IOException {
+        final File tagFolder = new File(dataFolder, tag);
+
+        return save(inputStream, tagFolder);
+    }
+
+    private String save(InputStream inputStream, File dataFolder) throws IOException {
         String newId = UUID.randomUUID().toString();
         String relativePath = buildRelativePath(newId);
 
         final File file = new File(dataFolder, relativePath);
-        FileUtils.copyInputStreamToFile(p_inputStream, file);
+        FileUtils.copyInputStreamToFile(inputStream, file);
 
         return relativePath;
     }

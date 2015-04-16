@@ -45,7 +45,7 @@ public class ImageServiceImpl {
 
         String fileStoreId;
         try {
-            fileStoreId = fileStore.save(imageFile.getInputStream());
+            fileStoreId = fileStore.save(imageFile.getInputStream(), "image_original");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

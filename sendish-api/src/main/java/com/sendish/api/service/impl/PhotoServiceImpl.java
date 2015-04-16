@@ -142,7 +142,7 @@ public class PhotoServiceImpl {
 
         String fileStoreId;
         try {
-            fileStoreId = fileStore.save(file.getInputStream());
+            fileStoreId = fileStore.save(file.getInputStream(), "photo_original");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

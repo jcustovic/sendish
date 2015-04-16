@@ -120,7 +120,7 @@ public class ResizePhotoServiceImpl implements ResizePhotoService {
         resizedPhoto.setHeight(height);
         resizedPhoto.setSize((long) content.length);
 
-        String storeId = fileStore.save(new ByteArrayInputStream(content));
+        String storeId = fileStore.save(new ByteArrayInputStream(content), "photo_resized");
 
         resizedPhoto.setStorageId(storeId);
 
