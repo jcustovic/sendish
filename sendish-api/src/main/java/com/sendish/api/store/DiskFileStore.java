@@ -45,7 +45,9 @@ public class DiskFileStore implements FileStore {
     public String save(InputStream inputStream, String tag) throws IOException {
         final File tagFolder = new File(dataFolder, tag);
 
-        return save(inputStream, tagFolder);
+        String path = save(inputStream, tagFolder);
+
+        return tag + "/" + path;
     }
 
     private String save(InputStream inputStream, File dataFolder) throws IOException {
