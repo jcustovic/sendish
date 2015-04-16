@@ -37,15 +37,15 @@ public class RedisStatisticsRepository {
     }
     
     public Long incrementTotalUserLikeCount(Long userId) {
-    	return userStatistics(userId).increment("total.likeCount", 1);    	
+    	return userStatistics(userId).increment("total.likeCount", 1);
     }
     
     public Long incrementTotalUserDislikeCount(Long userId) {
-    	return userStatistics(userId).increment("total.dislikeCount", 1);    	
+    	return userStatistics(userId).increment("total.dislikeCount", 1);
     }
     
     public Long incrementTotalUserReportCount(Long userId) {
-    	return userStatistics(userId).increment("total.reportCount", 1);    	
+    	return userStatistics(userId).increment("total.reportCount", 1);
     }
 
     public Long incrementPhotoCommentCount(Long photoId) {
@@ -79,15 +79,15 @@ public class RedisStatisticsRepository {
         HashOperations<String, String, String> hashOp = template.opsForHash();
         List<String> values = hashOp.multiGet(KeyUtils.userStatistics(userId), fields);
 
-        long likeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(0), "0"));
-        long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
-        long reportCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
-        long unseenPhotoCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
-        long unreadInboxItemCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(4), "0"));
+        Long likeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(0), "0"));
+        Long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(1), "0"));
+        Long reportCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
+        Long unseenPhotoCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
+        Long unreadInboxItemCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(4), "0"));
         boolean hasNewActivities = values.get(5) != null;
-        
-        long dailySentCount = getDailySentPhotoCount(userId, LocalDate.now());
-        long totalCityCount = userCities(userId).size();
+
+        Long dailySentCount = getDailySentPhotoCount(userId, LocalDate.now());
+        Long totalCityCount = userCities(userId).size();
 
 		return new UserStatisticsDto(likeCount, dislikeCount, reportCount,
 				dailySentCount, unseenPhotoCount, unreadInboxItemCount,

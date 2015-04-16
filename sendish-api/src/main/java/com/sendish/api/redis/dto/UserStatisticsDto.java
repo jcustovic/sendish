@@ -6,19 +6,18 @@ public class UserStatisticsDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private long rank;
-	private long totalLikeCount;
-	private long totalDislikeCount;
-	private long totalReportCount;
-	private long totalCityCount;
-	private long unseenPhotoCount;
-	private long unreadInboxItemCount;
-	private long dailySendCount;
+	private Long totalLikeCount;
+	private Long totalDislikeCount;
+	private Long totalReportCount;
+	private Long totalCityCount;
+	private Long unseenPhotoCount;
+	private Long unreadInboxItemCount;
+	private Long dailySendCount;
 	private boolean hasNewActivities;
 
-	public UserStatisticsDto(long totalLikeCount, long totalDislikeCount,
-			long totalReportCount, long dailySendCount, Long unseenPhotoCount,
-			long unreadInboxItemCount, long totalCityCount,
+	public UserStatisticsDto(Long totalLikeCount, Long totalDislikeCount,
+			Long totalReportCount, Long dailySendCount, Long unseenPhotoCount,
+			Long unreadInboxItemCount, Long totalCityCount,
 			Boolean hasNewActivities) {
 		this.totalLikeCount = totalLikeCount;
 		this.totalDislikeCount = totalDislikeCount;
@@ -30,35 +29,31 @@ public class UserStatisticsDto implements Serializable {
 		this.hasNewActivities = hasNewActivities;
 	}
 
-	public long getRank() {
-		return rank;
-	}
-
-	public long getTotalLikeCount() {
+	public Long getTotalLikeCount() {
 		return totalLikeCount;
 	}
 
-	public long getTotalDislikeCount() {
+	public Long getTotalDislikeCount() {
 		return totalDislikeCount;
 	}
 
-	public long getTotalReportCount() {
+	public Long getTotalReportCount() {
 		return totalReportCount;
 	}
 
-	public long getTotalCityCount() {
+	public Long getTotalCityCount() {
 		return totalCityCount;
 	}
 
-	public long getUnseenPhotoCount() {
+	public Long getUnseenPhotoCount() {
 		return unseenPhotoCount;
 	}
 
-	public long getUnreadInboxItemCount() {
+	public Long getUnreadInboxItemCount() {
 		return unreadInboxItemCount;
 	}
 
-	public long getDailySendCount() {
+	public Long getDailySendCount() {
 		return dailySendCount;
 	}
 

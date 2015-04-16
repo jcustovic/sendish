@@ -46,9 +46,9 @@ public class SwaggerSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser("docs").password("docs").roles(ROLE_DOCS)
+                .withUser("docs").password("cHusica").roles(ROLE_DOCS)
                 .and()
-                .withUser("admin").password("admin").roles(ROLE_DOCS, ROLE_DOCS_ADMIN);
+                .withUser("admin").password("cHusica").roles(ROLE_DOCS, ROLE_DOCS_ADMIN);
     }
 
 }

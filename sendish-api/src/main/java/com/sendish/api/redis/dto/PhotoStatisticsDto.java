@@ -6,14 +6,14 @@ public class PhotoStatisticsDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private long openedCount;
-	private long likeCount;
-	private long dislikeCount;
-	private long cityCount;
-	private long commentCount;
-	private long reportCount;
+	private Long openedCount;
+	private Long likeCount;
+	private Long dislikeCount;
+	private Long cityCount;
+	private Long commentCount;
+	private Long reportCount;
 
-	public PhotoStatisticsDto(long openedCount, long likeCount, long dislikeCount, long cityCount, long commentCount, long reportCount) {
+	public PhotoStatisticsDto(Long openedCount, Long likeCount, Long dislikeCount, Long cityCount, Long commentCount, Long reportCount) {
 		this.openedCount = openedCount;
 		this.likeCount = likeCount;
 		this.dislikeCount = dislikeCount;
@@ -22,31 +22,31 @@ public class PhotoStatisticsDto implements Serializable {
 		this.reportCount = reportCount;
 	}
 
-	public long getOpenedCount() {
+	public Long getOpenedCount() {
 		return openedCount;
 	}
 
-	public void setOpenedCount(long openedCount) {
+	public void setOpenedCount(Long openedCount) {
 		this.openedCount = openedCount;
 	}
 
-	public long getLikeCount() {
+	public Long getLikeCount() {
 		return likeCount;
 	}
 
-	public long getDislikeCount() {
+	public Long getDislikeCount() {
 		return dislikeCount;
 	}
 
-	public long getCityCount() {
+	public Long getCityCount() {
 		return cityCount;
 	}
 
-	public long getCommentCount() {
+	public Long getCommentCount() {
 		return commentCount;
 	}
 
-	public long getReportCount() {
+	public Long getReportCount() {
 		return reportCount;
 	}
 

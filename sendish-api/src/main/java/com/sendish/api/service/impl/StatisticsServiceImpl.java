@@ -1,5 +1,6 @@
 package com.sendish.api.service.impl;
 
+import com.sendish.api.statistics.DBStatisticsSynchronizer;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,26 +19,37 @@ public class StatisticsServiceImpl {
 	@Autowired
 	private RedisStatisticsRepository statisticsRepository;
 
-    // TODO: At some point of time also save stats to DB (User, Photo, Comment). Example when one hour elapsed from last update
-    // or photo stops traveling etc. ... UserStatisticsRepository.java, PhotoStatisticsRepository.java
-	
+	@Autowired
+	private DBStatisticsSynchronizer dbStatisticsSynchronizer;
+
 	public Long likePhoto(Long photoId, User photoOwner) {
-		statisticsRepository.incrementTotalUserLikeCount(photoOwner.getId());	
-		
-		return statisticsRepository.likePhoto(photoId);
+		statisticsRepository.incrementTotalUserLikeCount(photoOwner.getId());
+		Long likeCount = statisticsRepository.likePhoto(photoId);
+
+		dbStatisticsSynchronizer.syncUserStat(photoOwner.getId());
+		dbStatisticsSynchronizer.syncPhotoStat(photoId);
+
+		return likeCount;
 	}
 
 	public Long dislikePhoto(Long photoId, User photoOwner) {
-		statisticsRepository.incrementTotalUserDislikeCount(photoOwner.getId());	
-		
-		return statisticsRepository.dislikePhoto(photoId);
-		
+		statisticsRepository.incrementTotalUserDislikeCount(photoOwner.getId());
+		Long dislikeCount = statisticsRepository.dislikePhoto(photoId);
+
+		dbStatisticsSynchronizer.syncUserStat(photoOwner.getId());
+		dbStatisticsSynchronizer.syncPhotoStat(photoId);
+
+		return dislikeCount;
 	}
 
 	public Long reportPhoto(Long photoId, User photoOwner) {
-		statisticsRepository.incrementTotalUserReportCount(photoOwner.getId());	
-		
-		return statisticsRepository.reportPhoto(photoId);
+		statisticsRepository.incrementTotalUserReportCount(photoOwner.getId());
+		Long reportCount = statisticsRepository.reportPhoto(photoId);
+
+		dbStatisticsSynchronizer.syncUserStat(photoOwner.getId());
+		dbStatisticsSynchronizer.syncPhotoStat(photoId);
+
+		return reportCount;
 	}
 
 	public void resetUserUnseenCount(Long userId) {
@@ -86,10 +98,12 @@ public class StatisticsServiceImpl {
 
 	public void likeComment(Long photoCommentId) {
 		statisticsRepository.likeComment(photoCommentId);
+		dbStatisticsSynchronizer.syncPhotoCommentStat(photoCommentId);
 	}
 
 	public void dislikeComment(Long photoCommentId) {
 		statisticsRepository.dislikeComment(photoCommentId);
+		dbStatisticsSynchronizer.syncPhotoCommentStat(photoCommentId);
 	}
 
 	public void markActivitiesAsRead(Long userId) {

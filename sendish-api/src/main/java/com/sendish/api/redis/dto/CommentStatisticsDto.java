@@ -6,19 +6,19 @@ public class CommentStatisticsDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private long likeCount;
-    private long dislikeCount;
+    private Long likeCount;
+    private Long dislikeCount;
 
-    public CommentStatisticsDto(long likeCount, long dislikeCount) {
+    public CommentStatisticsDto(Long likeCount, Long dislikeCount) {
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
     }
 
-    public long getLikeCount() {
+    public Long getLikeCount() {
         return likeCount;
     }
 
-    public long getDislikeCount() {
+    public Long getDislikeCount() {
         return dislikeCount;
     }
 
