@@ -40,7 +40,7 @@
 		<querydsl.version>3.6.3</querydsl.version>
 		<postgresql.jdbc.version>9.4-1201-jdbc41</postgresql.jdbc.version>
 		<postgis-jdbc.version>1.3.3</postgis-jdbc.version>
-		<ehcache-core.version>2.6.10</ehcache-core.version>
+		<ehcache.version>2.10.0</ehcache.version>
 
         <com.mysema.maven.pt-maven-plugin.version>1.1.3</com.mysema.maven.pt-maven-plugin.version>
 	</properties>
@@ -129,12 +129,18 @@
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-ehcache</artifactId>
 				<version>${hibernate.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>net.sf.ehcache</groupId>
+						<artifactId>ehcache-core</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			
 			<dependency>
 				<groupId>net.sf.ehcache</groupId>
-				<artifactId>ehcache-core</artifactId>
-				<version>${ehcache-core.version}</version>
+				<artifactId>ehcache</artifactId>
+				<version>${ehcache.version}</version>
 			</dependency>
 
 			<dependency>
