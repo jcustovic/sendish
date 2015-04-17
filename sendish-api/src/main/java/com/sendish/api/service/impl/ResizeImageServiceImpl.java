@@ -47,14 +47,12 @@ public class ResizeImageServiceImpl implements ResizeImageService {
 
     @Override
     public ResizedImage getResizedImage(Long imageId, String sizeKey) {
-    	return RetryUtils.retry(() -> {
-    		ResizedImage resizedImage = resizedImageRepository.findByImageIdAndKey(imageId, sizeKey);
-	        if (resizedImage == null) {
-	            resizedImage = resize(imageId, sizeKey);
-	        }
-	
-	        return resizedImage;
-    	}, 3, 50);
+        ResizedImage resizedImage = resizedImageRepository.findByImageIdAndKey(imageId, sizeKey);
+        if (resizedImage == null) {
+            resizedImage = resize(imageId, sizeKey);
+        }
+
+        return resizedImage;
     }
     
     private ResizedImage resize(Long imageId, String sizeKey) {

@@ -114,7 +114,9 @@ public class RedisDBStatisticsSynchronizerScheduler {
 
         // TODO: Should we move rank update somewhere else?
         Long rank = rankingService.getRank(userId);
-        userStatDb.setRank(rank.intValue());
+        if (rank != null) {
+            userStatDb.setRank(rank.intValue());
+        }
 
         userStatisticsRepository.save(userStatDb);
     }
