@@ -27,14 +27,11 @@ public class InMemoryRedisAutoConfiguration {
 
     @Bean
     public RedisServer redisServer() throws IOException {
-        RedisServer.Builder redisServer = RedisServer.builder()
-                .port(6379);
-
         if (config.getExecutable() != null) {
-            redisServer.executable(config.getExecutable().getFile());
+            return new RedisServer(config.getExecutable().getFile(), config.getPort());
         }
 
-        return redisServer.build();
+        return RedisServer.builder().port(6379).build();
     }
 
     @PostConstruct

@@ -7,6 +7,7 @@ import org.springframework.core.io.Resource;
 public class InMemoryRedisConfigurationProperties {
 
     private Resource executable;
+    private Integer port;
 
     public void setExecutable(Resource executable) {
         this.executable = executable;
@@ -14,6 +15,14 @@ public class InMemoryRedisConfigurationProperties {
 
     public Resource getExecutable() {
         return executable;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
     }
 
 }
