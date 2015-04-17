@@ -207,13 +207,13 @@ public class PhotoCommentServiceImpl {
         boolean isCommentOwner = comment.getUser().getId().equals(userId);
         commentDto.setCanDelete(isCommentOwner || isPhotoOwner);
         
-        // TODO: Can we somehow save a round trip to the database for each comment?
+        // TODO: Can we somehow save a round trip to the database for each comment (maybe releated to Query DSL optimization - additional JOIN)?
         PhotoCommentVote photoCommentVote = photoCommentVoteRepository.findOne(new PhotoCommentVoteId(userId, comment.getId()));
         if (photoCommentVote != null) {
         	commentDto.setLiked(photoCommentVote.getLike());
         }
 
-        // TODO: Maybe get from database (since we have it on comment object) when we will store it there so we save on trip to Redis.
+        // TODO: Maybe get from DB PhotoComment object (not the same as live stats but maybe good enough - 5-10 min delay from live)?
         CommentStatisticsDto commentStatistics = statisticsService.getCommentStatistics(comment.getId());
         commentDto.setLikes(commentStatistics.getLikeCount());
         commentDto.setDislikes(commentStatistics.getDislikeCount());

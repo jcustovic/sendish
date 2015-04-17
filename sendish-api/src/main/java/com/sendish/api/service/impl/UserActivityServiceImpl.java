@@ -85,7 +85,7 @@ public class UserActivityServiceImpl {
 
 	private String getDisplayName(String referenceType, User user) {
         if (user == null) {
-            // TODO: Hack here. If from user is empty (e.g. welcome inbox messages).
+            // TODO: Hack here. If from user is empty (e.g. welcome inbox messages, admin messages etc.).
             return "Sendish";
         }
 		if ("PHOTO_COMMENT".equals(referenceType)) {

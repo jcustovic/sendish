@@ -94,7 +94,7 @@ public class UserInboxServiceImpl {
     	
     	userInboxItem = userInboxItemRepository.save(userInboxItem);
 
-    	// TODO: Move after transaction for save is done!
+    	// TODO: Move after transaction for inbox item save is done!
     	statisticsService.incrementUnreadInboxItemCount(userId);
     	sendNewInboxItemNotification(userInboxItem);
     	
