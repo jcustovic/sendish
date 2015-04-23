@@ -50,6 +50,8 @@
     <logger name="com.mangofactory.swagger" level="warn" />
     <logger name="org.springframework.boot.actuate" level="warn" />
     <logger name="com.notnoop.apns" level="warn" />
+
+    <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="none" />
     
     <!-- 
     <logger name="org.hibernate.event.internal.DefaultLoadEventListener" level="trace" />
