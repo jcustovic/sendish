@@ -1,6 +1,7 @@
 package com.sendish.api.service.impl;
 
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sendish.api.service.ResizePhotoService;
+import com.sendish.api.util.ImageUtils;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.Thumbnails.Builder;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -29,6 +31,8 @@ import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.ResizedPhotoRepository;
 import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.ResizedPhoto;
+
+import javax.imageio.ImageIO;
 
 @Service
 @Primary
@@ -94,17 +98,18 @@ public class ResizePhotoServiceImpl implements ResizePhotoService {
             if (sizeKey.endsWith("blur")) {
             	thumbnails.addFilter(blurFilter);
             	thumbnails.addFilter(transparencyColorFilter);
-				
-//            	BufferedImage bufferedImage = thumbnails.asBufferedImage();
-//				Thumbnails.of(bufferedImage)
-//					.outputFormat(ImageUtils.getImageTypeFromContentType(photo.getContentType()))
-//					.size(size[0], size[1])
-//					.outputQuality(1)
-//					.watermark(Positions.CENTER, ImageIO.read(logoOverlayPath.getInputStream()), 1f)
-//					.toOutputStream(out);
-            }
 
-            thumbnails.toOutputStream(out);	
+                // Add watermark
+                BufferedImage bufferedImage = thumbnails.asBufferedImage();
+                Thumbnails.of(bufferedImage)
+                        .scale(1)
+                        .outputQuality(0.8)
+                        .outputFormat(ImageUtils.getImageTypeFromContentType(photo.getContentType()))
+                        .watermark(Positions.CENTER, ImageIO.read(logoOverlayPath.getInputStream()), 1f)
+                        .toOutputStream(out);
+            } else {
+                thumbnails.toOutputStream(out);
+            }
 
             return createResizedPhoto(photo, sizeKey, size[0], size[1], out.toByteArray());
         } catch (IOException e) {
