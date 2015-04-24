@@ -148,7 +148,9 @@
         <profile>
             <id>dev</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>!prod</name>
+                </property>
             </activation>
 
             <dependencies>
