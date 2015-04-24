@@ -103,7 +103,7 @@ public class ResizePhotoServiceImpl implements ResizePhotoService {
                 BufferedImage bufferedImage = thumbnails.asBufferedImage();
                 Thumbnails.of(bufferedImage)
                         .scale(1)
-                        .outputQuality(0.8)
+                        .outputQuality(0.9)
                         .outputFormat(ImageUtils.getImageTypeFromContentType(photo.getContentType()))
                         .watermark(Positions.CENTER, ImageIO.read(logoOverlayPath.getInputStream()), 1f)
                         .toOutputStream(out);
