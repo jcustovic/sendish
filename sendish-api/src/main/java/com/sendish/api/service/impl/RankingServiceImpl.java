@@ -59,7 +59,7 @@ public class RankingServiceImpl {
 				username = UserUtils.getDisplayNameWithCity(user);
 			}
 			
-			if (topUser.getScore() > 0) {
+			if (topUser.getScore() > 0 && !user.getUsername().startsWith("fake")) {
 				usersRank.add(new UserRankDto(user.getId(), username, String.valueOf(++i) + ".", String.valueOf(topUser.getScore().longValue())));	
 			}
 		}
