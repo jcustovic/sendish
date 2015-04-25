@@ -25,7 +25,10 @@ public class PhotoStopDecider {
 		} else if (photoStatistics.getOpenedCount() >= 10) {	
 			minLikePercent = 0.6;
 			maxAllowedReport = 3;
-		} else if (photoStatistics.getOpenedCount() >= 5) {
+		} else if (photoStatistics.getOpenedCount() > 5) {
+			minLikePercent = 0.5;
+			maxAllowedReport = 2;
+		} else if (photoStatistics.getOpenedCount() == 5) {
 			minLikePercent = 0.4;
 			maxAllowedReport = 2;
 		} else {

@@ -35,7 +35,7 @@ public class TravelingPhotoResenderScheduler {
     @Transactional
     public void resendTravelingPhotos() throws InterruptedException {
         LOGGER.info("Starting resend of traveling photos...");
-    	Page<Long> photoIds = photoSendingDetailsRepository.findTravelingPhotoIdsByLastSentGreatherThan(DateTime.now().minusMinutes(15), new PageRequest(0, 10000, Sort.Direction.DESC, "photoId"));
+    	Page<Long> photoIds = photoSendingDetailsRepository.findTravelingPhotoIdsByLastSentGreatherThan(DateTime.now().minusMinutes(5), new PageRequest(0, 10000, Sort.Direction.DESC, "photoId"));
     	
     	LOGGER.info("Found {} photos that need to be resent.", photoIds.getTotalElements());
         ExecutorService executor = Executors.newFixedThreadPool(20);
