@@ -27,7 +27,7 @@ public class HotPhotoDecider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HotPhotoDecider.class);
 
-	private static final int MIN_LIKES_COUNT_FOR_HOT_LIST = 30;
+	private static final int MIN_LIKES_COUNT_FOR_HOT_LIST = 5;
 
 	@Autowired
 	private HotPhotoRepository hotPhotoRepository;

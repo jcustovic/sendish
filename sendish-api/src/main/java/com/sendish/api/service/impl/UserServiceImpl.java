@@ -119,6 +119,12 @@ public class UserServiceImpl {
         userProfileDto.setNewActivities(userStatistics.getHasNewActivities());
         userProfileDto.setUnreadInboxItemCount(userStatistics.getUnreadInboxItemCount());
         userProfileDto.setId(userId);
+        
+        DateTime now = DateTime.now();
+        if (userDetails.getLastInteractionTime().isBefore(now.minusMinutes(10))) {
+        	userDetails.setLastInteractionTime(now);
+        	userDetailsRepository.save(userDetails);
+        }
 
         return userProfileDto;
     }
@@ -153,7 +159,7 @@ public class UserServiceImpl {
         }
     }
 
-    public void updateUserLocationAndStatistics(Long userId, DateTime photoDate, Location location, City city) {
+    public void updateUserLocationAndIncreaseDailySentCount(Long userId, DateTime photoDate, Location location, City city) {
         UserDetails userDetails = getUserDetails(userId);
         userDetails.setLastSentTime(photoDate);
         userDetails.setLastLocationTime(photoDate);
