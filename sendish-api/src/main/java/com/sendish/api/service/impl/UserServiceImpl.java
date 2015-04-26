@@ -121,7 +121,7 @@ public class UserServiceImpl {
         userProfileDto.setId(userId);
         
         DateTime now = DateTime.now();
-        if (userDetails.getLastInteractionTime().isBefore(now.minusMinutes(10))) {
+        if (userDetails.getLastInteractionTime() != null && userDetails.getLastInteractionTime().isBefore(now.minusMinutes(10))) {
         	userDetails.setLastInteractionTime(now);
         	userDetailsRepository.save(userDetails);
         }
