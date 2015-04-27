@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
-import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -32,22 +30,24 @@ public class NewUserAutomaticPhotoAndInboxSenderImpl {
     private UserInboxServiceImpl userInboxService;
 
     public void send(User user) {
-        sendOnePhoto(user);
+        sendPhotos(user, 10);
         sendInboxMessages(user);
     }
 
-    private void sendOnePhoto(User user) {
+    private void sendPhotos(User user, int sendCount) {
         List<AutoSendingPhoto> possiblePhotos = autoSendingPhotoRepository.findAllActiveDefault();
-
-        long count = possiblePhotos.size();
-        if (count == 0) {
+        if (possiblePhotos.isEmpty()) {
             return;
         }
 
-        long randomIndex = new Random().nextInt((int) count);
+        while (sendCount-- > 0 && !possiblePhotos.isEmpty()) {
+            int count = possiblePhotos.size();
+            int randomIndex = new Random().nextInt(count);
 
-        Optional<AutoSendingPhoto> randomPhoto = StreamSupport.stream(possiblePhotos.spliterator(), false).skip(randomIndex).findFirst();
-        photoService.sendPhotoToUser(randomPhoto.get().getPhoto().getId(), user.getId());
+            AutoSendingPhoto photo = possiblePhotos.remove(randomIndex);
+
+            photoService.sendPhotoToUser(photo.getPhoto().getId(), user.getId());
+        }
     }
 
     private void sendInboxMessages(User user) {
