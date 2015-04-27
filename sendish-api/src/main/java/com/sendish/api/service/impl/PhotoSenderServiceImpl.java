@@ -87,10 +87,12 @@ public class PhotoSenderServiceImpl {
 	public void stopSending(Long photoId, String stopReason) {
         LOGGER.debug("Stopping photo with id {}", photoId);
 		PhotoSendingDetails photoSendingDetails = photoSendingDetailsRepository.findOne(photoId);
-		photoSendingDetails.setPhotoStatus(PhotoStatus.STOPPED);
-		photoSendingDetails.setPhotoStatusReason(stopReason);
-		
-		photoSendingDetailsRepository.save(photoSendingDetails);
+		if (photoSendingDetails != null && !PhotoStatus.STOPPED.equals(photoSendingDetails.getPhotoStatus())) {
+			photoSendingDetails.setPhotoStatus(PhotoStatus.STOPPED);
+			photoSendingDetails.setPhotoStatusReason(stopReason);
+			
+			photoSendingDetailsRepository.save(photoSendingDetails);	
+		}
 	}
 
 }
