@@ -99,8 +99,8 @@ public class HotPhotoServiceImpl {
     private void sendCongratsInboxItem(Photo photo) {
         InboxMessage inboxMessage = new InboxMessage();
         inboxMessage.setShortTitle("Congrats! Your photo just ended up on hot list.");
-        inboxMessage.setTitle("Congrats! Your photo just ended up on hot list.");
-        inboxMessage.setMessage("Now everyone can see your photo. Keep up the good work :)");
+        inboxMessage.setTitle("Congratulations!");
+        inboxMessage.setMessage("Your photo made the hot list. Keep sendishing :)");
         inboxMessage.setImage(createImageOutOfPhoto(photo));
 
         inboxMessage = inboxMessageRepository.save(inboxMessage);
