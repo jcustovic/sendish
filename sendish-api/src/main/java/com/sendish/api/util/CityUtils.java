@@ -15,9 +15,10 @@ public class CityUtils {
     }
 
     public static final String getLocationName(City city, int trimLength) {
-        String name = getLocationName(city);
+    	String countryName = city.getCountry().getName();
+    	trimLength -= countryName.length();
 
-        return StringUtils.trim(name, trimLength, "...");
+        return StringUtils.trim(city.getName(), --trimLength, "...") + ", " + countryName;
 	}
 
 }
