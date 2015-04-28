@@ -7,7 +7,7 @@ public class ReceivedPhotoDetailsDto extends PhotoDetailsDto {
 	private Boolean like;
 	private Boolean report;
 	private Boolean opened;
-	private Boolean backButton = true;
+	private Boolean forceRating = false;
 
 	public Boolean getLike() {
 		return like;
@@ -33,12 +33,12 @@ public class ReceivedPhotoDetailsDto extends PhotoDetailsDto {
 		this.opened = opened;
 	}
 
-	public Boolean getBackButton() {
-		return backButton;
+	public Boolean getForceRating() {
+		return forceRating;
 	}
 
-	public void setBackButton(Boolean backButton) {
-		this.backButton = backButton;
+	public void setForceRating(Boolean forceRating) {
+		this.forceRating = forceRating;
 	}
 
 }
