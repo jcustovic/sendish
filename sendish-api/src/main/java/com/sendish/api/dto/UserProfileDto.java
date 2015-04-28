@@ -13,6 +13,7 @@ public class UserProfileDto extends BaseEntityDto {
 	private BigDecimal lastLat;
 	private Date lastLocationTime;
 	private String rank;
+	private String rankScore;
 	private Long totalLikes;
 	private Long totalDislikes;
 	private Long citiesCount;
@@ -68,6 +69,14 @@ public class UserProfileDto extends BaseEntityDto {
 
 	public void setRank(String rank) {
 		this.rank = rank;
+	}
+
+	public String getRankScore() {
+		return rankScore;
+	}
+
+	public void setRankScore(String rankScore) {
+		this.rankScore = rankScore;
 	}
 
 	public Long getTotalLikes() {

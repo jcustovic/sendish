@@ -44,7 +44,8 @@ public class HotPhotoDecider {
 	@Async
 	public void decide(Long photoId, Long likeCount) {
         try {
-            if (likeCount > MIN_LIKES_COUNT_FOR_HOT_LIST) {
+            // TODO: Maybe consider greater also and somehow mark that the mail was sent already so we don't spam!
+            if (likeCount == MIN_LIKES_COUNT_FOR_HOT_LIST) {
                 HotPhoto hotPhoto = hotPhotoRepository.findOne(photoId);
                 if (hotPhoto == null) {
                     Photo photo = photoRepository.findOne(photoId);

@@ -108,8 +108,10 @@ public class UserServiceImpl {
             userProfileDto.setRank("No rank");
         } else {
             userProfileDto.setRank(userRank.toString());
+            Long score = rankingService.getScore(userId);
+            userProfileDto.setRankScore(score < 0 ? "< 0" : String.valueOf(score));
         }
-        
+
         UserStatisticsDto userStatistics = statisticsService.getUserStatistics(userId);
         userProfileDto.setTotalDislikes(userStatistics.getTotalDislikeCount());
         userProfileDto.setTotalLikes(userStatistics.getTotalLikeCount());

@@ -102,7 +102,7 @@ public class RegistrationServiceImpl {
 
 	public void sendResetPasswordEmail(String username) throws MessagingException {
 		final User user = userRepository.findByUsernameIgnoreCase(username);
-		if (user != null) {
+		if (user != null && user.getEmailConfirmed()) {
 			user.setVerificationCode(UUID.randomUUID().toString());
 			userRepository.save(user);
 			

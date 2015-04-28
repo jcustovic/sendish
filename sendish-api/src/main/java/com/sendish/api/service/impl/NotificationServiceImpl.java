@@ -8,10 +8,7 @@ import com.sendish.repository.model.jpa.ApnsPushToken;
 import com.sendish.repository.model.jpa.GcmPushToken;
 import com.sendish.repository.model.jpa.NotificationMessage;
 import com.sendish.repository.model.jpa.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +17,6 @@ import java.util.Date;
 @Service
 @Transactional
 public class NotificationServiceImpl {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     @Autowired
     private ApnsPushTokenRepository apnsPushTokenRepository;
@@ -55,11 +50,7 @@ public class NotificationServiceImpl {
         }
         token.setDevToken(p_devToken);
 
-        try {
-            apnsPushTokenRepository.save(token);
-        } catch (DataIntegrityViolationException e) {
-            LOGGER.warn("Registering APNS push token {} failed for user {}", p_token, p_userId);
-        }
+        apnsPushTokenRepository.save(token);
     }
 
     private User getUser(Long p_userId) {
@@ -81,11 +72,7 @@ public class NotificationServiceImpl {
             token.setModifiedDate(new Date());
         }
 
-        try {
-            gcmPushTokenRepository.save(token);
-        } catch (DataIntegrityViolationException e) {
-            LOGGER.warn("Registering GCM push token {} failed for user {}", p_token, p_userId);
-        }
+        gcmPushTokenRepository.save(token);
     }
 
     public void unregisterApns(String p_token, Long p_userId) {

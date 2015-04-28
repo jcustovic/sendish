@@ -3,6 +3,8 @@ package com.sendish.api.web.controller.api.v1;
 import javax.mail.MessagingException;
 import javax.validation.Valid;
 
+import com.sendish.api.service.impl.UserServiceImpl;
+import com.sendish.repository.model.jpa.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,9 @@ public class RegistrationController {
     
     @Autowired
     private RegistrationServiceImpl registrationService;
+
+    @Autowired
+    private UserServiceImpl userService;
 
     @InitBinder("userRegistration")
     protected void initBinder(WebDataBinder binder) {
@@ -70,9 +75,14 @@ public class RegistrationController {
     @ApiOperation(value = "Request password reset", notes = "Only if the user signed with email registration!")
     @ApiResponses({
         @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
-        @ApiResponse(code = 204, message = "Reset password email is sent (NOTE: Only if a user exists in the system).", response = Void.class)
+        @ApiResponse(code = 204, message = "Reset password email is sent (NOTE: Only if a user exists in the system).", response = Void.class),
+        @ApiResponse(code = 400, message = "Email not verified", response = Void.class)
     })
     public ResponseEntity<Void> sendResetPasswordEmail(@PathVariable String username) {
+        User user = userService.findByUsernameIgnoreCaseOrEmailIgnoreCase(username, username);
+        if (user != null && !user.getEmailConfirmed()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     	try {
 			registrationService.sendResetPasswordEmail(username);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);

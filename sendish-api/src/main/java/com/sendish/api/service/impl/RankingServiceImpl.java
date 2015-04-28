@@ -68,13 +68,23 @@ public class RankingServiceImpl {
     }
     
     public Long getRank(Long userId) {
-    	Long rank = globalLeaderboard.reverseRank(userId.toString());
-    	if (rank == null) {
-    		return null;
-    	} else {
-    		return rank + 1;
-    	}
-    }
+		Long rank = globalLeaderboard.reverseRank(userId.toString());
+		if (rank == null) {
+			return null;
+		} else {
+			return rank + 1;
+		}
+	}
+
+	public Long getScore(Long userId) {
+		Double rank = globalLeaderboard.score(userId.toString());
+
+		if (rank == null) {
+			return null;
+		} else {
+			return rank.longValue();
+		}
+	}
     
     @Async
     public void addPointsForNewSendish(User user) {

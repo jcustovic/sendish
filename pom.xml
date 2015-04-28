@@ -22,7 +22,7 @@
 		<java.version>1.8</java.version>
 
 		<spring-boot.version>1.2.3.RELEASE</spring-boot.version>
-		<spring-social-facebook.version>2.0.0.RELEASE</spring-social-facebook.version>
+		<spring-social-facebook.version>2.0.1.RELEASE</spring-social-facebook.version>
 
 		<joda-time.version>2.7</joda-time.version>
 		<org.jadira.usertype.version>3.2.0.GA</org.jadira.usertype.version>
