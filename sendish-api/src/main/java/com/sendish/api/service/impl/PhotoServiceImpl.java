@@ -314,7 +314,6 @@ public class PhotoServiceImpl {
 		photoVoteRepository.save(vote);
 		
 		statisticsService.dislikePhoto(photoId, photoOwner);
-		rankingService.removePointsForDislikedPhoto(photoOwner);	
 	}
 
     public void reportReceived(Long photoId, String reason, String reasonText, Long userId) {
@@ -340,7 +339,6 @@ public class PhotoServiceImpl {
             photoReceiverRepository.save(photoReceiver);
 
             statisticsService.reportPhoto(photoId, photoOwner);
-            rankingService.removePointsForReportedPhoto(photoOwner);
             
             if (photoStopDecider.checkToStop(photoId)) {
             	photoSenderService.stopSending(photoId, "Stopped after report check");

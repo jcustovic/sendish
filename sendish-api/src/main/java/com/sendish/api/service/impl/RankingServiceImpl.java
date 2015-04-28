@@ -27,12 +27,9 @@ public class RankingServiceImpl {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RankingServiceImpl.class);
 	
-	private static final double NEW_SENDISH_POINTS = 10;
+	private static final double NEW_SENDISH_POINTS = 5;
 	private static final double LIKED_PHOTO_POINTS = 2;
-	private static final double DISLIKED_PHOTO_POINTS = -4;
-	private static final double REPORTED_PHOTO_POINTS = -5;
 	private static final double LIKED_COMMENT_POINTS = 1;
-	private static final double DISLIKED_COMMENT_POINTS = -2;
 	
 	@Autowired
 	private UserRepository userRepository;
@@ -89,46 +86,25 @@ public class RankingServiceImpl {
     @Async
     public void addPointsForNewSendish(User user) {
     	if (user.isUserActive()) {
-    		increaseScore(user.getId(), NEW_SENDISH_POINTS);	
+    		addScore(user.getId(), NEW_SENDISH_POINTS);
     	}
     }
     
     @Async
     public void addPointsForLikedPhoto(User user) {
     	if (user.isUserActive()) {
-    		increaseScore(user.getId(), LIKED_PHOTO_POINTS);
-    	}
-    }
-    
-    @Async
-    public void removePointsForDislikedPhoto(User user) {
-    	if (user.isUserActive()) {
-    		increaseScore(user.getId(), DISLIKED_PHOTO_POINTS);
-    	}
-    }
-    
-    @Async
-    public void removePointsForReportedPhoto(User user) {
-    	if (user.isUserActive()) {
-    		increaseScore(user.getId(), REPORTED_PHOTO_POINTS);
-    	}
-    }
-    
-    @Async
-    public void addPointsForLikedComment(User user) {
-    	if (user.isUserActive()) {
-    		increaseScore(user.getId(), LIKED_COMMENT_POINTS);
-    	}
-    }
-    
-    @Async
-    public void removePointsForDislikedComment(User user) {
-    	if (user.isUserActive()) {
-    		increaseScore(user.getId(), DISLIKED_COMMENT_POINTS);
+    		addScore(user.getId(), LIKED_PHOTO_POINTS);
     	}
     }
 
-	private void increaseScore(Long userId, double points) {
+	@Async
+	public void addPointsForLikedComment(User user) {
+		if (user.isUserActive()) {
+			addScore(user.getId(), LIKED_COMMENT_POINTS);
+		}
+	}
+
+	private void addScore(Long userId, double points) {
 		try {
 			globalLeaderboard.incrementScore(userId.toString(), points);
 		} catch (Exception e) {

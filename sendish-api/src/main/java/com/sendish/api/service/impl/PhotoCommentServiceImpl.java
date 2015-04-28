@@ -242,7 +242,6 @@ public class PhotoCommentServiceImpl {
                 }
             } else {
                 statisticsService.dislikeComment(photoCommentId);
-                rankingService.removePointsForDislikedComment(comment.getUser());
             }
         }
     }
