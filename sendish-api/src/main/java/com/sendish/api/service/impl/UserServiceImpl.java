@@ -32,6 +32,7 @@ public class UserServiceImpl {
 
     public static final int DEFAULT_SEND_LIMIT_PER_DAY = 20;
     public static final int DEFAULT_RECEIVE_LIMIT_PER_DAY = 50;
+    private static final int MAX_LOCATION_NAME_PROFILE_DETAILS = 35;
 
     @Autowired
     private UserRepository userRepository;
@@ -93,7 +94,7 @@ public class UserServiceImpl {
 
         UserProfileDto userProfileDto = new UserProfileDto();
         if (userDetails.getLastLocationTime() != null) {
-            userProfileDto.setLastPlace(CityUtils.getTrimmedLocationName(userDetails.getCurrentCity()));
+            userProfileDto.setLastPlace(CityUtils.getLocationName(userDetails.getCurrentCity(), MAX_LOCATION_NAME_PROFILE_DETAILS));
             userProfileDto.setLastLat(userDetails.getLocation().getLatitude());
             userProfileDto.setLastLng(userDetails.getLocation().getLongitude());
             userProfileDto.setLastLocationTime(userDetails.getLastInteractionTime().toDate());

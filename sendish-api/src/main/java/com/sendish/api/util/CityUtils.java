@@ -20,8 +20,8 @@ public class CityUtils {
             return StringUtils.trim(city.getName(), trimLength, "...,");
         } else if (cityLength == trimLength - 4) {
             return city.getName() + ", " + city.getCountry().getIso();
-        } else if (cityLength > trimLength - 8) {
-            return city.getName() + ", " + city.getCountry().getIso3();
+        //} else if (cityLength > trimLength - 8) {
+        //    return city.getName() + ", " + city.getCountry().getIso3();
         } else {
             return StringUtils.trim(getLocationName(city), trimLength, "...");
         }
