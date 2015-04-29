@@ -26,6 +26,7 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(RedisBasedDistributorImpl.class);
 
+	public static final int NEW_PHOTO_RECIPIENT_COUNT = 10;
     public static final int USER_LOCK_EXPIRE_IN_SECONDS = 60;
     public static final int MAX_USER_FOR_SLOT_CALCULATION = 2000;
 
@@ -53,7 +54,7 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 
 	@Override
 	public List<PhotoReceiver> sendNewPhoto(Long photoId) {
-		return sendPhoto(photoId, false, 5);
+		return sendPhoto(photoId, false, NEW_PHOTO_RECIPIENT_COUNT);
 	}
 
     private List<PhotoReceiver> sendPhoto(Long photoId, boolean checkForAlreadyReceived, int receiverCount) {
