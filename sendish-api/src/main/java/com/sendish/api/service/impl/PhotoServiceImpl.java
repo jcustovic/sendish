@@ -232,7 +232,7 @@ public class PhotoServiceImpl {
     }
 
     public List<PhotoTraveledDto> getTraveledLocations(Long photoId, Integer page) {
-        List<PhotoReceiver> receivedList = photoReceiverRepository.findByPhotoIdAndOpenedDateNotNull(photoId, new PageRequest(page, PHOTO_LOCATION_PAGE_SIZE, Direction.DESC, "createdDate"));
+        List<PhotoReceiver> receivedList = photoReceiverRepository.findByPhotoIdAndOpenedDateNotNull(photoId, new PageRequest(page, PHOTO_LOCATION_PAGE_SIZE, Direction.DESC, "openedDate"));
 
         return mapToPhotoTraveledDto(receivedList);
     }
