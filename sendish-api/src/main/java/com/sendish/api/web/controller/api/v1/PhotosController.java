@@ -4,6 +4,7 @@ import com.sendish.api.dto.*;
 import com.sendish.api.exception.ResizeFailedException;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.ResizePhotoService;
+import com.sendish.api.service.impl.PhotoVoteServiceImpl;
 import com.sendish.api.service.impl.UserServiceImpl;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
@@ -46,6 +47,9 @@ public class PhotosController {
     private PhotoServiceImpl photoService;
 
     @Autowired
+    private PhotoVoteServiceImpl photoVoteService;
+
+    @Autowired
     private LocationBasedFileUploadValidator locationBasedFileUploadValidator;
 
     @Autowired
@@ -69,7 +73,7 @@ public class PhotosController {
         @ApiResponse(code = 200, message = "OK")
     })
     public List<ReceivedPhotoDto> getReceivedPhotos(@RequestParam(defaultValue = "0") Integer page, AuthUser user) {
-        return photoService.findReceivedByUserId(user.getUserId(), page);
+        return photoService.findAutoReceivedByUserId(user.getUserId(), page);
     }
 
     @RequestMapping(value = "/received/{photoId}", method = RequestMethod.GET)
@@ -88,7 +92,7 @@ public class PhotosController {
             }
         }
 
-        ReceivedPhotoDetailsDto photo = photoService.openReceivedByPhotoIdAndUserId(photoId, user.getUserId(), location.getLongitude(), location.getLatitude());
+        ReceivedPhotoDetailsDto photo = photoService.getReceivedByPhotoIdAndUserId(photoId, user.getUserId(), location.getLongitude(), location.getLatitude());
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
@@ -172,7 +176,7 @@ public class PhotosController {
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            photoService.likeReceived(photoId, user.getUserId());
+            photoVoteService.likeReceived(photoId, user.getUserId());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
@@ -188,7 +192,7 @@ public class PhotosController {
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            photoService.dislikeReceived(photoId, user.getUserId());
+            photoVoteService.dislikeReceived(photoId, user.getUserId());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
@@ -204,7 +208,7 @@ public class PhotosController {
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            photoService.reportReceived(photoId, reason, reasonText, user.getUserId());
+            photoVoteService.reportReceived(photoId, reason, reasonText, user.getUserId());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }

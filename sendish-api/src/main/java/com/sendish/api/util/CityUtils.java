@@ -15,10 +15,16 @@ public class CityUtils {
     }
 
     public static final String getLocationName(City city, int trimLength) {
-    	String countryName = city.getCountry().getName();
-    	trimLength -= countryName.length();
-
-        return StringUtils.trim(city.getName(), --trimLength, "...") + ", " + countryName;
+        int cityLength = city.getName().length();
+        if (cityLength > trimLength - 4) {
+            return StringUtils.trim(city.getName(), trimLength, "...,");
+        } else if (cityLength == trimLength - 4) {
+            return city.getName() + ", " + city.getCountry().getIso();
+        } else if (cityLength > trimLength - 8) {
+            return city.getName() + ", " + city.getCountry().getIso3();
+        } else {
+            return StringUtils.trim(getLocationName(city), trimLength, "...");
+        }
 	}
 
 }

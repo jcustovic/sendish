@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.sendish.api.service.ResizePhotoService;
 
+import com.sendish.api.service.impl.PhotoVoteServiceImpl;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -47,6 +48,9 @@ public class HotPhotosController {
 	
 	@Autowired
     private PhotoServiceImpl photoService;
+
+    @Autowired
+    private PhotoVoteServiceImpl photoVoteService;
 	
 	@Autowired
     @Qualifier("retryableResizePhotoService")
@@ -137,7 +141,7 @@ public class HotPhotosController {
         } else if (photo.getPhoto().getUser().getId().equals(user.getUserId())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            photoService.likePhoto(photoId, user.getUserId());
+            photoVoteService.likePhoto(photoId, user.getUserId());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
@@ -157,7 +161,7 @@ public class HotPhotosController {
         } else if (photo.getPhoto().getUser().getId().equals(user.getUserId())) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            photoService.dislikePhoto(photoId, user.getUserId());
+            photoVoteService.dislikePhoto(photoId, user.getUserId());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }

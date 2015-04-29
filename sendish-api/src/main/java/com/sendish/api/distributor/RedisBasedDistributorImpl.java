@@ -107,7 +107,7 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 		if (checkForAlreadyReceived) {
 			boolean hasAlreadyReceived = photoService.hasAlreadyReceivedPhoto(photoId, userId);
 			if (hasAlreadyReceived) {
-				LOGGER.debug("User {} already received photo {}", userIdString, photoId);
+				LOGGER.debug("User {} already received or seen photo {}", userIdString, photoId);
 			} else if (lockUser(userId)) {
 				return sendPhotoToUser(photoId, userIdString, userId);
 			} else {

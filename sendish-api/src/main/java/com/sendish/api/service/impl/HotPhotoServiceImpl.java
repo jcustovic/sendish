@@ -49,6 +49,9 @@ public class HotPhotoServiceImpl {
     @Autowired
     private PhotoRepository photoRepository;
 
+    @Autowired
+    private PhotoSenderServiceImpl photoSenderService;
+
     public List<PhotoDto> findAll(Integer page) {
         Page<HotPhoto> photos = hotPhotoRepository.findAll(new PageRequest(page, HOT_PHOTO_PAGE_SIZE, Direction.DESC, "selectedTime"));
 
@@ -85,12 +88,14 @@ public class HotPhotoServiceImpl {
 		return photoDetails;
 	}
 
-    public void addNewPhoto(Long photoId) {
+    public void newHotPhoto(Long photoId) {
         HotPhoto hotPhoto = new HotPhoto();
         hotPhoto.setPhotoId(photoId);
         hotPhoto.setSelectedTime(DateTime.now());
 
         hotPhotoRepository.save(hotPhoto);
+
+        photoSenderService.stopSending(photoId, "Photo reached hot list");
 
         Photo photo = photoRepository.findOne(photoId);
         sendCongratsInboxItem(photo);

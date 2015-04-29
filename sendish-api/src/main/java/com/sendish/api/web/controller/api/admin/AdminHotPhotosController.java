@@ -56,7 +56,7 @@ public class AdminHotPhotosController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        hotPhotoService.addNewPhoto(photoId);
+        hotPhotoService.newHotPhoto(photoId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

@@ -28,8 +28,6 @@ import com.sendish.api.dto.ReceivedPhotoDetailsDto;
 import com.sendish.api.dto.ReceivedPhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
 import com.sendish.api.notification.AsyncNotificationProvider;
-import com.sendish.api.photo.HotPhotoDecider;
-import com.sendish.api.photo.PhotoStopDecider;
 import com.sendish.api.redis.KeyUtils;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.util.CityUtils;
@@ -90,9 +88,6 @@ public class PhotoServiceImpl {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
-
-    @Autowired
-    private AsyncPhotoSenderServiceImpl asyncPhotoSenderService;
     
     @Autowired
     private PhotoSenderServiceImpl photoSenderService;
@@ -107,16 +102,7 @@ public class PhotoServiceImpl {
     private RankingServiceImpl rankingService;
     
     @Autowired
-    private UserActivityServiceImpl userActivityService;
-    
-    @Autowired
     private PhotoVoteRepository photoVoteRepository;
-    
-    @Autowired
-    private PhotoStopDecider photoStopDecider;
-    
-    @Autowired
-    private HotPhotoDecider hotPhotoDecider;
 
     public Photo findOne(Long photoId) {
         return photoRepository.findOne(photoId);
@@ -172,15 +158,15 @@ public class PhotoServiceImpl {
     }
 
     public List<PhotoDto> findByUserId(Long userId, Integer page) {
-        List<Photo> photos = photoRepository.findByUserId(userId, 
-        		new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
+        List<Photo> photos = photoRepository.findByUserId(userId,
+                new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
 
         return photoDtoMapper.mapToPhotoDto(photos, MAX_LOCATION_NAME_LENGTH_PHOTO_LIST);
     }
 
-    public List<ReceivedPhotoDto> findReceivedByUserId(Long userId, Integer page) {
-        List<PhotoReceiver> photos = photoReceiverRepository.findByUserId(userId, 
-        		new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
+    public List<ReceivedPhotoDto> findAutoReceivedByUserId(Long userId, Integer page) {
+        List<PhotoReceiver> photos = photoReceiverRepository.findAutoReceivedByUserId(userId,
+                new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
         
         if (page == 0) {
 			statisticsService.resetUserUnseenCount(userId);
@@ -205,7 +191,7 @@ public class PhotoServiceImpl {
         return photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
     }
 
-    public ReceivedPhotoDetailsDto openReceivedByPhotoIdAndUserId(Long photoId, Long userId, BigDecimal longitude, BigDecimal latitude) {
+    public ReceivedPhotoDetailsDto getReceivedByPhotoIdAndUserId(Long photoId, Long userId, BigDecimal longitude, BigDecimal latitude) {
         PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
         if (photoReceiver == null) {
             return null;
@@ -213,13 +199,7 @@ public class PhotoServiceImpl {
 
         ReceivedPhotoDetailsDto photoDetailsDto = new ReceivedPhotoDetailsDto();
         if (photoReceiver.getOpenedDate() == null) {
-            photoReceiver.setOpenedDate(DateTime.now());
-            Location location = getUserLocation(userId, longitude, latitude);
-            photoReceiver.setOpenedLocation(location);
-            City city = cityService.findNearest(location.getLatitude(), location.getLongitude());
-            photoReceiver.setCity(city);
-            photoReceiverRepository.save(photoReceiver);
-            statisticsService.trackReceivedPhotoOpened(photoId, userId, city.getId());
+            saveAndMarkReceivedPhotoAsOpened(photoReceiver, longitude, latitude);
         } else {
         	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
         	if (vote != null) {
@@ -233,117 +213,22 @@ public class PhotoServiceImpl {
         return photoDetailsDto;
     }
 
-    public void likeReceived(Long photoId, Long userId) {
-    	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
-    	if (vote == null) {
-    		savePhotoLike(photoId, userId);
-    		PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-    		asyncPhotoSenderService.resendPhotoOnLike(photoId, photoReceiver.getId());
-    	}
+    public void saveAndMarkReceivedPhotoAsOpened(PhotoReceiver photoReceiver) {
+        saveAndMarkReceivedPhotoAsOpened(photoReceiver, null, null);
     }
 
-    // TODO: Maybe allow changing dislike to like?
-    public void likePhoto(Long photoId, Long userId) {
-    	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
-    	if (vote == null) {
-    		savePhotoLike(photoId, userId);
-    	}
-	}
+    public void saveAndMarkReceivedPhotoAsOpened(PhotoReceiver photoReceiver, BigDecimal longitude, BigDecimal latitude) {
+        Long userId = photoReceiver.getUser().getId();
+        Long photoId = photoReceiver.getPhoto().getId();
+        Location location = getUserLocation(userId, longitude, latitude);
+        City city = cityService.findNearest(location.getLatitude(), location.getLongitude());
 
-	private void savePhotoLike(Long photoId, Long userId) {
-		Photo photo = photoRepository.findOne(photoId);
-        User photoOwner = photo.getUser();
+        photoReceiver.setOpenedDate(DateTime.now());
+        photoReceiver.setOpenedLocation(location);
+        photoReceiver.setCity(city);
+        photoReceiverRepository.save(photoReceiver);
 
-        if (photoOwner.getId().equals(userId)) {
-            throw new IllegalStateException("User cannot like his own photo. UserId: " + userId + ", PhotoId: " + photoId);
-        }
-
-		User user = userRepository.findOne(userId);
-		
-		PhotoVote vote = new PhotoVote();
-		vote.setPhoto(photo);
-		vote.setUser(user);
-		vote.setLike(true);
-		photoVoteRepository.save(vote);
-		
-		Long likeCount = statisticsService.likePhoto(photoId, photoOwner);
-		hotPhotoDecider.decide(photoId, likeCount);
-		rankingService.addPointsForLikedPhoto(photoOwner);
-		
-		if (!photo.getDeleted()) {
-			userActivityService.addPhotoLikedActivity(photo, user);
-		}
-	}
-
-	// TODO: Maybe allow changing like to dislike?
-    public void dislikeReceived(Long photoId, Long userId) {
-    	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
-    	if (vote == null) {
-    		savePhotoDislike(photoId, userId);
-    		PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-    		photoReceiver.setDeleted(true);
-            photoReceiverRepository.save(photoReceiver);
-            
-            if (photoStopDecider.checkToStop(photoId)) {
-            	photoSenderService.stopSending(photoId, "Stopped after dislike check");
-            }
-    	}
-    }
-
-	public void dislikePhoto(Long photoId, Long userId) {
-		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
-    	if (vote == null) {
-    		savePhotoDislike(photoId, userId);
-    	}
-	}
-
-	private void savePhotoDislike(Long photoId, Long userId) {
-		Photo photo = photoRepository.findOne(photoId);
-        User photoOwner = photo.getUser();
-
-        if (photoOwner.getId().equals(userId)) {
-            throw new IllegalStateException("User cannot dislike his own photo. UserId: " + userId + ", PhotoId: " + photoId);
-        }
-
-		User user = userRepository.findOne(userId);
-		
-		PhotoVote vote = new PhotoVote();
-		vote.setPhoto(photo);
-		vote.setUser(user);
-		vote.setLike(false);
-		photoVoteRepository.save(vote);
-		
-		statisticsService.dislikePhoto(photoId, photoOwner);
-	}
-
-    public void reportReceived(Long photoId, String reason, String reasonText, Long userId) {
-    	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
-    	if (vote == null) {
-    		PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-            User photoOwner = photoReceiver.getPhoto().getUser();
-
-            if (photoOwner.getId().equals(userId)) {
-                throw new IllegalStateException("User cannot report his own photo. UserId: " + userId + ", PhotoId: " + photoId);
-            }
-    		
-    		vote = new PhotoVote();
-    		vote.setPhoto(photoReceiver.getPhoto());
-    		vote.setUser(photoReceiver.getUser());
-    		vote.setLike(false);
-    		vote.setReport(true);
-    		vote.setReportType(reason);
-    		vote.setReportText(reasonText);
-    		photoVoteRepository.save(vote);
-            
-            photoReceiver.setDeleted(true);
-            photoReceiverRepository.save(photoReceiver);
-
-            statisticsService.reportPhoto(photoId, photoOwner);
-            
-            if (photoStopDecider.checkToStop(photoId)) {
-            	photoSenderService.stopSending(photoId, "Stopped after report check");
-            }
-    	}
+        statisticsService.trackReceivedPhotoOpened(photoId, userId, city.getId());
     }
 
     public List<PhotoTraveledDto> getTraveledLocations(Long photoId, Integer page) {
@@ -377,6 +262,7 @@ public class PhotoServiceImpl {
         PhotoReceiver photoReceiver = new PhotoReceiver();
         photoReceiver.setUser(user);
         photoReceiver.setPhoto(photo);
+        photoReceiver.setAutoReceived(true);
         photoReceiverRepository.save(photoReceiver);
 
         UserDetails userDetails = userService.getUserDetails(userId);
@@ -384,7 +270,7 @@ public class PhotoServiceImpl {
         userService.saveUserDetails(userDetails);
 
         // TODO: Move to separate method after PhotoReceiver has been saved and committed!
-        usersReceivedPhotos(userId).add(photoId.toString());
+        addPhotoToUsersViewedList(userId, photoId);
         statisticsService.incrementUserUnseenPhotoCount(userId);
         statisticsService.increaseUserDailyReceivedPhotoCount(userId, photoReceiver.getCreatedDate().toLocalDate());
         
@@ -394,7 +280,11 @@ public class PhotoServiceImpl {
 
         return photoReceiver;
     }
-    
+
+    public void addPhotoToUsersViewedList(Long userId, Long photoId) {
+        usersReceivedPhotos(userId).add(photoId.toString());
+    }
+
     private void sendNewPhotoNotification(Long userId, Photo photo) {
 		Map<String, Object> photoReceivedFields = new HashMap<>();
         photoReceivedFields.put("TYPE", "OPEN_RECEIVED_PHOTO");

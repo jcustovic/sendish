@@ -29,6 +29,9 @@ public class PhotoReceiver extends BaseEntity {
 	@JoinColumn(name = "pr_user_id", nullable = false)
 	private User user;
 
+	@Column(name = "pr_auto_received", nullable = false)
+	private Boolean autoReceived = false;
+
 	@Column(name = "pr_deleted", nullable = false)
 	private Boolean deleted = false;
 
@@ -74,7 +77,15 @@ public class PhotoReceiver extends BaseEntity {
 		this.user = user;
 	}
 
-	public Boolean getDeleted() {
+	public Boolean isAutoReceived() {
+		return autoReceived;
+	}
+
+	public void setAutoReceived(Boolean autoReceived) {
+		this.autoReceived = autoReceived;
+	}
+
+	public Boolean isDeleted() {
 		return deleted;
 	}
 
