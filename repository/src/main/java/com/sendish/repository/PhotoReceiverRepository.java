@@ -23,6 +23,9 @@ public interface PhotoReceiverRepository extends JpaRepository<PhotoReceiver, Lo
     List<PhotoReceiver> findAutoReceivedByUserId(Long userId, Pageable pageRequest);
 
     @Query("SELECT pr FROM PhotoReceiver pr WHERE pr.photo.id = ?1 AND pr.user.id = ?2 AND pr.deleted = false")
+    PhotoReceiver findNotDeletedByPhotoIdAndUserId(Long photoId, Long userId);
+
+    @Query("SELECT pr FROM PhotoReceiver pr WHERE pr.photo.id = ?1 AND pr.user.id = ?2")
     PhotoReceiver findByPhotoIdAndUserId(Long photoId, Long userId);
 
     List<PhotoReceiver> findByPhotoIdAndOpenedDateNotNull(Long photoId, Pageable pageRequest);
