@@ -188,11 +188,11 @@ public class PhotoServiceImpl {
     }
 
     public PhotoReceiver findReceivedByPhotoIdAndUserId(Long photoId, Long userId) {
-        return photoReceiverRepository.findNotDeletedByPhotoIdAndUserId(photoId, userId);
+        return photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
     }
 
     public ReceivedPhotoDetailsDto getReceivedByPhotoIdAndUserId(Long photoId, Long userId, BigDecimal longitude, BigDecimal latitude) {
-        PhotoReceiver photoReceiver = photoReceiverRepository.findNotDeletedByPhotoIdAndUserId(photoId, userId);
+        PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
         if (photoReceiver == null) {
             return null;
         }

@@ -4,7 +4,10 @@ import com.sendish.api.service.MailSenderService;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.repository.PhotoRepository;
+import com.sendish.repository.PhotoStatisticsRepository;
 import com.sendish.repository.model.jpa.Photo;
+import com.sendish.repository.model.jpa.PhotoStatistics;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +20,7 @@ import com.sendish.repository.model.jpa.HotPhoto;
 
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +38,9 @@ public class HotPhotoDecider {
 
     @Autowired
     private PhotoRepository photoRepository;
+    
+    @Autowired
+    private PhotoStatisticsRepository photoStatisticsRepository;
 
     @Autowired
     private MailSenderService mailSenderService;
@@ -49,9 +56,12 @@ public class HotPhotoDecider {
                 HotPhoto hotPhoto = hotPhotoRepository.findOne(photoId);
                 if (hotPhoto == null) {
                     Photo photo = photoRepository.findOne(photoId);
+                    PhotoStatistics photoStat = photoStatisticsRepository.findOne(photoId);
                     Map<String, Object> variables = new HashMap<>();
                     variables.put("photo", photo);
+                    variables.put("photoStat", photoStat);
                     variables.put("likeCount", likeCount);
+                    // TODO: Description in template and number of dislikes from DB
 
                     Map<String, byte[]> inlineImages = getInlineImages(photo);
 

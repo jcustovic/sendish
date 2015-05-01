@@ -803,7 +803,9 @@
                                                             <span class="center" th:text="${'User: ' + T(com.sendish.api.util.UserUtils).getDisplayName(photo.user)}">User: cHus</span>
                                                             <span class="center" th:text="${'City: ' + T(com.sendish.api.util.CityUtils).getLocationName(photo.city)}">City: Zagreb, Croatia</span>
                                                             <span class="center" th:text="${'Number of likes: ' + likeCount}">Number of likes: 500</span>
+                                                            <span class="center" th:text="${'Number of dislikes: ' + photoStat.dislikes}">Number of dislikes: 100</span>
                                                             <span class="center" th:text="${'Image ID (UUID): ' + photo.id + ' (' + photo.uuid + ')'}">Image ID (UUID): 523 (c807ebfb-e203-430e-a743-6667d1c8266c)</span>
+                                                            <span class="center" th:text="${'Description: ' + photo.description}">Description: Cool photo!</span>
                                                         </td>
                                                     </tr>
                                                     <tr>

@@ -3,6 +3,7 @@ package com.sendish.api.service.impl;
 import java.util.List;
 
 import com.sendish.api.distributor.PhotoDistributor;
+import com.sendish.repository.PhotoReceiverRepository;
 import com.sendish.repository.PhotoSendingDetailsRepository;
 import com.sendish.repository.model.jpa.*;
 
@@ -23,6 +24,9 @@ public class PhotoSenderServiceImpl {
 
     @Autowired
     private PhotoDistributor photoDistributor;
+    
+    @Autowired
+    private PhotoReceiverRepository photoReceiverRepository;
 
     public PhotoSendingDetails sendNewPhoto(Long photoId) {
         PhotoSendingDetails photoSendingDetails = photoSendingDetailsRepository.findOne(photoId);
@@ -91,7 +95,9 @@ public class PhotoSenderServiceImpl {
 			photoSendingDetails.setPhotoStatus(PhotoStatus.STOPPED);
 			photoSendingDetails.setPhotoStatusReason(stopReason);
 			
-			photoSendingDetailsRepository.save(photoSendingDetails);	
+			photoSendingDetailsRepository.save(photoSendingDetails);
+			
+			photoReceiverRepository.deleteUnopenedByPhotoId(photoId);
 		}
 	}
 
