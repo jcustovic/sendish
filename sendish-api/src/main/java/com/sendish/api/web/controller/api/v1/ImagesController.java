@@ -10,6 +10,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -67,9 +68,13 @@ public class ImagesController {
         if (image == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            ResizedImage resizedImage = resizedImageService.getResizedImage(image.getId(), sizeKey);
-
-            return viewImage(webRequest, resizedImage.getCreatedDate(), image.getContentType(), resizedImage.getSize(), resizedImage.getStorageId());
+        	try {
+	            ResizedImage resizedImage = resizedImageService.getResizedImage(image.getId(), sizeKey);
+	
+	            return viewImage(webRequest, resizedImage.getCreatedDate(), image.getContentType(), resizedImage.getSize(), resizedImage.getStorageId());
+        	} catch (Exception e) {
+                return viewImage(webRequest, image.getCreatedDate(), image.getContentType(), image.getSize(), image.getStorageId());
+            }
         }
     }
 

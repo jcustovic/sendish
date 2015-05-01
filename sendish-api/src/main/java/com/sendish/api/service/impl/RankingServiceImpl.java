@@ -27,8 +27,8 @@ public class RankingServiceImpl {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RankingServiceImpl.class);
 	
-	private static final double NEW_SENDISH_POINTS = 5;
-	private static final double LIKED_PHOTO_POINTS = 2;
+	private static final double NEW_SENDISH_POINTS = 1;
+	private static final double LIKED_PHOTO_POINTS = 4;
 	private static final double LIKED_COMMENT_POINTS = 1;
 	
 	@Autowired

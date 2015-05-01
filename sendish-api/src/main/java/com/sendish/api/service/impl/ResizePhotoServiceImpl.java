@@ -9,8 +9,10 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sendish.api.exception.UnsupportedResizeKey;
 import com.sendish.api.service.ResizePhotoService;
 import com.sendish.api.util.ImageUtils;
+
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.Thumbnails.Builder;
 import net.coobird.thumbnailator.geometry.Positions;
@@ -77,18 +79,19 @@ public class ResizePhotoServiceImpl implements ResizePhotoService {
     }
 
     private ResizedPhoto resize(Long photoId, String sizeKey) throws DataIntegrityViolationException {
-        Photo photo = photoRepository.findOne(photoId);
+    	int[] size = KEY_SIZE_MAP.get(sizeKey);
+        if (size == null) {
+            throw new UnsupportedResizeKey("Size key " + sizeKey + " not supported");
+        }
+        
+    	Photo photo = photoRepository.findOne(photoId);
         InputStream originalIS = null;
         try {
             originalIS = fileStore.getAsInputStream(photo.getStorageId());
         } catch (ResourceNotFoundException e) {
             throw new RuntimeException(e);
         }
-
-        int[] size = KEY_SIZE_MAP.get(sizeKey);
-        if (size == null) {
-            throw new RuntimeException("Size key " + sizeKey + " not supported");
-        }
+        
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             Builder<? extends InputStream> thumbnails = Thumbnails.of(originalIS).useOriginalFormat().size(size[0], size[1]);

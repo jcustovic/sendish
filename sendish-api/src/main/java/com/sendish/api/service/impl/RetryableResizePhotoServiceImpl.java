@@ -1,6 +1,7 @@
 package com.sendish.api.service.impl;
 
 import com.sendish.api.exception.ResizeFailedException;
+import com.sendish.api.exception.UnsupportedResizeKey;
 import com.sendish.api.service.ResizePhotoService;
 import com.sendish.repository.model.jpa.ResizedPhoto;
 
@@ -28,6 +29,9 @@ public class RetryableResizePhotoServiceImpl implements ResizePhotoService {
 	    		// Multiple request at the same time can do a resize. The second time it should work!
 	    		return resizePhotoService.getResizedPhoto(photoId, sizeKey);
 	    	}
+    	} catch (UnsupportedResizeKey e) {
+    		LOGGER.warn("Resize photo " + photoId + " for key " + sizeKey + " failed exception", e);
+    		throw new ResizeFailedException(e);
     	} catch (Exception e) {
     		LOGGER.error("Resize photo " + photoId + " for key " + sizeKey + " failed exception", e);
     		throw new ResizeFailedException(e);

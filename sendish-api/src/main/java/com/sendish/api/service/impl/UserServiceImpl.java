@@ -30,7 +30,7 @@ import com.sendish.repository.model.jpa.UserStatistics;
 @Transactional
 public class UserServiceImpl {
 
-    public static final int DEFAULT_SEND_LIMIT_PER_DAY = 20;
+    public static final int DEFAULT_SEND_LIMIT_PER_DAY = 10;
     public static final int DEFAULT_RECEIVE_LIMIT_PER_DAY = 50;
     private static final int MAX_LOCATION_NAME_PROFILE_DETAILS = 35;
 

@@ -56,7 +56,7 @@ public class PhotoVoteServiceImpl {
 	public void likePhoto(Long photoId, Long userId) {
 		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
 		if (vote == null) {
-			checkAndAddPhotoToReceivedPhotoAndMarkAsOpened(photoId, userId);
+			checkAndAddPhotoToReceivedPhotoAndMarkAsOpened(photoId, userId, false);
 			processPhotoLike(photoId, userId);
 		}
 	}
@@ -64,7 +64,6 @@ public class PhotoVoteServiceImpl {
 	public void likeReceived(Long photoId, Long userId) {
 		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
 		if (vote == null) {
-			checkAndAddPhotoToReceivedPhotoAndMarkAsOpened(photoId, userId);
 			processPhotoLike(photoId, userId);
 			PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
 			asyncPhotoSenderService.resendPhotoOnLike(photoId, photoReceiver.getId());
@@ -109,6 +108,7 @@ public class PhotoVoteServiceImpl {
 	public void dislikePhoto(Long photoId, Long userId) {
 		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
 		if (vote == null) {
+			checkAndAddPhotoToReceivedPhotoAndMarkAsOpened(photoId, userId, true);
 			processPhotoDislike(photoId, userId);
 		}
 	}
@@ -157,13 +157,14 @@ public class PhotoVoteServiceImpl {
 		}
 	}
 
-	private void checkAndAddPhotoToReceivedPhotoAndMarkAsOpened(Long photoId, Long userId) {
+	private void checkAndAddPhotoToReceivedPhotoAndMarkAsOpened(Long photoId, Long userId, boolean deleted) {
 		PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
 		if (photoReceiver == null) {
 			Photo photo = photoService.findOne(photoId);
 			User user = userRepository.findOne(userId);
 			photoReceiver = new PhotoReceiver();
 			photoReceiver.setAutoReceived(false);
+			photoReceiver.setDeleted(deleted);
 			photoReceiver.setPhoto(photo);
 			photoReceiver.setUser(user);
 

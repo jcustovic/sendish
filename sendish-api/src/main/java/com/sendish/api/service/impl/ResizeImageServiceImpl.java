@@ -1,5 +1,6 @@
 package com.sendish.api.service.impl;
 
+import com.sendish.api.exception.UnsupportedResizeKey;
 import com.sendish.api.service.ResizeImageService;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
@@ -56,6 +57,11 @@ public class ResizeImageServiceImpl implements ResizeImageService {
     }
     
     private ResizedImage resize(Long imageId, String sizeKey) {
+    	int[] size = KEY_SIZE_MAP.get(sizeKey);
+        if (size == null) {
+            throw new UnsupportedResizeKey("Size key " + sizeKey + " not supported");
+        }
+        
         Image image = imageRepository.findOne(imageId);
         InputStream originalIS = null;
         try {
@@ -64,10 +70,6 @@ public class ResizeImageServiceImpl implements ResizeImageService {
             throw new RuntimeException(e);
         }
 
-        int[] size = KEY_SIZE_MAP.get(sizeKey);
-        if (size == null) {
-            throw new RuntimeException("Size key " + sizeKey + " not supported");
-        }
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             Builder<? extends InputStream> thumbnails = Thumbnails.of(originalIS).useOriginalFormat().size(size[0], size[1]);
