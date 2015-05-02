@@ -33,6 +33,12 @@ public class UserActivityServiceImpl {
 	private static final int PAGE_SIZE = 20;
 	private static final int MAX_ACTIVITY_PER_USER = 50;
     private static final int MAX_ACTIVITY_TEXT_IN_DB_LENGTH = 512;
+    
+    public static final String PHOTO_SENT_TYPE = "PHOTO_SENT"; // Opens sent photo details
+    public static final String PHOTO_RECEIVED_TYPE = "PHOTO_RECEIVED"; // Opens received photo details
+    public static final String PHOTO_SENT_COMMENT_TYPE = "PHOTO_SENT_COMMENT"; // Opens sent photo comments
+    public static final String PHOTO_RECEIVED_COMMENT_TYPE = "PHOTO_RECEIVED_COMMENT"; // Opens received photo comments
+    public static final String INBOX_ITEM_TYPE = "INBOX_ITEM"; // Opens inbox item details
 	
 	private static PrettyTime prettyTime = new PrettyTime();
 	
@@ -60,23 +66,48 @@ public class UserActivityServiceImpl {
 		activityItem.setDisplayName(displayName);
 		activityItem.setDescription(userActivity.getText());
 		activityItem.setReferenceId(userActivity.getReferenceId());
-		activityItem.setReferenceType(getDtoReferenceType(userActivity.getReferenceType()));
+		if (userActivity.getUser().getId() == 4) {
+			activityItem.setReferenceType(getDtoReferenceTypeV1_1(userActivity.getReferenceType()));
+		} else {
+			activityItem.setReferenceType(getDtoReferenceType(userActivity.getReferenceType()));	
+		}
 		activityItem.setImageUuid(userActivity.getImageUuid());
 		activityItem.setTimeAgo(prettyTime.format(userActivity.getCreatedDate().toDate()));
 
 		return activityItem;
 	}
-
-	private String getDtoReferenceType(String referenceType) {
+	
+	private String getDtoReferenceTypeV1_1(String referenceType) {
 		if ("PHOTO_LIKED".equals(referenceType)) {
-			return "PHOTO_SENT";
+			return PHOTO_SENT_TYPE;
 		} else if ("PHOTO_COMMENT".equals(referenceType) || "PHOTO_SENT_COMMENT_LIKED".equals(referenceType) 
 				|| "SENT_PHOTO_REPLY_COMMENT".equals(referenceType)) {
-			return "PHOTO_SENT_COMMENT";
+			return PHOTO_SENT_TYPE;
 		} else if ("PHOTO_RECEIVED_COMMENT_LIKED".equals(referenceType) || "RECEIVED_PHOTO_REPLY_COMMENT".equals(referenceType)) {
-			return "PHOTO_RECEIVED_COMMENT";
+			return PHOTO_RECEIVED_TYPE;
 		} else if ("INBOX_ITEM".equals(referenceType)) {
-			return "INBOX_ITEM";
+			return INBOX_ITEM_TYPE;
+		}
+		LOGGER.warn("Unknown referenceType {} so returning that name", referenceType);
+		
+		return "UNKNOWN";
+	}
+
+	/**
+	 * Remove when all users move to 1.1 or above!
+	 * 
+	 */
+	@Deprecated
+	private String getDtoReferenceType(String referenceType) {
+		if ("PHOTO_LIKED".equals(referenceType)) {
+			return PHOTO_SENT_TYPE;
+		} else if ("PHOTO_COMMENT".equals(referenceType) || "PHOTO_SENT_COMMENT_LIKED".equals(referenceType) 
+				|| "SENT_PHOTO_REPLY_COMMENT".equals(referenceType)) {
+			return PHOTO_SENT_COMMENT_TYPE;
+		} else if ("PHOTO_RECEIVED_COMMENT_LIKED".equals(referenceType) || "RECEIVED_PHOTO_REPLY_COMMENT".equals(referenceType)) {
+			return PHOTO_RECEIVED_COMMENT_TYPE;
+		} else if ("INBOX_ITEM".equals(referenceType)) {
+			return INBOX_ITEM_TYPE;
 		}
 		LOGGER.warn("Unknown referenceType {} so returning that name", referenceType);
 		
@@ -88,7 +119,9 @@ public class UserActivityServiceImpl {
             // TODO: Hack here. If from user is empty (e.g. welcome inbox messages, admin messages etc.).
             return "Sendish";
         }
-		if ("PHOTO_COMMENT".equals(referenceType)) {
+		if ("PHOTO_COMMENT".equals(referenceType)
+				|| "RECEIVED_PHOTO_REPLY_COMMENT".equals(referenceType)
+				|| "SENT_PHOTO_REPLY_COMMENT".equals(referenceType)) {
 			return UserUtils.getDisplayNameWithCity(user);
 		}
 		

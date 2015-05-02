@@ -202,7 +202,9 @@ public class PhotoServiceImpl {
             saveAndMarkReceivedPhotoAsOpened(photoReceiver, longitude, latitude);
         } else {
         	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
-        	if (vote != null) {
+        	if (vote == null && userId == 4) {
+        		photoDetailsDto.setForceRating(true);
+        	} else if (vote != null) {
         		photoDetailsDto.setLike(vote.getLike());
                 photoDetailsDto.setReport(vote.getReport());		
         	}
