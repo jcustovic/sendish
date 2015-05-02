@@ -28,6 +28,7 @@ public class UserPoolFillerScheduler {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserPoolFillerScheduler.class);
 
     private static final long HALF_MINUTE_DELAY = 30000L;
+    public static final long MINUTE_DELAY = 60000L;
     private static final long MAX_FETCH_SIZE = 1000;
     private static final long MAX_USER_POOL_SIZE = 10000;
 
@@ -37,7 +38,7 @@ public class UserPoolFillerScheduler {
     @Autowired
     private UserPool userPool;
 
-    @Scheduled(fixedDelay = HALF_MINUTE_DELAY)
+    @Scheduled(fixedDelay = HALF_MINUTE_DELAY, initialDelay = MINUTE_DELAY)
     @Transactional
     public void fillUsersPool() {
         Long poolSize = userPool.getPoolSize();

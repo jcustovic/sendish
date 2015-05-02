@@ -24,6 +24,7 @@ public class NewNotSentPhotoScheduler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NewNotSentPhotoScheduler.class);
 
     public static final long HALF_MINUTE_DELAY = 30000L;
+    public static final long MINUTE_DELAY = 60000L;
 
     @Autowired
     private PhotoSenderServiceImpl photoSenderService;
@@ -31,7 +32,7 @@ public class NewNotSentPhotoScheduler {
     @Autowired
     private PhotoSendingDetailsRepository photoSendingDetailsRepository;
 
-    @Scheduled(fixedDelay = HALF_MINUTE_DELAY)
+    @Scheduled(fixedDelay = HALF_MINUTE_DELAY, initialDelay = MINUTE_DELAY)
     @Transactional
     public void resendNewUnsentPhotos() throws InterruptedException {
         LOGGER.info("Starting resend of new photos...");
