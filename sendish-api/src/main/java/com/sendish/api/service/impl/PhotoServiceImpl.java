@@ -199,12 +199,13 @@ public class PhotoServiceImpl {
 
         ReceivedPhotoDetailsDto photoDetailsDto = new ReceivedPhotoDetailsDto();
         if (photoReceiver.getOpenedDate() == null) {
+        	if (userId == 18) {
+        		photoDetailsDto.setForceRating(true);
+        	}
             saveAndMarkReceivedPhotoAsOpened(photoReceiver, longitude, latitude);
         } else {
         	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
-        	if (vote == null && userId == 4) {
-        		photoDetailsDto.setForceRating(true);
-        	} else if (vote != null) {
+        	if (vote != null) {
         		photoDetailsDto.setLike(vote.getLike());
                 photoDetailsDto.setReport(vote.getReport());		
         	}

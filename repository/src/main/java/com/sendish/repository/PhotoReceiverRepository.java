@@ -16,7 +16,7 @@ import java.util.List;
 @Transactional(propagation = Propagation.MANDATORY)
 public interface PhotoReceiverRepository extends JpaRepository<PhotoReceiver, Long> {
 
-    @Query("SELECT pr.photo FROM PhotoReceiver pr WHERE pr.user.id = ?1 AND pr.photo.uuid = ?2 AND pr.deleted = false")
+    @Query("SELECT pr.photo FROM PhotoReceiver pr WHERE pr.user.id = ?1 AND pr.photo.uuid = ?2")
     Photo findPhotoByUserIdAndPhotoUUID(Long userId, String photoUUID);
 
     @Query("SELECT pr FROM PhotoReceiver pr LEFT JOIN FETCH pr.photo LEFT JOIN FETCH pr.city WHERE pr.user.id = ?1 AND pr.deleted = false AND pr.autoReceived = true")
