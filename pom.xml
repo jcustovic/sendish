@@ -12,8 +12,9 @@
 
 	<modules>
 		<module>repository</module>
-		<module>location-importer</module>
+		<module>location-importer-app</module>
 		<module>sendish-api</module>
+		<module>sendish-batch-app</module>
 		<module>inmemory-redis</module>
 	</modules>
 

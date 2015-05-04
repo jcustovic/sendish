@@ -9,6 +9,7 @@
 	</parent>
 	
 	<artifactId>sendish-api</artifactId>
+    <packaging>jar</packaging>
 
     <build>
         <plugins>
