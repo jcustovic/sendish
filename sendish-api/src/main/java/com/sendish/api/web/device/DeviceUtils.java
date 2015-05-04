@@ -14,7 +14,9 @@ public class DeviceUtils {
 	public static boolean isIOSWithVersionGreatherThan(String version) {
 		Device device = getDevice();
 
-		return DeviceType.IOS.equals(device.getType()) && device.isVersionGreatherThan(version) == 1;
+		return DeviceType.IOS.equals(device.getType())
+				&& version != null
+				&& device.isVersionGreatherThan(version) == 1;
 	}
 
 	public static boolean isIOS() {
@@ -24,7 +26,9 @@ public class DeviceUtils {
 	public static boolean isAndroidWithVersionGreatherThan(String version) {
 		Device device = getDevice();
 
-		return DeviceType.ANDROID.equals(device.getType()) && device.isVersionGreatherThan(version) == 1;
+		return DeviceType.ANDROID.equals(device.getType())
+				&& version != null
+				&& device.isVersionGreatherThan(version) == 1;
 	}
 
 	public static boolean isAndroid() {

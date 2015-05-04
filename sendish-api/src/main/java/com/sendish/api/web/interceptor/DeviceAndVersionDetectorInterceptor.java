@@ -13,8 +13,8 @@ import com.sendish.api.web.device.DeviceType;
 import com.sendish.api.web.device.DeviceUtils;
 
 public class DeviceAndVersionDetectorInterceptor extends HandlerInterceptorAdapter {
-	
-	private static final Pattern IOS_VERSION_PATTERN = Pattern.compile("Sendish/([^\\s]+)");
+
+	private static final Pattern IOS_VERSION_PATTERN = Pattern.compile("sendish/([^\\s]+)");
 
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		String userAgent = request.getHeader("User-Agent");
