@@ -31,7 +31,10 @@ public class InMemoryRedisAutoConfiguration {
             return new RedisServer(config.getExecutable().getFile(), config.getPort());
         }
 
-        return RedisServer.builder().port(6379).build();
+        return RedisServer.builder()
+        		.port(6379)
+        		.setting("maxheap 2000000000") // Windows fix set heap to 2Gb
+        		.build();
     }
 
     @PostConstruct

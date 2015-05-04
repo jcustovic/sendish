@@ -28,7 +28,7 @@
 		<org.jadira.usertype.version>3.2.0.GA</org.jadira.usertype.version>
 		<hibernate-spatial.version>4.3</hibernate-spatial.version>
 		<vividsolutions.jts.version>1.13</vividsolutions.jts.version>
-		<swagger-springmvc.version>0.9.3</swagger-springmvc.version>
+		<swagger-springmvc.version>1.0.2</swagger-springmvc.version>
 		<hibernate.version>4.3.8.Final</hibernate.version>
 		<prettytime.version>3.2.7.Final</prettytime.version>
 		<javax.mail.version>1.4.7</javax.mail.version>
