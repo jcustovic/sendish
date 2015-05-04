@@ -11,4 +11,24 @@ public class DeviceUtils {
 		return (Device) RequestContextHolder.getRequestAttributes().getAttribute(DEVICE_ATTRIBUTE_NAME, RequestAttributes.SCOPE_REQUEST);
 	}
 
+	public static boolean isIOSWithVersionGreatherThan(String version) {
+		Device device = getDevice();
+
+		return DeviceType.IOS.equals(device.getType()) && device.isVersionGreatherThan(version) == 1;
+	}
+
+	public static boolean isIOS() {
+		return DeviceType.IOS.equals(getDevice());
+	}
+
+	public static boolean isAndroidWithVersionGreatherThan(String version) {
+		Device device = getDevice();
+
+		return DeviceType.ANDROID.equals(device.getType()) && device.isVersionGreatherThan(version) == 1;
+	}
+
+	public static boolean isAndroid() {
+		return DeviceType.ANDROID.equals(getDevice());
+	}
+
 }

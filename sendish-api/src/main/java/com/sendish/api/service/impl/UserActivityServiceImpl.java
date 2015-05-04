@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.sendish.api.web.device.DeviceUtils;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,7 @@ public class UserActivityServiceImpl {
 		activityItem.setDisplayName(displayName);
 		activityItem.setDescription(userActivity.getText());
 		activityItem.setReferenceId(userActivity.getReferenceId());
-		if (userActivity.getUser().getId() == 4) {
+		if (DeviceUtils.isIOSWithVersionGreatherThan("1.0") || DeviceUtils.isAndroid()) {
 			activityItem.setReferenceType(getDtoReferenceTypeV1_1(userActivity.getReferenceType()));
 		} else {
 			activityItem.setReferenceType(getDtoReferenceType(userActivity.getReferenceType()));	

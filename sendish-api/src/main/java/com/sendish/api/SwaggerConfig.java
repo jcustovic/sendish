@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +40,6 @@ import com.sendish.api.security.userdetails.AuthUser;
 
 @Configuration
 @Order(Ordered.LOWEST_PRECEDENCE)
-@AutoConfigureAfter(MvcConfig.class)
 public class SwaggerConfig extends WebMvcConfigurerAdapter {
 
     @Autowired

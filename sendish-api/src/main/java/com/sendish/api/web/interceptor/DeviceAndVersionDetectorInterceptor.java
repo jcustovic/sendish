@@ -22,7 +22,7 @@ public class DeviceAndVersionDetectorInterceptor extends HandlerInterceptorAdapt
 		if (userAgent != null) {
 			userAgent = userAgent.toLowerCase();
 			if (userAgent.contains("iphone") || userAgent.contains("ipad")) {
-				device.setType(DeviceType.APPLE);
+				device.setType(DeviceType.IOS);
 				Matcher matcher = IOS_VERSION_PATTERN.matcher(userAgent);
 				if (matcher.find()) {
 				    String version = matcher.group(1);

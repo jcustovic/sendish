@@ -16,8 +16,13 @@ public class Device {
 		this.version = version;
 	}
 
-	// the strings are equal or one string is a substring of the other
-	// e.g. "1.2.3" = "1.2.3" or "1.2.3" < "1.2.3.4"
+	/**
+	 * the strings are equal or one string is a substring of the other
+	 * e.g. "1.2.3" = "1.2.3" or "1.2.3" < "1.2.3.4"
+	 *
+	 * @param minVersion
+	 * @return 0 = equals, 1 = greater, -1 = lower
+	 */
 	public Integer isVersionGreatherThan(String minVersion) {
 		String[] vals1 = minVersion.split("\\.");
 		String[] vals2 = version.split("\\.");
@@ -34,16 +39,6 @@ public class Device {
 		} else {
 			return Integer.signum(vals1.length - vals2.length);
 		}
-	}
-	
-	public static void main(String[] args) {
-		Device device = new Device();
-		device.setVersion("1.0");
-		System.out.println(device.isVersionGreatherThan("1.0"));
-		System.out.println(device.isVersionGreatherThan("1.1"));
-		System.out.println(device.isVersionGreatherThan("0.99"));
-		System.out.println(device.isVersionGreatherThan("1.0.1"));
-		System.out.println(device.isVersionGreatherThan("1.0.0"));
 	}
 	
 	// Getters & setters
