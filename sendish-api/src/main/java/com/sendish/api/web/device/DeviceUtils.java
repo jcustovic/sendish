@@ -15,7 +15,7 @@ public class DeviceUtils {
 		Device device = getDevice();
 
 		return DeviceType.IOS.equals(device.getType())
-				&& version != null
+				&& device.getVersion() != null
 				&& device.isVersionGreatherThan(version) == 1;
 	}
 
@@ -27,7 +27,7 @@ public class DeviceUtils {
 		Device device = getDevice();
 
 		return DeviceType.ANDROID.equals(device.getType())
-				&& version != null
+				&& device.getVersion() != null
 				&& device.isVersionGreatherThan(version) == 1;
 	}
 

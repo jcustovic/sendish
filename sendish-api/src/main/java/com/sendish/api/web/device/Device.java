@@ -24,8 +24,8 @@ public class Device {
 	 * @return 0 = equals, 1 = greater, -1 = lower
 	 */
 	public Integer isVersionGreatherThan(String minVersion) {
-		String[] vals1 = minVersion.split("\\.");
-		String[] vals2 = version.split("\\.");
+		String[] vals1 = version.split("\\.");
+		String[] vals2 = minVersion.split("\\.");
 		int i = 0;
 		// set index to first non-equal ordinal or length of shortest version
 		// string

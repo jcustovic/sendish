@@ -58,7 +58,7 @@ public class UserActivityServiceImpl {
 			statisticsService.markActivitiesAsRead(userId);
 		}
 		
-		return activity.stream().map(a -> mapToActivityItemDto(a)).collect(Collectors.toList());
+		return activity.stream().map(this::mapToActivityItemDto).collect(Collectors.toList());
 	}
 
 	private ActivityItemDto mapToActivityItemDto(UserActivity userActivity) {
@@ -95,7 +95,7 @@ public class UserActivityServiceImpl {
 	}
 
 	/**
-	 * Remove when all users move to 1.1 or above!
+	 * Remove when all users move to iOS >= 1.1 or above!
 	 * 
 	 */
 	@Deprecated
@@ -214,7 +214,7 @@ public class UserActivityServiceImpl {
 			return new ArrayList<>(0);
 		} else {
 			return userActivities.stream()
-					.map(id -> userActivityRepository.findOne(id))
+					.map(userActivityRepository::findOne)
 					.filter(ua -> ua != null) // TODO: Maybe log which ID were not found.
 					.collect(Collectors.toList());
 		}
@@ -225,7 +225,7 @@ public class UserActivityServiceImpl {
 		long end = PAGE_SIZE * (page + 1) - 1;
 		List<String> activityIds = userTimeline(userId).range(start, end);
 		
-		return activityIds.stream().map(id -> Long.valueOf(id)).collect(Collectors.toList());
+		return activityIds.stream().map(Long::valueOf).collect(Collectors.toList());
 	}
 
 	private void addActivityToUserTimeline(Long userId, Long activityId) {
