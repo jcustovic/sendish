@@ -199,9 +199,7 @@ public class PhotoServiceImpl {
 
         ReceivedPhotoDetailsDto photoDetailsDto = new ReceivedPhotoDetailsDto();
         if (photoReceiver.getOpenedDate() == null) {
-        	if (userId == 18) {
-        		photoDetailsDto.setForceRating(true);
-        	}
+            photoDetailsDto.setForceRating(true);
             saveAndMarkReceivedPhotoAsOpened(photoReceiver, longitude, latitude);
         } else {
         	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
