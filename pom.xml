@@ -11,10 +11,11 @@
 	<description>Sendish parent project</description>
 
 	<modules>
-		<module>repository</module>
-		<module>location-importer-app</module>
+		<module>sendish-repository</module>
+		<module>sendish-push-notification</module>
 		<module>sendish-api</module>
 		<module>sendish-batch-app</module>
+		<module>location-importer-app</module>
 		<module>inmemory-redis</module>
 	</modules>
 

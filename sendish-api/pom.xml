@@ -23,9 +23,15 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.sendish</groupId>
-			<artifactId>repository</artifactId>
+			<artifactId>sendish-repository</artifactId>
 			<version>${pom.version}</version>
 		</dependency>
+
+        <dependency>
+            <groupId>com.sendish</groupId>
+            <artifactId>sendish-push-notification</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
 		
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -115,11 +121,6 @@
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.notnoop.apns</groupId>
-            <artifactId>apns</artifactId>
         </dependency>
 
         <dependency>

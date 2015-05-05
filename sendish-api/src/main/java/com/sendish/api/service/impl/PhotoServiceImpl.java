@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.sendish.push.notification.AsyncNotificationProvider;
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,6 @@ import com.sendish.api.dto.PhotoTraveledDto;
 import com.sendish.api.dto.ReceivedPhotoDetailsDto;
 import com.sendish.api.dto.ReceivedPhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
-import com.sendish.api.notification.AsyncNotificationProvider;
 import com.sendish.api.redis.KeyUtils;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.util.CityUtils;

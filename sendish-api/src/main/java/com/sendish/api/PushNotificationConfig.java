@@ -1,7 +1,7 @@
 package com.sendish.api;
 
-import com.sendish.api.notification.ApnsNotificationProviderImpl;
-import com.sendish.api.notification.DelegateNotificationProvider;
+import com.sendish.push.notification.ApnsNotificationProviderImpl;
+import com.sendish.push.notification.DelegateNotificationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;

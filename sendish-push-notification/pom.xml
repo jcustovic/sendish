@@ -10,21 +10,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>sendish-batch-app</artifactId>
-    <packaging>jar</packaging>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-
-    <properties>
-        <top.basedir>${project.basedir}/..</top.basedir>
-    </properties>
+    <artifactId>sendish-push-notification</artifactId>
 
     <dependencies>
         <dependency>
@@ -34,20 +20,19 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sendish</groupId>
-            <artifactId>sendish-push-notification</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-batch</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.notnoop.apns</groupId>
+            <artifactId>apns</artifactId>
         </dependency>
     </dependencies>
-
 
 </project>

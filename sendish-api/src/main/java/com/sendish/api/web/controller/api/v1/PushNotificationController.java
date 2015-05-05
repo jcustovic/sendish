@@ -1,8 +1,8 @@
 package com.sendish.api.web.controller.api.v1;
 
-import com.sendish.api.notification.AsyncNotificationProvider;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.NotificationServiceImpl;
+import com.sendish.push.notification.AsyncNotificationProvider;
 import com.sendish.repository.model.jpa.ApnsPushToken;
 import com.sendish.repository.model.jpa.GcmPushToken;
 import com.wordnik.swagger.annotations.*;

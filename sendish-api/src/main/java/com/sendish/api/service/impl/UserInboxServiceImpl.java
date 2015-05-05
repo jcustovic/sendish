@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.sendish.push.notification.AsyncNotificationProvider;
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.InboxItemDto;
-import com.sendish.api.notification.AsyncNotificationProvider;
 import com.sendish.api.util.StringUtils;
 import com.sendish.repository.InboxMessageRepository;
 import com.sendish.repository.UserInboxItemRepository;

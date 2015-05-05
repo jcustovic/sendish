@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.sendish.push.notification.AsyncNotificationProvider;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.CommentDto;
 import com.sendish.api.dto.NewCommentDto;
-import com.sendish.api.notification.AsyncNotificationProvider;
 import com.sendish.api.redis.dto.CommentStatisticsDto;
 import com.sendish.api.util.StringUtils;
 import com.sendish.api.util.UserUtils;

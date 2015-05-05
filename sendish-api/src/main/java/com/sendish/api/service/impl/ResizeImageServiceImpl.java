@@ -4,7 +4,6 @@ import com.sendish.api.exception.UnsupportedResizeKey;
 import com.sendish.api.service.ResizeImageService;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
-import com.sendish.api.util.RetryUtils;
 import com.sendish.repository.ImageRepository;
 import com.sendish.repository.ResizedImageRepository;
 import com.sendish.repository.model.jpa.Image;

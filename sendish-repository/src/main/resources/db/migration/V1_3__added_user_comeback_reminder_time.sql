@@ -1,0 +1,1 @@
+ALTER TABLE auth_user_details ADD COLUMN aud_come_back_reminder_time timestamp;

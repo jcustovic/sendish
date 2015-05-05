@@ -1,0 +1,17 @@
+
+spring:
+  application:
+    name: sendish-batch-app
+  datasource:
+    url: jdbc:h2:file:~/sendish/db
+    username: sa
+    password: cHusica
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.spatial.dialect.h2geodb.GeoDBDialect
+    properties:
+      hibernate:
+         cache:
+            use_second_level_cache: false
+            use_query_cache: false

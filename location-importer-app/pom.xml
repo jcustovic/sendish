@@ -19,7 +19,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.sendish</groupId>
-			<artifactId>repository</artifactId>
+			<artifactId>sendish-repository</artifactId>
 			<version>${pom.version}</version>
 		</dependency>
 
