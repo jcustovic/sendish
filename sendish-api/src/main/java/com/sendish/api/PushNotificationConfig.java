@@ -3,6 +3,7 @@ package com.sendish.api;
 import com.sendish.push.notification.ApnsNotificationProviderImpl;
 import com.sendish.push.notification.DelegateNotificationProvider;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -10,6 +11,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 
 @Configuration
+@ComponentScan("com.sendish.push.notification")
 public class PushNotificationConfig {
 
     @Bean

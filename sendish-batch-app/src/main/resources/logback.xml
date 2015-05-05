@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    
+    <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%20.20t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wex"/>
+	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+	
+    <property name="PATTERN_DEFAULT" value="[%date{dd.MM.yyyy HH:mm:ss.SSS}] : %-5level : %thread : %contextName : [%logger.%method:%line] %X{referenceClass} - %msg%n" />
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/sendish-batch-app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/sendish-batch-app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${PATTERN_DEFAULT}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+        <smtpHost>mail.sendish.com</smtpHost>
+        <smtpPort>587</smtpPort>
+        <!--
+        <ssl>true</ssl>
+        -->
+        <username>app.sender@sendish.com</username>
+        <password>4fLlmz2qtlDF</password>
+
+        <to>jan.custovic@gmail.com</to>
+        <from>error@sendish.com</from>
+        <subject>[Sendish-API-error-${CONTEXT_NAME}]: %logger{20} - %m</subject>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${PATTERN_DEFAULT}</pattern>
+        </layout>
+    </appender>
+
+
+    <logger name="com.sendish.batch" level="debug" />
+
+    <logger name="org.springframework.boot.actuate" level="warn" />
+    <logger name="com.notnoop.apns" level="warn" />
+
+    <logger name="org.hibernate.engine.jdbc.spi.SqlExceptionHelper" level="off" />
+    
+    <!-- 
+    <logger name="org.hibernate.event.internal.DefaultLoadEventListener" level="trace" />
+    <logger name="org.hibernate.jpa.spi" level="trace" />
+    -->
+
+	<!--
+    <logger name="net.sf.ehcache" level="trace" />
+    <logger name="org.hibernate.cache" level="trace" />
+	<logger name="org.hibernate.SQL" level="trace" />    
+    <logger name="org.hibernate.stat.Statistics" level="trace" />
+    -->
+	
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="EMAIL" />
+    </root>
+
+</configuration>

@@ -23,7 +23,7 @@ public class DeleteUnopenedPhotoReceiver {
     @Scheduled(fixedDelay = FIVE_MIN_RATE)
     @Transactional
     public void checkForInvalidTokens() {
-        LOG.debug("Started delete uopened photo receiver scheduler");
+        LOG.debug("Started delete unopened photo receiver scheduler");
 
         DateTime olderThan = DateTime.now().minusDays(2);
         Integer deleteCount = photoReceiverRepository.deleteUnopenedOlderThan(olderThan);
