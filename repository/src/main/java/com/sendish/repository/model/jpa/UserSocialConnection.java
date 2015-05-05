@@ -29,9 +29,9 @@ public class UserSocialConnection implements Serializable {
     public static final int DISPLAY_NAME_MAX_LENGTH     = 255;
     public static final int PROFILE_URL_MAX_LENGTH      = 512;
     public static final int IMAGE_URL_MAX_LENGTH        = 512;
-    public static final int ACCESS_TOKEN_MAX_LENGTH     = 255;
+    public static final int ACCESS_TOKEN_MAX_LENGTH     = 512;
     public static final int SECRET_MAX_LENGTH           = 255;
-    public static final int REFRESH_TOKEN_MAX_LENGTH    = 255;
+    public static final int REFRESH_TOKEN_MAX_LENGTH    = 512;
 
     @Id
     @Column(name = "usc_user_id", nullable = false)

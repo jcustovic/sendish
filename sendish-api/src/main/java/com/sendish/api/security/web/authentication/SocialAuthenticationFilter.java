@@ -103,8 +103,8 @@ public class SocialAuthenticationFilter extends GenericFilterBean {
             return;
         }
 
-        if (socialAuth[1].length() > 255) {
-            authenticationEntryPoint.commence(request, response, new BadCredentialsException("Max 255 chars allowed for access token"));
+        if (socialAuth[1].length() > 512) {
+            authenticationEntryPoint.commence(request, response, new BadCredentialsException("Max 512 chars allowed for access token"));
             return;
         }
 
