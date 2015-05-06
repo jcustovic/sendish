@@ -35,7 +35,7 @@
 
         <to>jan.custovic@gmail.com</to>
         <from>error@sendish.com</from>
-        <subject>[Sendish-API-error-${CONTEXT_NAME}]: %logger{20} - %m</subject>
+        <subject>[Sendish-Batch-App-error-${CONTEXT_NAME}]: %logger{20} - %m</subject>
 
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>${PATTERN_DEFAULT}</pattern>
