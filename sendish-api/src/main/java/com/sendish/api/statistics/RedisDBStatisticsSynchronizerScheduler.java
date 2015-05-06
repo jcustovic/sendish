@@ -1,6 +1,5 @@
 package com.sendish.api.statistics;
 
-
 import com.sendish.api.redis.dto.CommentStatisticsDto;
 import com.sendish.api.redis.dto.PhotoStatisticsDto;
 import com.sendish.api.redis.dto.UserStatisticsDto;

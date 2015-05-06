@@ -1,4 +1,3 @@
-
 spring:
   application:
     name: sendish-batch-app
@@ -15,3 +14,30 @@ spring:
          cache:
             use_second_level_cache: false
             use_query_cache: false
+
+flyway:
+  locations: db/migration,db/h2/migration
+  validateOnMigrate: false
+
+management:
+  context-path: /manage
+  security:
+    role: MANAGE
+
+security:
+  enable-csrf: false
+  user:
+    name: mag
+    password: pass
+
+app:
+  ios:
+    cert:
+      dev:
+        path: classpath:ios/apns/SendishAPNS_DEV.jks
+        pass: sendisH
+      prod:
+        path: classpath:ios/apns/SendishAPNS_PROD.jks
+        pass: sendisH
+
+

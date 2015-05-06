@@ -126,6 +126,7 @@ public class UserServiceImpl {
         DateTime now = DateTime.now();
         if (userDetails.getLastInteractionTime() != null && userDetails.getLastInteractionTime().isBefore(now.minusMinutes(10))) {
         	userDetails.setLastInteractionTime(now);
+            userDetails.setComeBackReminderTime(null);
         	userDetailsRepository.save(userDetails);
         }
 
@@ -157,6 +158,7 @@ public class UserServiceImpl {
             userDetails.setLocation(new Location(latitude, longitude));
             userDetails.setCurrentCity(cityService.findNearest(latitude, longitude));
             userDetails.setLastInteractionTime(DateTime.now());
+            userDetails.setComeBackReminderTime(null);
 
             userDetailsRepository.save(userDetails);
         }
@@ -169,6 +171,7 @@ public class UserServiceImpl {
         userDetails.setLocation(location);
         userDetails.setCurrentCity(city);
         userDetails.setLastInteractionTime(photoDate);
+        userDetails.setComeBackReminderTime(null);
 
         Long currentCount = statisticsService.incrementUserDailySentPhotoCount(userId, photoDate.toLocalDate());
 

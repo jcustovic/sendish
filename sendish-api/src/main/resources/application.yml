@@ -45,7 +45,7 @@ security:
 
 endpoints:
   shutdown:
-    enabled: true
+    enabled: false
 
 flyway:
   locations: db/migration,db/h2/migration
@@ -71,7 +71,3 @@ app:
     overlay:
       sendish_logo: classpath:app/image/sendish_64x64.png
 
----
-
-spring:
-    profiles: prod

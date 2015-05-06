@@ -25,6 +25,7 @@
 
 		<spring-boot.version>1.2.3.RELEASE</spring-boot.version>
 		<spring-social-facebook.version>2.0.1.RELEASE</spring-social-facebook.version>
+		<spring-data-releasetrain.version>Fowler-RELEASE</spring-data-releasetrain.version>
 
 		<joda-time.version>2.7</joda-time.version>
 		<org.jadira.usertype.version>3.2.0.GA</org.jadira.usertype.version>
@@ -63,12 +64,26 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-releasetrain</artifactId>
+				<version>${spring-data-releasetrain.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+
+			<dependency>
 				<!-- Import dependency management from Spring Boot -->
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
 				<version>${spring-boot.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.springframework.data</groupId>
+						<artifactId>spring-data-releasetrain</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 
 			<dependency>

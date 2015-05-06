@@ -125,14 +125,14 @@ public class ApnsNotificationProviderImpl implements ApnsNotificationProvider {
                     pageToken.getTotalElements());
             LOG.debug("\t --> sending page {} with {} tokens", pageToken.getNumber() + 1, pageToken.getNumberOfElements());
 
-            sendMessage(pageToken, message);
+            sendJsonMessage(pageToken.getContent(), message);
 
             while (pageToken.hasNext()) {
                 pageToken = searchNext(p_queryHolder, pageToken.nextPageable());
 
                 LOG.debug("\t --> sending page {} with {} tokens", pageToken.getNumber(), pageToken.getNumberOfElements());
 
-                sendMessage(pageToken, message);
+                sendJsonMessage(pageToken.getContent(), message);
             }
         }
 
@@ -205,16 +205,25 @@ public class ApnsNotificationProviderImpl implements ApnsNotificationProvider {
         }
     }
 
+    public void sendMessage(ApnsPushToken token, String message) {
+        String payload = buildMessage(message, null);
 
-    private void sendMessage(Page<ApnsPushToken> p_pageToken, String p_message) {
-        final List<String> refIds =  p_pageToken.getContent().stream().filter(t -> !t.isDevToken()).map(PushToken::getToken).collect(Collectors.toList());
+        if (token.isDevToken()) {
+            devService.push(token.getToken(), payload);
+        } else {
+            prodService.push(token.getToken(), payload);
+        }
+    }
+
+    private void sendJsonMessage(Collection<ApnsPushToken> tokens, String message) {
+        final List<String> refIds =  tokens.stream().filter(t -> !t.isDevToken()).map(PushToken::getToken).collect(Collectors.toList());
         if (!refIds.isEmpty()) {
-            sendPushMessage(prodService, p_message, refIds);
+            sendPushMessage(prodService, message, refIds);
         }
 
-        final List<String> devRefIds =  p_pageToken.getContent().stream().filter(PushToken::isDevToken).map(PushToken::getToken).collect(Collectors.toList());
+        final List<String> devRefIds =  tokens.stream().filter(PushToken::isDevToken).map(PushToken::getToken).collect(Collectors.toList());
         if (!devRefIds.isEmpty()) {
-            sendPushMessage(devService, p_message, devRefIds);
+            sendPushMessage(devService, message, devRefIds);
         }
     }
 

@@ -30,7 +30,7 @@ public class ApnsInvalidTokenChecker {
     @Transactional
     public void checkForInvalidTokens() {
         Map<String, Date> inactiveDevices = apnsNotificationProvider.getInactiveDevices();
-        LOG.debug("Invalid prod devices --> count: {}", inactiveDevices.size());
+        LOG.info("Invalid prod devices --> count: {}", inactiveDevices.size());
         invalidatedTokens(inactiveDevices);
 
         inactiveDevices = apnsNotificationProvider.getInactiveDevicesDev();

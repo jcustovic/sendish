@@ -81,7 +81,9 @@ public class HotPhotoServiceImpl {
 		photoDtoMapper.mapToPhotoDto(hotPhoto.getPhoto(), photoDetails, MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS);
 		photoDetails.setComments(photoCommentService.findFirstByPhotoId(photoId, userId, 3));
 		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
-        if (vote != null) {
+        if (vote == null) {
+            photoDetails.setForceRating(true);
+        } else {
         	photoDetails.setLike(vote.getLike());
         }
 		
