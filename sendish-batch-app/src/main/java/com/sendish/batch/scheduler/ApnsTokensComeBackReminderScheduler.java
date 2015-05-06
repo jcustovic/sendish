@@ -30,7 +30,7 @@ public class ApnsTokensComeBackReminderScheduler {
     @Scheduled(fixedDelay = ONE_HOUR_RATE)
     public void sendComeBackRemindersForIOSUsers() {
         LOG.debug("Started come back reminder for iOS users");
-        DateTime lastInteractionTimeLowerThan = DateTime.now().minusDays(1);
+        DateTime lastInteractionTimeLowerThan = DateTime.now().minusHours(32); // 1 day and 8 hours
         DateTime lastTimeSentLowerThan = DateTime.now().minusDays(3);
         try (Stream<ApnsPushToken> tokens = apnsPushTokenRepository.streamUsersThatRequiredFirstComeBackMsgToBeSent(lastInteractionTimeLowerThan)) {
             if (tokens != null) {
