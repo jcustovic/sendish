@@ -1,14 +1,5 @@
 package com.sendish.api.web.method.support;
 
-/*******************************************************************************
- * Copyright (C) 2011-2014 Tri plus grupa d.o.o <info@3plus.hr>
- * All rights reserved.
- * 
- * This file is part of project zipato-admin.
- * It can not be copied and/or distributed without the
- * express permission of Tri plus grupa d.o.o
- ******************************************************************************/
-
 import com.sendish.api.security.userdetails.AuthUser;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
