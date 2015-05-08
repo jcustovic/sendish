@@ -21,7 +21,7 @@ public class ComeBackReminderSender {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendNotification(ApnsPushToken apnsPushToken) {
-        apnsNotificationProvider.sendMessage(apnsPushToken, "We miss you! Check out new photos on hot list!");
+        apnsNotificationProvider.sendMessage(apnsPushToken, "We miss you! Check out new photos on the hot list!");
 
         UserDetails userDetails = apnsPushToken.getUser().getDetails();
         userDetails.setComeBackReminderTime(DateTime.now());

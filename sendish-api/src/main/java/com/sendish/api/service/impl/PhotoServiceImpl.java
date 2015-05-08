@@ -247,7 +247,7 @@ public class PhotoServiceImpl {
 
     public void deletePhoto(Long photoId) {
         Photo photo = photoRepository.findOne(photoId);
-        photo.setDeleted(true);
+        photo.setSenderDeleted(true);
 
         photoRepository.save(photo);
     }
@@ -333,7 +333,7 @@ public class PhotoServiceImpl {
     }
 
     private List<PhotoTraveledDto> mapToPhotoTraveledDto(List<PhotoReceiver> receivedList) {
-        return receivedList.stream().map(photo -> mapToPhotoTraveledDto(photo)).collect(Collectors.toList());
+        return receivedList.stream().map(this::mapToPhotoTraveledDto).collect(Collectors.toList());
     }
 
     private PhotoTraveledDto mapToPhotoTraveledDto(PhotoReceiver photoReceiver) {
