@@ -5,9 +5,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import com.sendish.api.service.impl.PhotoServiceImpl;
-import com.sendish.repository.model.jpa.Photo;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,7 +23,9 @@ import com.sendish.api.dto.CommentDto;
 import com.sendish.api.dto.NewCommentDto;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.PhotoCommentServiceImpl;
+import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.api.web.controller.validator.NewCommentValidator;
+import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoComment;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -46,7 +45,7 @@ public class PhotoCommentsController {
     
     @Autowired
     private NewCommentValidator newCommentValidator;
-
+    
     @RequestMapping(value = "/{photoId}/comments", method = RequestMethod.GET)
     @ApiOperation(value = "Get comments for a specific photo")
     @ApiResponses({
@@ -63,43 +62,13 @@ public class PhotoCommentsController {
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
     
-    @Deprecated
-	@RequestMapping(value = "/{photoId}", method = RequestMethod.POST)
-    @ApiOperation(value = "Post a comment to specific photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created comment")
-    @ApiResponses({
-    	@ApiResponse(code = 200, message = "NOT USED! 201 will be returned", response = Void.class),
-        @ApiResponse(code = 201, message = "Comment created"),
-        @ApiResponse(code = 400, message = "Validation errors or bad request"),
-        @ApiResponse(code = 404, message = "Photo not found")
-    })
-	public ResponseEntity<String> newComment(@PathVariable Long photoId,
-			@RequestParam String comment, @RequestParam Long replyToId, AuthUser user) {
-        Photo photo = photoService.findOne(photoId);
-        if (photo == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        if (comment.length() > 200) {
-            return new ResponseEntity<>("Comment to long. Max 200 characters allowed", HttpStatus.BAD_REQUEST);
-        }
-
-        PhotoComment photoComment = photoCommentService.save(photoId, comment, user.getUserId());
-    	
-    	final URI location = ServletUriComponentsBuilder
-                .fromCurrentServletMapping().path("/api/v1.0/photo-comments/{id}").build()
-                .expand(photoComment.getId()).toUri();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(location);
-
-        return new ResponseEntity<>(headers, HttpStatus.CREATED);
-    }
-	
 	@RequestMapping(value = "/new/{photoId}", method = RequestMethod.POST)
     @ApiOperation(value = "Post a comment to specific photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created comment")
     @ApiResponses({
-    	@ApiResponse(code = 200, message = "NOT USED! 201 will be returned", response = Void.class),
-        @ApiResponse(code = 201, message = "Comment created")
+    	@ApiResponse(code = 200, message = "NOT USED! 201 will be returned"),
+        @ApiResponse(code = 201, message = "Comment created"),
+    	@ApiResponse(code = 400, message = "Validation errors or bad request"),
+        @ApiResponse(code = 404, message = "Photo not found")
     })
 	public ResponseEntity<Void> postNewComment(@PathVariable Long photoId,
 			@RequestBody @Valid NewCommentDto newCommentDto, BindingResult result, AuthUser user) throws BindException {
@@ -121,7 +90,7 @@ public class PhotoCommentsController {
 
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
-
+	
     @RequestMapping(value = "/comment/{photoCommentId}", method = RequestMethod.DELETE)
     @ApiOperation(value = "Delete your comments or any comment on a photo that you own")
     @ApiResponses({

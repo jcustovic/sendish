@@ -15,53 +15,53 @@ public class PhotoReply extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Column(name = "pr_uuid", nullable = false, unique = true, length = 36)
+    @Column(name = "prp_uuid", nullable = false, unique = true, length = 36)
     private String uuid;
 
-    @Column(name = "pr_name", nullable = false, length = 128)
+    @Column(name = "prp_name", nullable = false, length = 128)
     private String name;
 
-    @Column(name = "pr_description", length = 200)
+    @Column(name = "prp_description", length = 200)
     private String description;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "pr_photo_id", nullable = false)
+    @JoinColumn(name = "prp_photo_id", nullable = false)
     private Photo photo;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "pr_user_id", nullable = false)
+    @JoinColumn(name = "prp_user_id", nullable = false)
     private User user;
 
-    @Column(name = "pr_deleted", nullable = false)
+    @Column(name = "prp_deleted", nullable = false)
     private Boolean deleted = false;
 
-    @Column(name = "pr_storage_id", length = 200, nullable = false, unique = true)
+    @Column(name = "prp_storage_id", length = 200, nullable = false, unique = true)
     private String storageId;
 
-    @Column(name = "pr_width", nullable = false)
+    @Column(name = "prp_width", nullable = false)
     private Integer width;
 
-    @Column(name = "pr_height", nullable = false)
+    @Column(name = "prp_height", nullable = false)
     private Integer height;
 
-    @Column(name = "pr_size_byte", nullable = false)
+    @Column(name = "prp_size_byte", nullable = false)
     private Long size;
 
-    @Column(name = "pr_content_type", nullable = false)
+    @Column(name = "prp_content_type", nullable = false)
     private String contentType;
 
-    @Column(name = "pr_created_date", nullable = false)
+    @Column(name = "prp_created_date", nullable = false)
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime createdDate;
 
-    @Column(name = "pr_report_type", length = 32)
+    @Column(name = "prp_report_type", length = 32)
     private String reportType;
 
-    @Column(name = "pr_report_text", length = 128)
+    @Column(name = "prp_report_text", length = 128)
     private String reportText;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "pr_report_by", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "prp_reported_by")
     private User reportedBy;
 
     @PrePersist
@@ -161,10 +161,6 @@ public class PhotoReply extends BaseEntity {
 
     public DateTime getCreatedDate() {
         return createdDate;
-    }
-
-    public void setCreatedDate(DateTime createdDate) {
-        this.createdDate = createdDate;
     }
 
     public String getReportType() {

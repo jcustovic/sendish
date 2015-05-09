@@ -13,7 +13,9 @@ import javax.persistence.*;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ChatMessage extends BaseEntity {
 
-    @ManyToOne(optional = false)
+	private static final long serialVersionUID = 1L;
+
+	@ManyToOne(optional = false)
     @JoinColumn(name = "cm_thread_id", nullable = false)
     private ChatThread chatThread;
 

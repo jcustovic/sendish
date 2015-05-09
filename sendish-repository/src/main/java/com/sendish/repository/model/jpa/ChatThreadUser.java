@@ -11,7 +11,9 @@ import java.io.Serializable;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ChatThreadUser implements Serializable {
 
-    @Id
+	private static final long serialVersionUID = 1L;
+
+	@Id
     @ManyToOne(optional = false)
     @JoinColumn(name = "ctu_thread_id", nullable = false)
     private ChatThread chatThread;

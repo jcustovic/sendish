@@ -40,7 +40,7 @@ public class TravelingPhotoResenderScheduler {
     	
     	LOGGER.info("Found {} photos that need to be resent.", photoIds.getTotalElements());
         ExecutorService executor = Executors.newFixedThreadPool(20);
-    	photoIds.getContent().stream().forEach(p -> executor.execute(() -> photoSenderService.resendPhoto(p)));
+    	photoIds.getContent().stream().forEach(p -> executor.execute(() -> photoSenderService.resendPhoto(p, 1)));
         executor.shutdown();
         executor.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
     	LOGGER.info("Sending finished.");

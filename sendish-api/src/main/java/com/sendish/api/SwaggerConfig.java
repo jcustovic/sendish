@@ -65,114 +65,114 @@ public class SwaggerConfig extends WebMvcConfigurerAdapter {
 		@Autowired
 	    private SpringSwaggerConfig springSwaggerConfig;
 		
-		 @Bean
-		    public SwaggerSpringMvcPlugin apiV1Implementation() {
-		        springSwaggerConfig.defaultIgnorableParameterTypes().add(AuthUser.class);
-		        springSwaggerConfig.defaultIgnorableParameterTypes().add(WebRequest.class);
+		@Bean
+	    public SwaggerSpringMvcPlugin apiV1Implementation() {
+	        springSwaggerConfig.defaultIgnorableParameterTypes().add(AuthUser.class);
+	        springSwaggerConfig.defaultIgnorableParameterTypes().add(WebRequest.class);
 
-		        return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
-		                .includePatterns("/api/v1.0/.*")
-		                .swaggerGroup("v1.0")
-		                .apiInfo(v1ApiInfo())
-		                .useDefaultResponseMessages(true);
-		    }
+	        return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
+	                .includePatterns("/api/v1.0/.*")
+	                .swaggerGroup("v1.0")
+	                .apiInfo(v1ApiInfo())
+	                .useDefaultResponseMessages(true);
+	    }
 
-		    private ApiInfo v1ApiInfo() {
-		        return new ApiInfo(
-		                "Sendish API",
-		                "REST API to connect to backend system",
-		                null, // "My Apps API terms of service"
-		                "jan@sendish.com",
-		                "© Sendish.com",
-		                null // "My Apps API License URL"
-		        );
-		    }
+	    private ApiInfo v1ApiInfo() {
+	        return new ApiInfo(
+	                "Sendish API",
+	                "REST API to connect to backend system",
+	                null, // "My Apps API terms of service"
+	                "jan@sendish.com",
+	                "© Sendish.com",
+	                null // "My Apps API License URL"
+	        );
+	    }
 
-		    @Bean
-		    public SwaggerSpringMvcPlugin adminImplementation() {
-		        springSwaggerConfig.defaultIgnorableParameterTypes().add(AuthUser.class);
-		        springSwaggerConfig.defaultIgnorableParameterTypes().add(WebRequest.class);
+	    @Bean
+	    public SwaggerSpringMvcPlugin adminImplementation() {
+	        springSwaggerConfig.defaultIgnorableParameterTypes().add(AuthUser.class);
+	        springSwaggerConfig.defaultIgnorableParameterTypes().add(WebRequest.class);
 
-		        return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
-		                .includePatterns("/api/admin/.*")
-		                .swaggerGroup("admin")
-		                .apiInfo(adminApiInfo())
-		                .useDefaultResponseMessages(true);
-		    }
+	        return new SwaggerSpringMvcPlugin(this.springSwaggerConfig)
+	                .includePatterns("/api/admin/.*")
+	                .swaggerGroup("admin")
+	                .apiInfo(adminApiInfo())
+	                .useDefaultResponseMessages(true);
+	    }
 
-		    private ApiInfo adminApiInfo() {
-		        return new ApiInfo(
-		                "Sendish Admin API",
-		                "Admin stuff",
-		                null, // "My Apps API terms of service"
-		                "jan@sendish.com",
-		                "© Sendish.com",
-		                null // "My Apps API License URL"
-		        );
-		    }
+	    private ApiInfo adminApiInfo() {
+	        return new ApiInfo(
+	                "Sendish Admin API",
+	                "Admin stuff",
+	                null, // "My Apps API terms of service"
+	                "jan@sendish.com",
+	                "© Sendish.com",
+	                null // "My Apps API License URL"
+	        );
+	    }
 		    
-		    @Bean
-		    public Map<RequestMethod, List<ResponseMessage>> defaultResponseMessages() {
-		    	LinkedHashMap<RequestMethod, List<ResponseMessage>> responses = newLinkedHashMap();
-		        
-				responses.put(GET, asList(
-		            new ResponseMessage(OK.value(), OK.getReasonPhrase(), null),
-		            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
-		            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
-			    ));
+	    @Bean
+	    public Map<RequestMethod, List<ResponseMessage>> defaultResponseMessages() {
+	    	LinkedHashMap<RequestMethod, List<ResponseMessage>> responses = newLinkedHashMap();
+	        
+			responses.put(GET, asList(
+	            new ResponseMessage(OK.value(), OK.getReasonPhrase(), null),
+	            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
+	            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
+		    ));
 
-		        responses.put(PUT, asList(
-		            new ResponseMessage(NOT_FOUND.value(), NOT_FOUND.getReasonPhrase(), null),
-		            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
-		            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
-		        ));
+	        responses.put(PUT, asList(
+	            new ResponseMessage(NOT_FOUND.value(), NOT_FOUND.getReasonPhrase(), null),
+	            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
+	            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
+	        ));
 
-		        responses.put(POST, asList(
-		            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
-		            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
-		        ));
+	        responses.put(POST, asList(
+	            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
+	            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
+	        ));
 
-		        responses.put(DELETE, asList(
-			        new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), null),
-			        new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
-			        new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
-		        ));
+	        responses.put(DELETE, asList(
+		        new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), null),
+		        new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
+		        new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
+	        ));
 
-		        responses.put(PATCH, asList(
-		            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), null),
-		            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
-		            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
-		        ));
+	        responses.put(PATCH, asList(
+	            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), null),
+	            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
+	            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
+	        ));
 
-		        responses.put(TRACE, asList(
-		            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), null),
-		            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
-		            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
-		        ));
+	        responses.put(TRACE, asList(
+	            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), null),
+	            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
+	            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
+	        ));
 
-		        responses.put(OPTIONS, asList(
-		            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), null),
-		            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
-		            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
-		        ));
-		        
-		        responses.put(HEAD, asList(
-		            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), null),
-		            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
-		            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
-		        ));
+	        responses.put(OPTIONS, asList(
+	            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), null),
+	            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
+	            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
+	        ));
+	        
+	        responses.put(HEAD, asList(
+	            new ResponseMessage(NO_CONTENT.value(), NO_CONTENT.getReasonPhrase(), null),
+	            new ResponseMessage(UNAUTHORIZED.value(), UNAUTHORIZED.getReasonPhrase(), null),
+	            new ResponseMessage(INTERNAL_SERVER_ERROR.value(), INTERNAL_SERVER_ERROR_MSG, null)
+	        ));
 
-		    	return responses;
-		    }
+	    	return responses;
+	    }
 
-		    private List<ResponseMessage> asList(ResponseMessage... responseMessages) {
-				List<ResponseMessage> list = new ArrayList<>();
-				for (ResponseMessage responseMessage : responseMessages) {
-					list.add(responseMessage);
-				}
-
-				return list;
+	    private List<ResponseMessage> asList(ResponseMessage... responseMessages) {
+			List<ResponseMessage> list = new ArrayList<>();
+			for (ResponseMessage responseMessage : responseMessages) {
+				list.add(responseMessage);
 			}
+
+			return list;
+		}
 		    
 	}
 

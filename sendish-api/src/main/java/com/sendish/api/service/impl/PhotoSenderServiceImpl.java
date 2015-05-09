@@ -50,7 +50,7 @@ public class PhotoSenderServiceImpl {
         return photoSendingDetailsRepository.save(photoSendingDetails);
     }
 
-    public void resendPhoto(Long photoId) {
+    public void resendPhoto(Long photoId, int numOfRecipients) {
         PhotoSendingDetails photoSendingDetails = photoSendingDetailsRepository.findOne(photoId);
         if (photoSendingDetails == null) {
             throw new IllegalStateException("PhotoSending with id " + photoId + " not found. Either the photo is not found or it is a new photo.");
@@ -59,7 +59,7 @@ public class PhotoSenderServiceImpl {
         	return;
         }
 
-        List<PhotoReceiver> receivers = photoDistributor.resendPhoto(photoId);
+        List<PhotoReceiver> receivers = photoDistributor.resendPhoto(photoId, numOfRecipients);
         if (receivers.isEmpty()) {
             photoSendingDetails.setSendStatus(PhotoSendStatus.NO_USER);
         } else {
@@ -82,7 +82,7 @@ public class PhotoSenderServiceImpl {
 		Long lastPhotoReceiverId = photoSendingDetails.getLastReceiver().getId();
 		
 		if (lastPhotoReceiverId.equals(photoReceiverId)) {
-			resendPhoto(photoId);
+			resendPhoto(photoId, 1);
 		} else {
 			LOGGER.debug("Not resending because photo receiver ({}) is not the last receiver ({})", photoReceiverId, lastPhotoReceiverId);
 		}

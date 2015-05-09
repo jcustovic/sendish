@@ -48,8 +48,8 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
     
     
     @Override
-	public List<PhotoReceiver> resendPhoto(Long photoId) {
-		return sendPhoto(photoId, true, 1);
+	public List<PhotoReceiver> resendPhoto(Long photoId, int numOfRecipients) {
+		return sendPhoto(photoId, true, numOfRecipients);
 	}
 
 	@Override
@@ -72,9 +72,10 @@ public class RedisBasedDistributorImpl implements PhotoDistributor {
 	    	}
 	    	
 	        Iterator<String> iterator = users.iterator();
-	        while (iterator.hasNext() && receiverCount-- > 0) {
+	        while (iterator.hasNext() && receiverCount > 0) {
 	        	String userIdString = iterator.next();
 	        	if (!photoOwnerIdString.equals(userIdString)) {
+	        		receiverCount--;
 	        		PhotoReceiver receiver = trySendingPhotoToUser(photoId, checkForAlreadyReceived, userIdString);
 	        		if (receiver != null) {
 	        			receivers.add(receiver);

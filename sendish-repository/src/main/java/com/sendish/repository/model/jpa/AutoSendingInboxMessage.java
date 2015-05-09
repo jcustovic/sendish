@@ -13,7 +13,9 @@ import javax.persistence.*;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AutoSendingInboxMessage extends BaseEntity {
 
-    @ManyToOne(optional = false)
+	private static final long serialVersionUID = 1L;
+
+	@ManyToOne(optional = false)
     @JoinColumn(name = "asim_im_id", nullable = false)
     private InboxMessage inboxMessage;
 

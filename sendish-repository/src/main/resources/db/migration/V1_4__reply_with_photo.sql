@@ -22,7 +22,8 @@ create table photo_reply (
   primary key (prp_id),
   constraint photo_reply_photo_id_fk foreign key (prp_photo_id) references photo,
   constraint photo_reply_user_id_fk foreign key (prp_user_id) references auth_user,
-  constraint photo_reply_reported_by_fk foreign key (prp_reported_by) references auth_user
+  constraint photo_reply_reported_by_fk foreign key (prp_reported_by) references auth_user,
+  constraint photo_reply_user_photo_uq unique (prp_user_id, prp_photo_id)
 );
 
 create index photo_reply_photo_id_idx on photo_reply (prp_photo_id);

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.sendish.push.notification.AsyncNotificationProvider;
+
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -59,27 +60,6 @@ public class PhotoCommentServiceImpl {
     
     @Autowired
     private UserActivityServiceImpl userActivityService;
-
-    @Deprecated
-	public PhotoComment save(Long photoId, String comment, Long userId) {
-        // TODO: Maybe restrict only to my photos or received photos?
-		Photo photo = photoRepository.findOne(photoId);
-		User user = userRepository.findOne(userId);
-		
-		PhotoComment photoComment = new PhotoComment();
-		photoComment.setPhoto(photo);
-		photoComment.setUser(user);
-		photoComment.setComment(comment);
-
-        photoComment = photoCommentRepository.save(photoComment);
-        statisticsService.incrementPhotoCommentCount(photoId);
-        if (!photo.getDeleted() && !photo.getUser().getId().equals(userId)) {
-        	sendCommentNotificationToPhotoOwner(user, photo, comment);
-        	userActivityService.addPhotoCommentActivity(photoComment);
-        }
-
-		return photoComment;
-	}
 	
 	public PhotoComment save(NewCommentDto commentDto) {
 		 // TODO: Maybe restrict only to my photos or received photos?
@@ -146,7 +126,7 @@ public class PhotoCommentServiceImpl {
         
         statisticsService.decrementPhotoCommentCount(photoComment.getPhoto().getId());
     }
-
+    
     private List<CommentDto> mapToCommentDto(List<PhotoComment> comments, Long userId) {
         return comments.stream().map(comment -> mapToCommentDto(comment, userId)).collect(Collectors.toList());
     }

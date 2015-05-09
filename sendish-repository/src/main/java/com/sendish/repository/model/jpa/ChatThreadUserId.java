@@ -13,9 +13,9 @@ public class ChatThreadUserId implements Serializable {
 		// Hibernate
 	}
 
-	public ChatThreadUserId(Long userId, Long chatThread) {
+	public ChatThreadUserId(Long userId, Long chatThreadId) {
 		user = userId;
-		chatThread = chatThread;
+		chatThread = chatThreadId;
 	}
 
 	@Override

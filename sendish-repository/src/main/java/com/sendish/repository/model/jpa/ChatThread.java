@@ -13,7 +13,9 @@ import javax.persistence.*;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ChatThread extends BaseEntity {
 
-    @ManyToOne(optional = false)
+	private static final long serialVersionUID = 1L;
+
+	@ManyToOne(optional = false)
     @JoinColumn(name = "cth_photo_reply_id", nullable = false)
     private PhotoReply photoReply;
 
@@ -50,10 +52,6 @@ public class ChatThread extends BaseEntity {
 
     public DateTime getCreatedDate() {
         return createdDate;
-    }
-
-    public void setCreatedDate(DateTime createdDate) {
-        this.createdDate = createdDate;
     }
 
 }
