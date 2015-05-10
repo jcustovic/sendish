@@ -85,7 +85,7 @@ public class RedisStatisticsRepository {
 		List<String> fields = Arrays.asList("total.likeCount",
 				"total.dislikeCount", "total.reportCount",
 				"total.unseenPhotoCount", "total.unreadInboxItemCount",
-				"hasNewActivities");
+				"hasNewActivities", "hasNewPhotoReplyActivities");
         HashOperations<String, String, String> hashOp = template.opsForHash();
         List<String> values = hashOp.multiGet(KeyUtils.userStatistics(userId), fields);
 
@@ -95,13 +95,14 @@ public class RedisStatisticsRepository {
         Long unseenPhotoCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
         Long unreadInboxItemCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(4), "0"));
         boolean hasNewActivities = values.get(5) != null;
+        boolean hasNewPhotoReplyActivities = values.get(6) != null;
 
         Long dailySentCount = getDailySentPhotoCount(userId, LocalDate.now());
         Long totalCityCount = userCities(userId).size();
 
 		return new UserStatisticsDto(likeCount, dislikeCount, reportCount,
 				dailySentCount, unseenPhotoCount, unreadInboxItemCount,
-				totalCityCount, hasNewActivities);
+				totalCityCount, hasNewActivities, hasNewPhotoReplyActivities);
     }
 
     public Long incrementUserDailySentPhotoCount(Long userId, LocalDate date) {
@@ -204,11 +205,11 @@ public class RedisStatisticsRepository {
     }
     
     public void setNewPhotoReplyActivity(Long userId) {
-    	userStatistics(userId).putIfAbsent("hasPhotoReplyActivities", "1");
+    	userStatistics(userId).putIfAbsent("hasNewPhotoReplyActivities", "1");
     }
     
     public void markPhotoReplyActivitiesAsRead(Long userId) {
-    	userStatistics(userId).remove("hasPhotoReplyActivities");
+    	userStatistics(userId).remove("hasNewPhotoReplyActivities");
     }
     
     // Redis objects

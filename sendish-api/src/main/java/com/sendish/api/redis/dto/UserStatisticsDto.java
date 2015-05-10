@@ -14,11 +14,12 @@ public class UserStatisticsDto implements Serializable {
 	private Long unreadInboxItemCount;
 	private Long dailySendCount;
 	private boolean hasNewActivities;
+	private boolean hasNewPhotoReplyActivities;
 
 	public UserStatisticsDto(Long totalLikeCount, Long totalDislikeCount,
 			Long totalReportCount, Long dailySendCount, Long unseenPhotoCount,
 			Long unreadInboxItemCount, Long totalCityCount,
-			Boolean hasNewActivities) {
+			Boolean hasNewActivities, boolean hasNewPhotoReplyActivities) {
 		this.totalLikeCount = totalLikeCount;
 		this.totalDislikeCount = totalDislikeCount;
 		this.totalReportCount = totalReportCount;
@@ -27,6 +28,7 @@ public class UserStatisticsDto implements Serializable {
 		this.unreadInboxItemCount = unreadInboxItemCount;
 		this.totalCityCount = totalCityCount;
 		this.hasNewActivities = hasNewActivities;
+		this.hasNewPhotoReplyActivities = hasNewPhotoReplyActivities;
 	}
 
 	public Long getTotalLikeCount() {
@@ -59,6 +61,10 @@ public class UserStatisticsDto implements Serializable {
 
 	public boolean getHasNewActivities() {
 		return hasNewActivities;
+	}
+
+	public boolean getHasNewPhotoReplyActivities() {
+		return hasNewPhotoReplyActivities;
 	}
 
 }

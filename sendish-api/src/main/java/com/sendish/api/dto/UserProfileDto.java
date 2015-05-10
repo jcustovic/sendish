@@ -22,6 +22,7 @@ public class UserProfileDto extends BaseEntityDto {
 	private Long dailySendLimitLeft;
 	private Boolean emailRegistration;
 	private Boolean newActivities;
+	private Boolean newPhotoReplyActivities;
 
 	public String getNick() {
 		return nick;
@@ -141,6 +142,14 @@ public class UserProfileDto extends BaseEntityDto {
 
 	public void setUnreadInboxItemCount(Long unreadInboxItemCount) {
 		this.unreadInboxItemCount = unreadInboxItemCount;
+	}
+
+	public Boolean getNewPhotoReplyActivities() {
+		return newPhotoReplyActivities;
+	}
+
+	public void setNewPhotoReplyActivities(Boolean newPhotoReplyActivities) {
+		this.newPhotoReplyActivities = newPhotoReplyActivities;
 	}
 
 }

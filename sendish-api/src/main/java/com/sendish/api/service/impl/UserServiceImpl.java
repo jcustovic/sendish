@@ -120,6 +120,7 @@ public class UserServiceImpl {
         userProfileDto.setUnseenPhotoCount(userStatistics.getUnseenPhotoCount());
         userProfileDto.setDailySendLimitLeft(getSentLimitLeft(userDetails, userStatistics));
         userProfileDto.setNewActivities(userStatistics.getHasNewActivities());
+        userProfileDto.setNewPhotoReplyActivities(userStatistics.getHasNewPhotoReplyActivities());
         userProfileDto.setUnreadInboxItemCount(userStatistics.getUnreadInboxItemCount());
         userProfileDto.setId(userId);
         
