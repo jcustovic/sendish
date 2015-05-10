@@ -68,12 +68,15 @@ create sequence chat_message_seq;
 create table chat_message (
   cm_id int8 not null default nextval('chat_message_seq'),
   cm_thread_id int8 not null,
+  cm_user_id int8 not null,
   cm_text varchar(1024),
   cm_deleted boolean not null,
   cm_created_date timestamp not null,
 
   primary key (cm_id),
-  constraint chat_message_thread_id_fk foreign key (cm_thread_id) references chat_thread
+  constraint chat_message_thread_id_fk foreign key (cm_thread_id) references chat_thread,
+  constraint chat_message_user_id_fk foreign key (cm_user_id) references auth_user
 );
 
 create index chat_message_thread_id_idx on chat_message (cm_thread_id);
+create index chat_message_user_id_idx on chat_message (cm_user_id);

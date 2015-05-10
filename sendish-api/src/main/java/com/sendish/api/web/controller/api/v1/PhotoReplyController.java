@@ -1,27 +1,43 @@
 package com.sendish.api.web.controller.api.v1;
 
 import java.net.URI;
+import java.util.List;
 
 import javax.validation.Valid;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.sendish.api.dto.ChatMessageDto;
+import com.sendish.api.dto.ChatThreadDetailsDto;
+import com.sendish.api.dto.NewPhotoReplyMessageDto;
+import com.sendish.api.dto.PhotoReplyDto;
 import com.sendish.api.dto.PhotoReplyFileUpload;
 import com.sendish.api.security.userdetails.AuthUser;
+import com.sendish.api.service.impl.ChatServiceImpl;
 import com.sendish.api.service.impl.PhotoReplyServiceImpl;
+import com.sendish.api.store.FileStore;
+import com.sendish.api.store.exception.ResourceNotFoundException;
+import com.sendish.api.web.controller.validator.NewPhotoReplyMessageValidator;
 import com.sendish.api.web.controller.validator.PhotoReplyFileUploadValidator;
+import com.sendish.repository.model.jpa.ChatThread;
 import com.sendish.repository.model.jpa.PhotoReply;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -38,6 +54,15 @@ public class PhotoReplyController {
 	
 	@Autowired
     private PhotoReplyFileUploadValidator photoReplyFileUploadValidator;
+	
+	@Autowired
+	private FileStore fileStore;
+	
+	@Autowired
+	private ChatServiceImpl chatServiceImpl;
+	
+	@Autowired
+	private NewPhotoReplyMessageValidator newPhotoReplyMessageValidator;
 	
 	@RequestMapping(method = RequestMethod.POST)
     @ApiOperation(value = "Reply with photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created photo comment")
@@ -65,10 +90,113 @@ public class PhotoReplyController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 	
-	@RequestMapping(value = "/chat/{photoReplyId}",method = RequestMethod.GET)
-	public ResponseEntity<?> getChatForPhotoReply(@PathVariable Long photoReplyId, AuthUser user) {
-		// TODO: Implement
-		return null;
+	@RequestMapping(method = RequestMethod.GET)
+	@ApiOperation(value = "List of all photo replies", notes = "All received and sent photo replies orderd by last activity")
+    @ApiResponses({
+    	@ApiResponse(code = 200, message = "OK")
+    })
+	public List<PhotoReplyDto> findAll(AuthUser user, @RequestParam(defaultValue = "0") Integer page) {
+		return photoReplyService.findAll(user.getUserId(), page);
 	}
+	
+	@RequestMapping(value = "/{photoReplyId}", method = RequestMethod.GET)
+	@ApiOperation(value = "Chat details with messages for photo reply")
+    @ApiResponses({
+    	@ApiResponse(code = 200, message = "OK"),
+    	@ApiResponse(code = 404, message = "Photo reply not found")
+    })
+	public ResponseEntity<ChatThreadDetailsDto> getChatThreadForPhotoReply(@PathVariable Long photoReplyId, AuthUser user) {
+		ChatThreadDetailsDto chatThread = photoReplyService.findChatThreadWithFirstPageByPhotoReplyId(photoReplyId, user.getUserId());
+		if (chatThread == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} else {
+			return new ResponseEntity<>(chatThread, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/{photoReplyId}", method = RequestMethod.DELETE)
+	@ApiOperation(value = "Delete photo reply")
+    @ApiResponses({
+    	@ApiResponse(code = 201, message = "Deleted"),
+    	@ApiResponse(code = 404, message = "Photo reply not found")
+    })
+	public ResponseEntity<ChatThreadDetailsDto> delete(@PathVariable Long photoReplyId, AuthUser user) {
+		if (photoReplyService.removeUserFromChatThread(photoReplyId, user.getUserId())) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@RequestMapping(value = "/{photoReplyId}/messages", method = RequestMethod.GET)
+	@ApiOperation(value = "Get messages for photo reply", notes = "NOTE: In photo reply details you already get the first page!")
+    @ApiResponses({
+    	@ApiResponse(code = 200, message = "OK"),
+    	@ApiResponse(code = 404, message = "Photo reply not found")
+    })
+	public ResponseEntity<List<ChatMessageDto>> getChatMessagesForPhotoReply(@PathVariable Long photoReplyId, @RequestParam(defaultValue = "0") Integer page,
+			AuthUser user) {
+		ChatThread chatThread = photoReplyService.findChatThreadByPhotoReplyId(photoReplyId);
+		if (chatThread == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} else {
+			List<ChatMessageDto> msgs = chatServiceImpl.findByThreadId(chatThread.getId(), page);
+			return new ResponseEntity<>(msgs, HttpStatus.OK);
+		}
+	}
+	
+	@RequestMapping(value = "/{photoReplyId}/new-messages", method = RequestMethod.POST)
+    @ApiOperation(value = "Post new message")
+    @ApiResponses({
+    	@ApiResponse(code = 200, message = "OK"),
+    	@ApiResponse(code = 400, message = "Validation errors")
+    })
+	public ResponseEntity<ChatMessageDto> postNewMessage(@RequestBody @Valid NewPhotoReplyMessageDto newMessage, BindingResult result, AuthUser user) throws BindException {
+		newMessage.setUserId(user.getUserId());
+		newPhotoReplyMessageValidator.validate(newMessage, result);
+		if (result.hasErrors()) {
+			throw new BindException(result);
+		}
+		
+		ChatMessageDto chatMessageDto = photoReplyService.newMessage(newMessage);
+    	
+        return new ResponseEntity<>(chatMessageDto, HttpStatus.OK);
+    }
+	
+	@RequestMapping(value = "/{photoReplyUUID}/view", method = RequestMethod.GET)
+    @ApiOperation(value = "View photo reply")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 403, message = "Not reply or photo owner"),
+        @ApiResponse(code = 404, message = "Not found")
+    })
+    public ResponseEntity<InputStreamResource> viewPhotoReply(@PathVariable String photoReplyUUID, WebRequest webRequest, AuthUser user) {
+        PhotoReply photoReply = photoReplyService.findByUuid(photoReplyUUID);
+
+        if (photoReply == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else if (photoReply.getUser().getId().equals(user.getUserId()) || photoReply.getPhoto().getUser().getId().equals(user.getUserId())) {
+        	return viewPhotoReply(webRequest, photoReply.getCreatedDate(), photoReply.getContentType(), photoReply.getSize(), photoReply.getStorageId());
+        } else {
+        	return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
+	
+	private ResponseEntity<InputStreamResource> viewPhotoReply(WebRequest webRequest, DateTime createdDate, String contentType, Long size, String storageId) {
+        if (webRequest.checkNotModified(createdDate.getMillis())) {
+            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        }
+
+        try {
+            InputStreamResource isr = new InputStreamResource(fileStore.getAsInputStream(storageId));
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.valueOf(contentType));
+            headers.setContentLength(size);
+
+            return new ResponseEntity<>(isr, headers, HttpStatus.OK);
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
 }

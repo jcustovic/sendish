@@ -15,4 +15,6 @@ public interface PhotoReplyRepository extends JpaRepository<PhotoReply, Long> {
 	
 	Page<PhotoReply> findByPhotoId(Long photoId, Pageable page);
 
+	PhotoReply findByUuid(String photoReplyUUID);
+
 }

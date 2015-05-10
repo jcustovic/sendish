@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.sendish.push.notification.AsyncNotificationProvider;
+
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import com.sendish.api.store.FileStore;
 import com.sendish.api.util.CityUtils;
 import com.sendish.api.util.ImageUtils;
 import com.sendish.repository.PhotoReceiverRepository;
+import com.sendish.repository.PhotoReplyRepository;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.PhotoVoteRepository;
 import com.sendish.repository.UserRepository;
@@ -40,6 +42,7 @@ import com.sendish.repository.model.jpa.City;
 import com.sendish.repository.model.jpa.Location;
 import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.PhotoReceiver;
+import com.sendish.repository.model.jpa.PhotoReply;
 import com.sendish.repository.model.jpa.PhotoSendingDetails;
 import com.sendish.repository.model.jpa.PhotoVote;
 import com.sendish.repository.model.jpa.PhotoVoteId;
@@ -103,6 +106,9 @@ public class PhotoServiceImpl {
     
     @Autowired
     private PhotoVoteRepository photoVoteRepository;
+    
+    @Autowired
+    private PhotoReplyRepository photoReplyRepository;
 
     public Photo findOne(Long photoId) {
         return photoRepository.findOne(photoId);
@@ -207,6 +213,10 @@ public class PhotoServiceImpl {
         		photoDetailsDto.setLike(vote.getLike());
                 photoDetailsDto.setReport(vote.getReport());		
         	}
+        	PhotoReply photoReply = photoReplyRepository.findByUserIdAndPhotoId(userId, photoId);
+            if (photoReply != null) {
+            	photoDetailsDto.setPhotoReplyId(photoReply.getId());	
+            }
         }
         
         mapPhotoDetailsDto(photoReceiver.getPhoto(), photoDetailsDto, userId);

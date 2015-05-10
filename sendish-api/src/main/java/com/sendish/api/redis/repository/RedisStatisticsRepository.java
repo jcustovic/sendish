@@ -55,9 +55,18 @@ public class RedisStatisticsRepository {
     public Long decrementPhotoCommentCount(Long photoId) {
     	return photoStatistics(photoId).increment("commentCount", -1);
 	}
+    
+    public Long incrementPhotoReplyWihtPhotoCount(Long photoId) {
+        return photoStatistics(photoId).increment("photoReplyCount", 1);
+    }
+    
+    public Long decrementPhotoReplyWihtPhotoCount(Long photoId) {
+        return photoStatistics(photoId).increment("photoReplyCount", -1);
+    }
 
     public PhotoStatisticsDto getPhotoStatistics(Long photoId) {
-        List<String> fields = Arrays.asList("openedCount", "likeCount", "dislikeCount", "commentCount", "reportCount");
+        List<String> fields = Arrays.asList("openedCount", "likeCount", "dislikeCount", "commentCount", "reportCount",
+        		"photoReplyCount");
         HashOperations<String, String, String> hashOp = template.opsForHash();
         List<String> values = hashOp.multiGet(KeyUtils.photoStatistics(photoId), fields);
 
@@ -66,9 +75,10 @@ public class RedisStatisticsRepository {
         Long dislikeCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(2), "0"));
         Long commentCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(3), "0"));
         Long reportCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(4), "0"));
+        Long photoReplyCount = Long.valueOf(ObjectUtils.defaultIfNull(values.get(5), "0"));
         Long cityCount = photoCities(photoId).size(); 
 
-        return new PhotoStatisticsDto(openedCount, likeCount, dislikeCount, cityCount, commentCount, reportCount);
+        return new PhotoStatisticsDto(openedCount, likeCount, dislikeCount, cityCount, commentCount, reportCount, photoReplyCount);
     }
 
     public UserStatisticsDto getUserStatistics(Long userId) {
@@ -191,6 +201,14 @@ public class RedisStatisticsRepository {
     
     public void markActivitiesAsRead(Long userId) {
     	userStatistics(userId).remove("hasNewActivities");
+    }
+    
+    public void setNewPhotoReplyActivity(Long userId) {
+    	userStatistics(userId).putIfAbsent("hasPhotoReplyActivities", "1");
+    }
+    
+    public void markPhotoReplyActivitiesAsRead(Long userId) {
+    	userStatistics(userId).remove("hasPhotoReplyActivities");
     }
     
     // Redis objects

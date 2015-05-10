@@ -8,6 +8,7 @@ public class ReceivedPhotoDetailsDto extends PhotoDetailsDto {
 	private Boolean report;
 	private Boolean opened;
 	private Boolean forceRating = false;
+	private Long photoReplyId;
 
 	public Boolean getLike() {
 		return like;
@@ -39,6 +40,14 @@ public class ReceivedPhotoDetailsDto extends PhotoDetailsDto {
 
 	public void setForceRating(Boolean forceRating) {
 		this.forceRating = forceRating;
+	}
+	
+	public Long getPhotoReplyId() {
+		return photoReplyId;
+	}
+
+	public void setPhotoReplyId(Long photoReplyId) {
+		this.photoReplyId = photoReplyId;
 	}
 
 }

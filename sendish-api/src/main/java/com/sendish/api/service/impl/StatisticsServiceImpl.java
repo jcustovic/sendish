@@ -1,6 +1,7 @@
 package com.sendish.api.service.impl;
 
 import com.sendish.api.statistics.DBStatisticsSynchronizer;
+
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,6 +96,14 @@ public class StatisticsServiceImpl {
 	public void decrementPhotoCommentCount(Long photoId) {
 		statisticsRepository.decrementPhotoCommentCount(photoId);
 	}
+	
+	public void incrementPhotoReplyWihtPhotoCount(Long photoId) {
+		statisticsRepository.incrementPhotoReplyWihtPhotoCount(photoId);
+	}
+	
+	public void decrementPhotoReplyWihtPhotoCount(Long photoId) {
+		statisticsRepository.decrementPhotoReplyWihtPhotoCount(photoId);
+	}
 
 	public void likeComment(Long photoCommentId) {
 		statisticsRepository.likeComment(photoCommentId);
@@ -113,6 +122,14 @@ public class StatisticsServiceImpl {
 	public void setNewActivityFlag(Long userId) {
 		statisticsRepository.setNewActivityFlag(userId);
 	}
+	
+	public void setNewPhotoReplyActivity(Long userId) {
+    	statisticsRepository.setNewPhotoReplyActivity(userId);
+    }
+    
+    public void markPhotoReplyActivitiesAsRead(Long userId) {
+    	statisticsRepository.markPhotoReplyActivitiesAsRead(userId);
+    }
 
 	public void incrementUnreadInboxItemCount(Long userId) {
 		statisticsRepository.incrementUnreadInboxItemCount(userId);

@@ -16,56 +16,64 @@ public class ChatMessage extends BaseEntity {
 	private static final long serialVersionUID = 1L;
 
 	@ManyToOne(optional = false)
-    @JoinColumn(name = "cm_thread_id", nullable = false)
-    private ChatThread chatThread;
+	@JoinColumn(name = "cm_thread_id", nullable = false)
+	private ChatThread chatThread;
 
-    @Column(name = "cm_text", length = 1024)
-    private String text;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "cm_user_id", nullable = false)
+	private User user;
 
-    @Column(name = "cm_deleted", nullable = false)
-    private Boolean deleted;
+	@Column(name = "cm_text", length = 1024)
+	private String text;
 
-    @Column(name = "cm_created_date", nullable = false)
-    @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
-    private DateTime createdDate;
+	@Column(name = "cm_deleted", nullable = false)
+	private Boolean deleted = false;
 
-    @PrePersist
-    public final void markCreatedDate() {
-        createdDate = DateTime.now();
-    }
+	@Column(name = "cm_created_date", nullable = false)
+	@Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+	private DateTime createdDate;
 
-    // Getters & setters
+	@PrePersist
+	public final void markCreatedDate() {
+		createdDate = DateTime.now();
+	}
 
-    public ChatThread getChatThread() {
-        return chatThread;
-    }
+	// Getters & setters
 
-    public void setChatThread(ChatThread chatThread) {
-        this.chatThread = chatThread;
-    }
+	public ChatThread getChatThread() {
+		return chatThread;
+	}
 
-    public String getText() {
-        return text;
-    }
+	public void setChatThread(ChatThread chatThread) {
+		this.chatThread = chatThread;
+	}
 
-    public void setText(String text) {
-        this.text = text;
-    }
+	public User getUser() {
+		return user;
+	}
 
-    public Boolean isDeleted() {
-        return deleted;
-    }
+	public void setUser(User user) {
+		this.user = user;
+	}
 
-    public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
-    }
+	public String getText() {
+		return text;
+	}
 
-    public DateTime getCreatedDate() {
-        return createdDate;
-    }
+	public void setText(String text) {
+		this.text = text;
+	}
 
-    public void setCreatedDate(DateTime createdDate) {
-        this.createdDate = createdDate;
-    }
+	public Boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public DateTime getCreatedDate() {
+		return createdDate;
+	}
 
 }
