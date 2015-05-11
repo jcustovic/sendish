@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.sendish.api.dto.*;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -14,11 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.sendish.api.dto.ChatMessageDto;
-import com.sendish.api.dto.ChatThreadDetailsDto;
-import com.sendish.api.dto.NewPhotoReplyMessageDto;
-import com.sendish.api.dto.PhotoReplyDto;
-import com.sendish.api.dto.PhotoReplyFileUpload;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.util.ImageUtils;
 import com.sendish.api.util.UserUtils;
@@ -132,7 +128,7 @@ public class PhotoReplyServiceImpl {
 		if (chatThread == null) {
 			return false;
 		}
-		
+
 		return chatService.removeUserFromChatThread(chatThread.getId(), userId);
 	}
 	
@@ -156,6 +152,22 @@ public class PhotoReplyServiceImpl {
 		// TODO: Send push notification
 		
 		return chatMessageDto;
+	}
+
+	public void report(ReportPhotoReplyDto reportDto) {
+		PhotoReply photoReply = findOne(reportDto.getPhotoReplyId());
+		photoReply.setDeleted(true);
+		photoReply.setReportedBy(userRepository.findOne(reportDto.getUserId()));
+		photoReply.setReportType(reportDto.getReportType());
+		photoReply.setReportText(reportDto.getReportText());
+
+		if (photoReply.getUser().getId().equals(reportDto.getUserId())) {
+			statisticsService.reportUser(photoReply.getPhoto().getUser().getId());
+		} else {
+			statisticsService.reportUser(photoReply.getUser().getId());
+		}
+
+		photoReplyRepository.save(photoReply);
 	}
 	
 	private PhotoReply mapToPhotoReply(PhotoReplyFileUpload photoReplyFileUpload, MultipartFile file) {

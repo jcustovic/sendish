@@ -124,7 +124,7 @@ public class PhotoVoteServiceImpl {
 		User user = userRepository.findOne(userId);
 		savePhotoVote(photo, user, false);
 
-		statisticsService.dislikePhoto(photoId, photoOwner);
+		statisticsService.dislikePhoto(photoId, photoOwner.getId());
 	}
 
 	public void reportReceived(Long photoId, String reason, String reasonText, Long userId) {
@@ -149,7 +149,7 @@ public class PhotoVoteServiceImpl {
 			photoReceiver.setDeleted(true);
 			photoReceiverRepository.save(photoReceiver);
 
-			statisticsService.reportPhoto(photoId, photoOwner);
+			statisticsService.reportPhoto(photoId, photoOwner.getId());
 
 			if (photoStopDecider.checkToStop(photoId)) {
 				photoSenderService.stopSending(photoId, "Stopped after report check");

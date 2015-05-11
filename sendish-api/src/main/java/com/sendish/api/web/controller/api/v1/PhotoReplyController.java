@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.sendish.api.dto.*;
+import com.sendish.api.web.controller.validator.ReportPhotoReplyValidator;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -25,11 +27,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.sendish.api.dto.ChatMessageDto;
-import com.sendish.api.dto.ChatThreadDetailsDto;
-import com.sendish.api.dto.NewPhotoReplyMessageDto;
-import com.sendish.api.dto.PhotoReplyDto;
-import com.sendish.api.dto.PhotoReplyFileUpload;
 import com.sendish.api.security.userdetails.AuthUser;
 import com.sendish.api.service.impl.ChatServiceImpl;
 import com.sendish.api.service.impl.PhotoReplyServiceImpl;
@@ -63,6 +60,9 @@ public class PhotoReplyController {
 	
 	@Autowired
 	private NewPhotoReplyMessageValidator newPhotoReplyMessageValidator;
+
+	@Autowired
+	private ReportPhotoReplyValidator reportPhotoReplyValidator;
 	
 	@RequestMapping(method = RequestMethod.POST)
     @ApiOperation(value = "Reply with photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created photo comment")
@@ -162,6 +162,24 @@ public class PhotoReplyController {
     	
         return new ResponseEntity<>(chatMessageDto, HttpStatus.OK);
     }
+
+	@RequestMapping(value = "/report", method = RequestMethod.POST)
+	@ApiOperation(value = "Report photo reply")
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 400, message = "Validation errors")
+	})
+	public ResponseEntity<Void> report(@RequestBody @Valid ReportPhotoReplyDto reportDto, BindingResult result, AuthUser user) throws BindException {
+		reportDto.setUserId(user.getUserId());
+		reportPhotoReplyValidator.validate(reportDto, result);
+		if (result.hasErrors()) {
+			throw new BindException(result);
+		}
+
+		photoReplyService.report(reportDto);
+
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
 	
 	@RequestMapping(value = "/{photoReplyUUID}/view", method = RequestMethod.GET)
     @ApiOperation(value = "View photo reply")

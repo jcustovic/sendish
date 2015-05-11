@@ -7,14 +7,10 @@ import org.springframework.validation.Validator;
 
 import com.sendish.api.dto.NewPhotoReplyMessageDto;
 import com.sendish.api.service.impl.PhotoReplyServiceImpl;
-import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.repository.model.jpa.PhotoReply;
 
 @Component
 public class NewPhotoReplyMessageValidator implements Validator {
-	
-	@Autowired
-	private PhotoServiceImpl photoService;
 	
 	@Autowired
 	private PhotoReplyServiceImpl photoReplyService;

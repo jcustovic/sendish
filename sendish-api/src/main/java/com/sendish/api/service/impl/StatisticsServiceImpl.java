@@ -33,22 +33,28 @@ public class StatisticsServiceImpl {
 		return likeCount;
 	}
 
-	public Long dislikePhoto(Long photoId, User photoOwner) {
-		statisticsRepository.incrementTotalUserDislikeCount(photoOwner.getId());
+	public Long dislikePhoto(Long photoId, Long photoOwnerId) {
 		Long dislikeCount = statisticsRepository.dislikePhoto(photoId);
-
-		dbStatisticsSynchronizer.syncUserStat(photoOwner.getId());
 		dbStatisticsSynchronizer.syncPhotoStat(photoId);
+
+		statisticsRepository.incrementTotalUserDislikeCount(photoOwnerId);
+		dbStatisticsSynchronizer.syncUserStat(photoOwnerId);
 
 		return dislikeCount;
 	}
 
-	public Long reportPhoto(Long photoId, User photoOwner) {
-		statisticsRepository.incrementTotalUserReportCount(photoOwner.getId());
+	public Long reportPhoto(Long photoId, Long photoOwnerId) {
 		Long reportCount = statisticsRepository.reportPhoto(photoId);
-
-		dbStatisticsSynchronizer.syncUserStat(photoOwner.getId());
 		dbStatisticsSynchronizer.syncPhotoStat(photoId);
+
+		reportUser(photoOwnerId);
+
+		return reportCount;
+	}
+
+	public Long reportUser(Long userId) {
+		Long reportCount = statisticsRepository.incrementTotalUserReportCount(userId);
+		dbStatisticsSynchronizer.syncUserStat(userId);
 
 		return reportCount;
 	}

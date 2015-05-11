@@ -19,7 +19,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 @RestController
 @RequestMapping("/api/v1.0/activities")
 @Api(value = "activities", description = "User activities")
-public class ActivityController {
+public class ActivitiesController {
 	
 	@Autowired
 	private UserActivityServiceImpl userActivityService;
