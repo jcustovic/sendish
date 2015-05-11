@@ -2,11 +2,16 @@ package com.sendish.api.service.impl;
 
 import java.awt.Dimension;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.sendish.api.dto.*;
+import com.sendish.api.util.CityUtils;
+import com.sendish.push.notification.AsyncNotificationProvider;
+import com.sendish.repository.model.jpa.User;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -54,6 +59,9 @@ public class PhotoReplyServiceImpl {
 	@Autowired
 	private StatisticsServiceImpl statisticsService;
 
+	@Autowired
+	private AsyncNotificationProvider notificationProvider;
+
 	public PhotoReply processNew(PhotoReplyFileUpload photoReplyFileUpload) {
 		MultipartFile file = photoReplyFileUpload.getImage();
 		PhotoReply photoReply = mapToPhotoReply(photoReplyFileUpload, file);
@@ -78,10 +86,14 @@ public class PhotoReplyServiceImpl {
 		photoReply = photoReplyRepository.save(photoReply);
 		chatService.createChatForPhotoReply(photoReply);
 
+		Long photoOwnerId = photoReply.getPhoto().getUser().getId();
+
 		statisticsService.incrementPhotoReplyWihtPhotoCount(photoReplyFileUpload.getPhotoId());
-		statisticsService.setNewPhotoReplyActivity(photoReply.getPhoto().getUser().getId());
-		
-		// TODO: Send push notification
+		statisticsService.setNewPhotoReplyActivity(photoOwnerId);
+
+		User sender = photoReply.getUser();
+		String text = CityUtils.getTrimmedLocationName(sender.getDetails().getCurrentCity()) + " replied with photo";
+		sendPhotoReplyNewsNotification(photoOwnerId, text, photoReply);
 
 		return photoReply;
 	}
@@ -107,8 +119,9 @@ public class PhotoReplyServiceImpl {
 		chatThreadDto.setId(chatThread.getId());
 		// TODO: Get name from ChatTreadUser
 		// chatThreadDto.setName();
-		// TODO: Add image
 		List<ChatMessageDto> messages = chatService.findByThreadId(chatThread.getId(), 0);
+		messages.add(0, mapPhotoReplyImageToMessageDto(chatThread.getPhotoReply()));
+
 		chatThreadDto.setMessages(messages);
 		
 		return chatThreadDto;
@@ -139,17 +152,19 @@ public class PhotoReplyServiceImpl {
 	public ChatMessageDto newMessage(NewPhotoReplyMessageDto newMessage) {
 		ChatThread chatThread = chatService.findThreadByPhotoReplyId(newMessage.getPhotoReplyId());
 
-		Long userId = newMessage.getUserId();
-		ChatMessageDto chatMessageDto = chatService.newChatMessage(chatThread.getId(), userId, newMessage.getMessage());
+		User sender = userRepository.findOne(newMessage.getUserId());
+		ChatMessageDto chatMessageDto = chatService.newChatMessage(chatThread.getId(), sender.getId(), newMessage.getMessage());
 		
 		PhotoReply photoReply = chatThread.getPhotoReply();
-		if (photoReply.getUser().getId().equals(userId)) {
-			statisticsService.setNewPhotoReplyActivity(photoReply.getPhoto().getUser().getId());
+		Long userReceivingReplyId;
+		if (photoReply.getUser().equals(sender)) {
+			userReceivingReplyId = photoReply.getPhoto().getUser().getId();
 		} else {
-			statisticsService.setNewPhotoReplyActivity(photoReply.getUser().getId());
+			userReceivingReplyId = photoReply.getUser().getId();
 		}
-		
-		// TODO: Send push notification
+		statisticsService.setNewPhotoReplyActivity(userReceivingReplyId);
+		String text = CityUtils.getTrimmedLocationName(sender.getDetails().getCurrentCity()) + " replied";
+		sendPhotoReplyNewsNotification(userReceivingReplyId, text, photoReply);
 		
 		return chatMessageDto;
 	}
@@ -192,12 +207,32 @@ public class PhotoReplyServiceImpl {
 		if (photoReply.getUser().getId().equals(userId)) {
 			photoReplyDto.setReceived(false);
 			photoReplyDto.setUsername(UserUtils.getDisplayName(photoReply.getPhoto().getUser()));
+			photoReplyDto.setText("You photo replied to ");
 		} else {
 			photoReplyDto.setReceived(true);
 			photoReplyDto.setUsername(UserUtils.getDisplayName(photoReply.getUser()));
+			photoReplyDto.setText(" replied with photo");
 		}
 		
 		return photoReplyDto;
+	}
+
+	private void sendPhotoReplyNewsNotification(Long receivingUserId, String text, PhotoReply photoReply) {
+		Map<String, Object> photoReplyNotifFields = new HashMap<>();
+		photoReplyNotifFields.put("TYPE", "OPEN_PHOTO_REPLY");
+		photoReplyNotifFields.put("REFERENCE_ID", photoReply.getId());
+
+		notificationProvider.sendPlainTextNotification(text, photoReplyNotifFields, receivingUserId);
+	}
+
+	private ChatMessageDto mapPhotoReplyImageToMessageDto(PhotoReply photoReply) {
+		ChatMessageDto dto = new ChatMessageDto();
+		dto.setType(ChatMessageDto.ChatMessageDtoType.IMG);
+		dto.setUrl(photoReply.getUuid());
+		dto.setUsername(UserUtils.getDisplayName(photoReply.getUser()));
+		dto.setTime(prettyTime.format(photoReply.getCreatedDate().toDate()));
+
+		return dto;
 	}
 
 }

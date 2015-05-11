@@ -7,6 +7,7 @@ public class PhotoReplyDto extends BaseEntityDto {
 	private String lastActivity;
 	private String imgUuid;
 	private String username;
+	private String text;
 	private Boolean received;
 
 	// Getters & setters
@@ -33,6 +34,14 @@ public class PhotoReplyDto extends BaseEntityDto {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
 	}
 
 	public Boolean getReceived() {

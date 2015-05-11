@@ -13,7 +13,7 @@ public class ChatMessageDto extends BaseEntityDto {
 	private String time;
 	private String url;
 	private String username;
-	
+
 	// Getters & setters
 
 	public ChatMessageDtoType getType() {
