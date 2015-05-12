@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import com.sendish.api.dto.*;
 import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.api.web.controller.validator.ReportPhotoReplyValidator;
+
 import com.sendish.repository.model.jpa.Photo;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -220,6 +221,19 @@ public class PhotoReplyController {
         	return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
+	
+	@RequestMapping(value = "/{photoReplyUUID}/view/{sizeKey}", method = RequestMethod.GET)
+    @ApiOperation(value = "View photo reply in different size")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 403, message = "Not reply or photo owner"),
+        @ApiResponse(code = 404, message = "Not found")
+    })
+    public ResponseEntity<InputStreamResource> viewPhotoReply(@PathVariable String photoReplyUUID, @PathVariable String sizeKey, 
+    		WebRequest webRequest, AuthUser user) {
+		// TODO: If needed return resized photo and call different service method
+		return viewPhotoReply(photoReplyUUID, webRequest, user);
+	}
 	
 	private ResponseEntity<InputStreamResource> viewPhotoReply(WebRequest webRequest, DateTime createdDate, String contentType, Long size, String storageId) {
         if (webRequest.checkNotModified(createdDate.getMillis())) {
