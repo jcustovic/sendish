@@ -6,7 +6,9 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.sendish.api.dto.*;
+import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.api.web.controller.validator.ReportPhotoReplyValidator;
+import com.sendish.repository.model.jpa.Photo;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -63,6 +65,9 @@ public class PhotoReplyController {
 
 	@Autowired
 	private ReportPhotoReplyValidator reportPhotoReplyValidator;
+
+	@Autowired
+	private PhotoServiceImpl photoService;
 	
 	@RequestMapping(method = RequestMethod.POST)
     @ApiOperation(value = "Reply with photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created photo comment")
@@ -95,8 +100,24 @@ public class PhotoReplyController {
     @ApiResponses({
     	@ApiResponse(code = 200, message = "OK")
     })
-	public List<PhotoReplyDto> findAll(AuthUser user, @RequestParam(defaultValue = "0") Integer page) {
+	public List<PhotoReplyDto> findAll(@RequestParam(defaultValue = "0") Integer page, AuthUser user) {
 		return photoReplyService.findAll(user.getUserId(), page);
+	}
+
+	@RequestMapping(value = "/photo/{photoId}/photo-replies", method = RequestMethod.GET)
+	@ApiOperation(value = "List of all photo replies on a photo", notes = "Only photo owner can see all the replies")
+	@ApiResponses({
+		@ApiResponse(code = 200, message = "OK"),
+		@ApiResponse(code = 404, message = "Photo not found")
+	})
+	public ResponseEntity<List<PhotoReplyDto>> findByPhoto(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page, AuthUser user) {
+		Photo photo = photoService.findByIdAndUserId(photoId, user.getUserId());
+		if (photo == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} else {
+			List<PhotoReplyDto> photoReplies = photoReplyService.findByPhotoId(photoId, user.getUserId(), page);
+			return new ResponseEntity<>(photoReplies, HttpStatus.OK);
+		}
 	}
 	
 	@RequestMapping(value = "/{photoReplyId}", method = RequestMethod.GET)

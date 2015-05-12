@@ -181,7 +181,11 @@ public class PhotoServiceImpl {
         return mapToReceivedPhotoDto(photos, MAX_LOCATION_NAME_LENGTH_PHOTO_LIST);
     }
 
-    public PhotoDetailsDto findByIdAndUserId(Long photoId, Long userId) {
+    public Photo findByIdAndUserId(Long photoId, Long userId) {
+        return photoRepository.findByIdAndUserId(photoId, userId);
+    }
+
+    public PhotoDetailsDto getDetailsByIdAndUserId(Long photoId, Long userId) {
         Photo photo = photoRepository.findByIdAndUserId(photoId, userId);
         if (photo != null) {
             PhotoDetailsDto photoDetailsDto = new PhotoDetailsDto();

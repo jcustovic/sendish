@@ -20,4 +20,6 @@ public interface ChatThreadRepository extends JpaRepository<ChatThread, Long> {
 	
 	ChatThread findByPhotoReplyId(Long photoReplyId);
 
+	List<ChatThread> findByPhotoReplyPhotoId(Long photoId, Pageable page);
+
 }

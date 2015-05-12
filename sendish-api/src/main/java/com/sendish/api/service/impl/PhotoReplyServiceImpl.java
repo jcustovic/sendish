@@ -184,6 +184,15 @@ public class PhotoReplyServiceImpl {
 
 		photoReplyRepository.save(photoReply);
 	}
+
+	public List<PhotoReplyDto> findByPhotoId(Long photoId, Long userId, Integer page) {
+		List<ChatThread> photoReplyChats = chatThreadRepository.findByPhotoReplyPhotoId(photoId,
+				new PageRequest(page, PHOTO_REPLIES_PAGE_SIZE, Direction.DESC, "lastActivity"));
+
+		return photoReplyChats.stream()
+				.map(chatThread -> mapToPhotoReplyDto(chatThread, userId))
+				.collect(Collectors.toList());
+	}
 	
 	private PhotoReply mapToPhotoReply(PhotoReplyFileUpload photoReplyFileUpload, MultipartFile file) {
 		PhotoReply photoReply = new PhotoReply();
