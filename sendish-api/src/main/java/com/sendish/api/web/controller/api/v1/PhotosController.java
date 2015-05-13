@@ -80,7 +80,7 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/{photoId}/like", method = RequestMethod.PUT)
-    @ApiOperation(value = "Like given hot photo")
+    @ApiOperation(value = "Like given photo")
     @ApiResponses({
         @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
         @ApiResponse(code = 204, message = "OK"),
@@ -100,7 +100,7 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/{photoUuid}/dislike", method = RequestMethod.PUT)
-    @ApiOperation(value = "Dislike given hot photo")
+    @ApiOperation(value = "Dislike given photo")
     @ApiResponses({
         @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
         @ApiResponse(code = 204, message = "OK"),
@@ -120,7 +120,7 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/{photoUuid}/view", method = RequestMethod.GET)
-    @ApiOperation(value = "View hot photo in original size")
+    @ApiOperation(value = "View photo in original size")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
@@ -136,7 +136,7 @@ public class PhotosController {
     }
 
     @RequestMapping(value = "/{photoUuid}/view/{sizeKey}", method = RequestMethod.GET)
-    @ApiOperation(value = "View hot photo in different size")
+    @ApiOperation(value = "View photo in different size")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
