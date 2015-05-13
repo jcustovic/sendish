@@ -17,6 +17,7 @@
 		<module>sendish-batch-app</module>
 		<module>location-importer-app</module>
 		<module>inmemory-redis</module>
+		<module>gcm-server</module>
 	</modules>
 
 	<properties>

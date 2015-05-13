@@ -20,6 +20,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.sendish</groupId>
+            <artifactId>gcm-server</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
