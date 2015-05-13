@@ -5,6 +5,7 @@ public class PhotoDto extends BaseEntityDto {
     private static final long serialVersionUID = 1L;
 
     private Long ownerUserId;
+    private Long cityId;
     private String originLocation;
     private String description;
     private String timeAgo;
@@ -22,7 +23,15 @@ public class PhotoDto extends BaseEntityDto {
 		this.ownerUserId = ownerUserId;
 	}
 
-	public String getOriginLocation() {
+    public Long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
+    }
+
+    public String getOriginLocation() {
         return originLocation;
     }
 
