@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.sendish.api.web.device.DeviceUtils;
+import com.sendish.repository.model.jpa.*;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +21,6 @@ import com.sendish.api.util.CityUtils;
 import com.sendish.api.util.StringUtils;
 import com.sendish.api.util.UserUtils;
 import com.sendish.repository.UserActivityRepository;
-import com.sendish.repository.model.jpa.Photo;
-import com.sendish.repository.model.jpa.PhotoComment;
-import com.sendish.repository.model.jpa.User;
-import com.sendish.repository.model.jpa.UserActivity;
 
 @Service
 @Transactional
@@ -40,6 +37,7 @@ public class UserActivityServiceImpl {
     public static final String PHOTO_SENT_COMMENT_TYPE = "PHOTO_SENT_COMMENT"; // Opens sent photo comments
     public static final String PHOTO_RECEIVED_COMMENT_TYPE = "PHOTO_RECEIVED_COMMENT"; // Opens received photo comments
     public static final String INBOX_ITEM_TYPE = "INBOX_ITEM"; // Opens inbox item details
+	public static final String PHOTO_REPLY_TYPE = "PHOTO_REPLY"; // Opens photo reply details (chat)
 	
 	private static PrettyTime prettyTime = new PrettyTime();
 	
@@ -109,7 +107,9 @@ public class UserActivityServiceImpl {
 			return PHOTO_RECEIVED_COMMENT_TYPE;
 		} else if ("INBOX_ITEM".equals(referenceType)) {
 			return INBOX_ITEM_TYPE;
-		}
+		} else if ("NEW_PHOTO_REPLY".equals(referenceType)) {
+            return PHOTO_REPLY_TYPE;
+        }
 		LOGGER.warn("Unknown referenceType {} so returning that name", referenceType);
 		
 		return "UNKNOWN";
@@ -182,6 +182,22 @@ public class UserActivityServiceImpl {
 			addActivityToUserTimeline(photo.getUser().getId(), activity.getId());
 		}
 	}
+
+    public void addNewPhotoReplyActivity(PhotoReply photoReply) {
+        User photoOwner = photoReply.getPhoto().getUser();
+        if (photoOwner.isUserActive()) {
+            UserActivity activity = new UserActivity();
+            activity.setFromUser(photoReply.getUser());
+            activity.setUser(photoOwner);
+            activity.setImageUuid(photoReply.getUuid());
+            activity.setReferenceType("NEW_PHOTO_REPLY");
+            activity.setReferenceId(photoReply.getId().toString());
+            activity.setText(" sent you photo reply");
+
+            activity = userActivityRepository.save(activity);
+            addActivityToUserTimeline(photoOwner.getId(), activity.getId());
+        }
+    }
 	
 	public void addCommentLikedActivity(PhotoComment comment, User user) {
 		if (comment.getUser().isUserActive()) {

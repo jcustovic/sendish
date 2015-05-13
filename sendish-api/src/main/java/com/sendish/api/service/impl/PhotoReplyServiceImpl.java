@@ -62,6 +62,9 @@ public class PhotoReplyServiceImpl {
 	@Autowired
 	private AsyncNotificationProvider notificationProvider;
 
+	@Autowired
+	private UserActivityServiceImpl userActivityService;
+
 	public PhotoReply processNew(PhotoReplyFileUpload photoReplyFileUpload) {
 		MultipartFile file = photoReplyFileUpload.getImage();
 		PhotoReply photoReply = mapToPhotoReply(photoReplyFileUpload, file);
@@ -95,7 +98,9 @@ public class PhotoReplyServiceImpl {
 		String text = CityUtils.getTrimmedLocationName(sender.getDetails().getCurrentCity()) + " replied with photo";
 		sendPhotoReplyNewsNotification(photoOwnerId, text, photoReply);
 
-		return photoReply;
+		userActivityService.addNewPhotoReplyActivity(photoReply);
+
+        return photoReply;
 	}
 
 	public PhotoReply findByUserIdAndPhotoId(Long userId, Long photoId) {
