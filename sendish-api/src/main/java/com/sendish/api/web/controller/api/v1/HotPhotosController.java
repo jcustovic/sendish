@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
-import com.sendish.api.dto.HotPhotoDetailsDto;
+import com.sendish.api.dto.PhotoDetailsDto;
 import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.dto.PhotoTraveledDto;
 import com.sendish.api.exception.ResizeFailedException;
@@ -74,8 +74,8 @@ public class HotPhotosController {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")
     })
-    public ResponseEntity<HotPhotoDetailsDto> photoDetails(@PathVariable Long photoId, AuthUser user) throws BindException {
-		HotPhotoDetailsDto photo = hotPhotoService.findByPhotoIdForUser(photoId, user.getUserId());
+    public ResponseEntity<PhotoDetailsDto> photoDetails(@PathVariable Long photoId, AuthUser user) throws BindException {
+		PhotoDetailsDto photo = hotPhotoService.findByPhotoIdForUser(photoId, user.getUserId());
         if (photo == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {

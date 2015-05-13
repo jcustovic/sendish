@@ -13,7 +13,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.sendish.api.dto.HotPhotoDetailsDto;
+import com.sendish.api.dto.PhotoDetailsDto;
 import com.sendish.api.dto.PhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
 
@@ -30,12 +30,6 @@ public class HotPhotoServiceImpl {
 	
 	@Autowired
 	private PhotoDtoMapper photoDtoMapper;
-	
-	@Autowired
-	private PhotoCommentServiceImpl photoCommentService;
-	
-	@Autowired
-    private PhotoVoteRepository photoVoteRepository;
 
     @Autowired
     private ImageRepository imageRepository;
@@ -72,22 +66,13 @@ public class HotPhotoServiceImpl {
 		return hotPhotoRepository.findOne(photoId);
 	}
 
-	public HotPhotoDetailsDto findByPhotoIdForUser(Long photoId, Long userId) {
+	public PhotoDetailsDto findByPhotoIdForUser(Long photoId, Long userId) {
 		HotPhoto hotPhoto = findByPhotoId(photoId);
 		if (hotPhoto == null) {
 			return null;
 		}
-		HotPhotoDetailsDto photoDetails = new HotPhotoDetailsDto();
-		photoDtoMapper.mapToPhotoDto(hotPhoto.getPhoto(), photoDetails, MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS);
-		photoDetails.setComments(photoCommentService.findFirstByPhotoId(photoId, userId, 3));
-		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
-        if (vote == null) {
-            photoDetails.setForceRating(true);
-        } else {
-        	photoDetails.setLike(vote.getLike());
-        }
-		
-		return photoDetails;
+
+		return photoDtoMapper.mapToPhotoDetailsDto(hotPhoto.getPhoto(), userId, MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS);
 	}
 
     public void newHotPhoto(Long photoId) {

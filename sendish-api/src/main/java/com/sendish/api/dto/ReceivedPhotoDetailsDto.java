@@ -1,6 +1,6 @@
 package com.sendish.api.dto;
 
-public class ReceivedPhotoDetailsDto extends PhotoDetailsDto {
+public class ReceivedPhotoDetailsDto extends CommonPhotoDetailsDto {
 
 	private static final long serialVersionUID = 1L;
 

@@ -24,4 +24,8 @@ public class CityServiceImpl {
         return cities.get(0);
     }
 
+    public City findOne(Long cityId) {
+        return cityRepository.findOne(cityId);
+    }
+
 }

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.sendish.api.dto.*;
 import com.sendish.push.notification.AsyncNotificationProvider;
 
 import org.joda.time.DateTime;
@@ -22,12 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.sendish.api.dto.LocationBasedFileUpload;
-import com.sendish.api.dto.PhotoDetailsDto;
-import com.sendish.api.dto.PhotoDto;
-import com.sendish.api.dto.PhotoTraveledDto;
-import com.sendish.api.dto.ReceivedPhotoDetailsDto;
-import com.sendish.api.dto.ReceivedPhotoDto;
 import com.sendish.api.mapper.PhotoDtoMapper;
 import com.sendish.api.redis.KeyUtils;
 import com.sendish.api.store.FileStore;
@@ -52,16 +47,16 @@ import com.sendish.repository.model.jpa.UserDetails;
 @Service
 @Transactional
 public class PhotoServiceImpl {
-	
+
 	// private static final Logger LOGGER = LoggerFactory.getLogger(PhotoServiceImpl.class);
 
     private static final int PHOTO_PAGE_SIZE = 20;
     private static final int PHOTO_LOCATION_PAGE_SIZE = 20;
     private static final int MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS = 24;
     private static final int MAX_LOCATION_NAME_LENGTH_PHOTO_LIST = 30;
-    
+
     private static PrettyTime prettyTime = new PrettyTime();
-    
+
     @Autowired
     private PhotoRepository photoRepository;
 
@@ -84,29 +79,26 @@ public class PhotoServiceImpl {
     private UserServiceImpl userService;
 
     @Autowired
-    private PhotoCommentServiceImpl photoCommentService;
-
-    @Autowired
     private StatisticsServiceImpl statisticsService;
 
     @Autowired
     private StringRedisTemplate redisTemplate;
-    
+
     @Autowired
     private PhotoSenderServiceImpl photoSenderService;
-    
+
     @Autowired
     private AsyncNotificationProvider notificationProvider;
-    
+
     @Autowired
     private PhotoDtoMapper photoDtoMapper;
-    
+
     @Autowired
     private RankingServiceImpl rankingService;
-    
+
     @Autowired
     private PhotoVoteRepository photoVoteRepository;
-    
+
     @Autowired
     private PhotoReplyRepository photoReplyRepository;
 
@@ -148,10 +140,10 @@ public class PhotoServiceImpl {
         photo = photoRepository.save(photo);
         photoStatisticsService.createNew(photo.getId());
         userService.updateUserLocationAndIncreaseDailySentCount(userId, uploadedDate, location, city);
-        
+
         User user = userRepository.findOne(userId);
         rankingService.addPointsForNewSendish(user);
-        
+
         return photoSenderService.sendNewPhoto(photo.getId());
     }
 
@@ -170,10 +162,18 @@ public class PhotoServiceImpl {
         return photoDtoMapper.mapToPhotoDto(photos, MAX_LOCATION_NAME_LENGTH_PHOTO_LIST);
     }
 
+    public List<PhotoDto> findNearbyByCity(Long cityId, Integer page) {
+        City city = cityService.findOne(cityId);
+        List<Photo> photos = photoRepository.findByCityCountryId(city.getCountry().getId(),
+                new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
+
+        return photoDtoMapper.mapToPhotoDto(photos, MAX_LOCATION_NAME_LENGTH_PHOTO_LIST);
+    }
+
     public List<ReceivedPhotoDto> findAutoReceivedByUserId(Long userId, Integer page) {
         List<PhotoReceiver> photos = photoReceiverRepository.findAutoReceivedByUserId(userId,
                 new PageRequest(page, PHOTO_PAGE_SIZE, Direction.DESC, "createdDate"));
-        
+
         if (page == 0) {
 			statisticsService.resetUserUnseenCount(userId);
 		}
@@ -185,13 +185,10 @@ public class PhotoServiceImpl {
         return photoRepository.findByIdAndUserId(photoId, userId);
     }
 
-    public PhotoDetailsDto getDetailsByIdAndUserId(Long photoId, Long userId) {
+    public CommonPhotoDetailsDto getDetailsByIdAndUserId(Long photoId, Long userId) {
         Photo photo = photoRepository.findByIdAndUserId(photoId, userId);
         if (photo != null) {
-            PhotoDetailsDto photoDetailsDto = new PhotoDetailsDto();
-            mapPhotoDetailsDto(photo, photoDetailsDto, userId);
-
-            return photoDetailsDto;
+            return photoDtoMapper.mapToCommonPhotoDetailsDto(photo, userId, MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS);
         }
 
         return null;
@@ -215,15 +212,15 @@ public class PhotoServiceImpl {
         	PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
         	if (vote != null) {
         		photoDetailsDto.setLike(vote.getLike());
-                photoDetailsDto.setReport(vote.getReport());		
+                photoDetailsDto.setReport(vote.getReport());
         	}
         	PhotoReply photoReply = photoReplyRepository.findByUserIdAndPhotoId(userId, photoId);
             if (photoReply != null) {
-            	photoDetailsDto.setPhotoReplyId(photoReply.getId());	
+            	photoDetailsDto.setPhotoReplyId(photoReply.getId());
             }
         }
-        
-        mapPhotoDetailsDto(photoReceiver.getPhoto(), photoDetailsDto, userId);
+
+        photoDtoMapper.mapToCommonPhotoDetailsDto(photoReceiver.getPhoto(), photoDetailsDto, userId, MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS);
 
         return photoDetailsDto;
     }
@@ -288,12 +285,21 @@ public class PhotoServiceImpl {
         addPhotoToUsersViewedList(userId, photoId);
         statisticsService.incrementUserUnseenPhotoCount(userId);
         statisticsService.increaseUserDailyReceivedPhotoCount(userId, photoReceiver.getCreatedDate().toLocalDate());
-        
+
         if (userDetails.getReceiveNewPhotoNotifications()) {
         	sendNewPhotoNotification(userId, photo);
         }
 
         return photoReceiver;
+    }
+
+    public PhotoDetailsDto getByUuid(String photoUuid, Long userId) {
+        Photo photo = photoRepository.findByUuid(photoUuid);
+        if (photo == null) {
+            return null;
+        }
+
+        return photoDtoMapper.mapToPhotoDetailsDto(photo, userId, MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS);
     }
 
     public void addPhotoToUsersViewedList(Long userId, Long photoId) {
@@ -317,12 +323,6 @@ public class PhotoServiceImpl {
         photo.setUuid(UUID.randomUUID().toString());
 
         return photo;
-    }
-
-    private void mapPhotoDetailsDto(Photo photo, PhotoDetailsDto photoDetailsDto, Long userId) {
-    	photoDtoMapper.mapToPhotoDto(photo, photoDetailsDto, MAX_LOCATION_NAME_LENGTH_PHOTO_DETAILS);
-
-        photoDetailsDto.setComments(photoCommentService.findFirstByPhotoId(photo.getId(), userId, 3));
     }
 
     private List<ReceivedPhotoDto> mapToReceivedPhotoDto(List<PhotoReceiver> photos, int maxLocationNameLength) {
