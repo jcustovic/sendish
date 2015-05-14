@@ -79,7 +79,7 @@ public class PhotosController {
         }
     }
 
-    @RequestMapping(value = "/{photoId}/like", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{photoUuid}/like", method = RequestMethod.PUT)
     @ApiOperation(value = "Like given photo")
     @ApiResponses({
         @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
