@@ -63,6 +63,7 @@ public class PhotoDtoMapper {
         PhotoStatisticsDto stats = statisticsService.getPhotoStatistics(photo.getId());
         photoDto.setCityCount(stats.getCityCount());
         photoDto.setCommentCount(stats.getCommentCount());
+        photoDto.setPhotoReplyCount(stats.getPhotoReplyCount());
         photoDto.setLikeCount(stats.getLikeCount());
         photoDto.setDislikeCount(stats.getDislikeCount());
 
