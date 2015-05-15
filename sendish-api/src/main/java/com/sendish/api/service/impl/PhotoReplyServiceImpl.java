@@ -65,6 +65,9 @@ public class PhotoReplyServiceImpl {
 	@Autowired
 	private UserActivityServiceImpl userActivityService;
 
+    @Autowired
+    private PhotoVoteServiceImpl photoVoteService;
+
 	public PhotoReply processNew(PhotoReplyFileUpload photoReplyFileUpload) {
 		MultipartFile file = photoReplyFileUpload.getImage();
 		PhotoReply photoReply = mapToPhotoReply(photoReplyFileUpload, file);
@@ -88,6 +91,7 @@ public class PhotoReplyServiceImpl {
 
 		photoReply = photoReplyRepository.save(photoReply);
 		chatService.createChatForPhotoReply(photoReply);
+        photoVoteService.likeReceived(photoReply.getUser().getId(), photoReply.getPhoto().getId());
 
 		Long photoOwnerId = photoReply.getPhoto().getUser().getId();
 
