@@ -1,5 +1,6 @@
-package com.sendish.push.notification;
+package com.sendish.push.notification.apns;
 
+import com.sendish.push.notification.NotificationProvider;
 import com.sendish.repository.model.jpa.ApnsPushToken;
 
 import java.util.Date;

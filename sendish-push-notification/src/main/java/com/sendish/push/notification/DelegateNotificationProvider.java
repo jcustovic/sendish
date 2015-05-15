@@ -27,7 +27,11 @@ public class DelegateNotificationProvider implements AsyncNotificationProvider {
     @Async
     @Override
     public final void sendPlainTextNotification(final String p_message, Long p_userId) {
-        sendPlainTextNotification(p_message, null, p_userId);
+        try {
+            notify(p_message, null, new UserQueryHolder(p_userId));
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+        }
     }
 
     @Async
@@ -79,7 +83,7 @@ public class DelegateNotificationProvider implements AsyncNotificationProvider {
         p_notification.setGcmCount(gcmCount.intValue());
         p_notification.setDoneSending(DateTime.now());
         if (gcmCount == 0 && apnsCount == 0) {
-            p_notification.setStatus(NotificationStatus.COMPLETED);
+            p_notification.setStatus(NotificationStatus.NO_USERS);
         } else {
             p_notification.setStatus(NotificationStatus.SENT);
         }

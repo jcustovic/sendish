@@ -13,7 +13,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
-
 @Entity
 @Table(name = "notification_message")
 @SequenceGenerator(name = "idSequence", sequenceName = "notification_message_seq", allocationSize = 1)

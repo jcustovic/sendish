@@ -1,6 +1,6 @@
 package com.sendish.batch.notification;
 
-import com.sendish.push.notification.ApnsNotificationProvider;
+import com.sendish.push.notification.apns.ApnsNotificationProvider;
 import com.sendish.repository.UserDetailsRepository;
 import com.sendish.repository.model.jpa.ApnsPushToken;
 import com.sendish.repository.model.jpa.UserDetails;

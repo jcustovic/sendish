@@ -1,4 +1,4 @@
-package com.sendish.push.notification;
+package com.sendish.push.notification.apns;
 
 import com.notnoop.apns.ApnsDelegateAdapter;
 import com.notnoop.apns.ApnsNotification;

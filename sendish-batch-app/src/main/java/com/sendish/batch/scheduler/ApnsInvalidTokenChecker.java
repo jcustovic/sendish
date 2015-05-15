@@ -1,6 +1,6 @@
 package com.sendish.batch.scheduler;
 
-import com.sendish.push.notification.ApnsNotificationProvider;
+import com.sendish.push.notification.apns.ApnsNotificationProvider;
 import com.sendish.repository.ApnsPushTokenRepository;
 
 import org.slf4j.Logger;

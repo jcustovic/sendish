@@ -67,7 +67,8 @@ app:
       prod:
         path: classpath:ios/apns/SendishAPNS_PROD.jks
         pass: sendisH
+  gcm:
+    api_key: AIzaSyCUFG3_XGvTzNgUbvpUMQiGyiAjFo8b6lo
   image:
     overlay:
       sendish_logo: classpath:app/image/sendish_64x64.png
-
