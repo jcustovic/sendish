@@ -247,6 +247,7 @@ public class PhotoReplyServiceImpl {
 		ChatMessageDto dto = new ChatMessageDto();
 		dto.setType(ChatMessageDto.ChatMessageDtoType.IMG);
 		dto.setImageUuid(photoReply.getUuid());
+		dto.setText(photoReply.getDescription());
 		dto.setDisplayName(UserUtils.getDisplayName(photoReply.getUser()));
 		dto.setTimeAgo(prettyTime.format(photoReply.getCreatedDate().toDate()));
 

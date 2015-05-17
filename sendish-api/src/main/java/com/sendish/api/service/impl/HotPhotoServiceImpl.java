@@ -82,7 +82,7 @@ public class HotPhotoServiceImpl {
 
         hotPhotoRepository.save(hotPhoto);
 
-        photoSenderService.stopSending(photoId, "Photo reached hot list");
+        // photoSenderService.stopSending(photoId, "Photo reached hot list");
 
         Photo photo = photoRepository.findOne(photoId);
         sendCongratsInboxItem(photo);
