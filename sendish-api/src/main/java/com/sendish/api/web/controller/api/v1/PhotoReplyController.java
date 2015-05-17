@@ -167,7 +167,7 @@ public class PhotoReplyController {
 		}
 	}
 	
-	@RequestMapping(value = "/{photoReplyId}/new-messages", method = RequestMethod.POST)
+	@RequestMapping(value = "/new-messages", method = RequestMethod.POST)
     @ApiOperation(value = "Post new message")
     @ApiResponses({
     	@ApiResponse(code = 200, message = "OK"),
