@@ -104,8 +104,8 @@ public class ChatServiceImpl {
 		dto.setId(message.getId());
 		dto.setText(message.getText());
 		dto.setType(ChatMessageDtoType.TEXT);
-		dto.setUsername(UserUtils.getDisplayName(message.getUser()));
-		dto.setTime(prettyTime.format(message.getCreatedDate().toDate()));
+		dto.setDisplayName(UserUtils.getDisplayName(message.getUser()));
+		dto.setTimeAgo(prettyTime.format(message.getCreatedDate().toDate()));
 		
 		return dto;
 	}

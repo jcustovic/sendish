@@ -219,17 +219,17 @@ public class PhotoReplyServiceImpl {
 	private PhotoReplyDto mapToPhotoReplyDto(ChatThread chatThread, Long userId) {
 		PhotoReply photoReply = chatThread.getPhotoReply();
 		PhotoReplyDto photoReplyDto = new PhotoReplyDto();
-		photoReplyDto.setLastActivity(prettyTime.format(chatThread.getLastActivity().toDate()));
+		photoReplyDto.setTimeAgo(prettyTime.format(chatThread.getLastActivity().toDate()));
 		photoReplyDto.setId(photoReply.getId());
-		photoReplyDto.setImgUuid(photoReply.getUuid());
+		photoReplyDto.setImageUuid(photoReply.getUuid());
 		if (photoReply.getUser().getId().equals(userId)) {
 			photoReplyDto.setReceived(false);
-			photoReplyDto.setUsername(UserUtils.getDisplayName(photoReply.getPhoto().getUser()));
-			photoReplyDto.setText("You photo replied to ");
+			photoReplyDto.setDisplayName(UserUtils.getDisplayName(photoReply.getPhoto().getUser()));
+			photoReplyDto.setMessage("You photo replied to ");
 		} else {
 			photoReplyDto.setReceived(true);
-			photoReplyDto.setUsername(UserUtils.getDisplayName(photoReply.getUser()));
-			photoReplyDto.setText(" replied with photo");
+			photoReplyDto.setDisplayName(UserUtils.getDisplayName(photoReply.getUser()));
+			photoReplyDto.setMessage(" replied with photo");
 		}
 		
 		return photoReplyDto;
@@ -246,9 +246,9 @@ public class PhotoReplyServiceImpl {
 	private ChatMessageDto mapPhotoReplyImageToMessageDto(PhotoReply photoReply) {
 		ChatMessageDto dto = new ChatMessageDto();
 		dto.setType(ChatMessageDto.ChatMessageDtoType.IMG);
-		dto.setUrl(photoReply.getUuid());
-		dto.setUsername(UserUtils.getDisplayName(photoReply.getUser()));
-		dto.setTime(prettyTime.format(photoReply.getCreatedDate().toDate()));
+		dto.setImageUuid(photoReply.getUuid());
+		dto.setDisplayName(UserUtils.getDisplayName(photoReply.getUser()));
+		dto.setTimeAgo(prettyTime.format(photoReply.getCreatedDate().toDate()));
 
 		return dto;
 	}

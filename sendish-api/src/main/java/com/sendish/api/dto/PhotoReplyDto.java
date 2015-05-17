@@ -4,46 +4,46 @@ public class PhotoReplyDto extends BaseEntityDto {
 
 	private static final long serialVersionUID = 1L;
 
-	private String lastActivity;
-	private String imgUuid;
-	private String username;
-	private String text;
+	private String timeAgo;
+	private String imageUuid;
+	private String displayName;
+	private String message;
 	private Boolean received;
 
 	// Getters & setters
 
-	public String getLastActivity() {
-		return lastActivity;
+	public String getTimeAgo() {
+		return timeAgo;
 	}
 
-	public void setLastActivity(String lastActivity) {
-		this.lastActivity = lastActivity;
+	public void setTimeAgo(String timeAgo) {
+		this.timeAgo = timeAgo;
 	}
 
-	public String getImgUuid() {
-		return imgUuid;
+	public String getImageUuid() {
+		return imageUuid;
 	}
 
-	public void setImgUuid(String imgUuid) {
-		this.imgUuid = imgUuid;
+	public void setImageUuid(String imageUuid) {
+		this.imageUuid = imageUuid;
 	}
 
-	public String getUsername() {
-		return username;
+	public String getDisplayName() {
+		return displayName;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 
-	public String getText() {
-		return text;
+	public String getMessage() {
+		return message;
 	}
 
-	public void setText(String text) {
-		this.text = text;
+	public void setMessage(String message) {
+		this.message = message;
 	}
-
+	
 	public Boolean getReceived() {
 		return received;
 	}

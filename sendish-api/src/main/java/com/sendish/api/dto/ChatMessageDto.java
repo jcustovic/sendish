@@ -10,50 +10,41 @@ public class ChatMessageDto extends BaseEntityDto {
 
 	private ChatMessageDtoType type;
 	private String text;
-	private String time;
-	private String url;
-	private String username;
-
+	private String timeAgo;
+	private String imageUuid;
+	private String displayName;
+	
 	// Getters & setters
-
+	
 	public ChatMessageDtoType getType() {
 		return type;
 	}
-
 	public void setType(ChatMessageDtoType type) {
 		this.type = type;
 	}
-
 	public String getText() {
 		return text;
 	}
-
 	public void setText(String text) {
 		this.text = text;
 	}
-
-	public String getTime() {
-		return time;
+	public String getTimeAgo() {
+		return timeAgo;
 	}
-
-	public void setTime(String time) {
-		this.time = time;
+	public void setTimeAgo(String timeAgo) {
+		this.timeAgo = timeAgo;
 	}
-
-	public String getUrl() {
-		return url;
+	public String getImageUuid() {
+		return imageUuid;
 	}
-
-	public void setUrl(String url) {
-		this.url = url;
+	public void setImageUuid(String imageUuid) {
+		this.imageUuid = imageUuid;
 	}
-
-	public String getUsername() {
-		return username;
+	public String getDisplayName() {
+		return displayName;
 	}
-
-	public void setUsername(String username) {
-		this.username = username;
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 
 }
