@@ -3,6 +3,7 @@ package com.sendish.api.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.sendish.repository.model.jpa.*;
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,6 @@ import com.sendish.repository.ChatMessageRepository;
 import com.sendish.repository.ChatThreadRepository;
 import com.sendish.repository.ChatThreadUserRepository;
 import com.sendish.repository.UserRepository;
-import com.sendish.repository.model.jpa.ChatMessage;
-import com.sendish.repository.model.jpa.ChatThread;
-import com.sendish.repository.model.jpa.ChatThreadUser;
-import com.sendish.repository.model.jpa.ChatThreadUserId;
-import com.sendish.repository.model.jpa.PhotoReply;
 
 @Service
 @Transactional
@@ -86,24 +82,44 @@ public class ChatServiceImpl {
 		}
 	}
 	
-	public ChatMessageDto newChatMessage(Long chatThreadId, Long userId, String text) {
-		ChatThread chatThread = chatThreadRepository.findOne(chatThreadId);
-		chatThread.setLastActivity(DateTime.now());
-		chatThreadRepository.save(chatThread);
-		
-		ChatMessage message = new ChatMessage();
-		message.setChatThread(chatThread);
-		message.setUser(userRepository.findOne(userId));
-		message.setText(text);
-		
-		return mapToMessageDto(chatMessageRepository.save(message));
+	public ChatMessageDto newTextChatMessage(Long chatThreadId, Long userId, String text) {
+        return newChatMessage(chatThreadId, userId, ChatMessageType.TEXT, null, text);
 	}
+
+    public ChatMessageDto newPhotoImageChatMessage(Long chatThreadId, Long userId, String uuid, String description) {
+        return newChatMessage(chatThreadId, userId, ChatMessageType.IMAGE_PHOTO, uuid, description);
+    }
+
+    public ChatMessageDto newPhotoReplyImageChatMessage(Long chatThreadId, Long userId, String uuid, String description) {
+        return newChatMessage(chatThreadId, userId, ChatMessageType.IMAGE_PHOTO_REPLY, uuid, description);
+    }
+
+    private ChatMessageDto newChatMessage(Long chatThreadId, Long userId, ChatMessageType type, String imageUuid, String text) {
+        ChatThread chatThread = chatThreadRepository.findOne(chatThreadId);
+        chatThread.setLastActivity(DateTime.now());
+        chatThreadRepository.save(chatThread);
+
+        ChatMessage message = new ChatMessage();
+        message.setChatThread(chatThread);
+        message.setUser(userRepository.findOne(userId));
+        message.setType(type);
+        message.setImageUuid(imageUuid);
+        message.setText(text);
+
+        return mapToMessageDto(chatMessageRepository.save(message));
+    }
 	
 	private ChatMessageDto mapToMessageDto(ChatMessage message) {
 		ChatMessageDto dto = new ChatMessageDto();
 		dto.setId(message.getId());
+        if (message.getType().equals(ChatMessageType.TEXT)) {
+            dto.setType(ChatMessageDtoType.TEXT);
+        } else {
+            dto.setType(ChatMessageDtoType.IMG);
+            dto.setImageType(message.getType());
+            dto.setImageUuid(message.getImageUuid());
+        }
 		dto.setText(message.getText());
-		dto.setType(ChatMessageDtoType.TEXT);
 		dto.setDisplayName(UserUtils.getDisplayName(message.getUser()));
 		dto.setTimeAgo(prettyTime.format(message.getCreatedDate().toDate()));
 		

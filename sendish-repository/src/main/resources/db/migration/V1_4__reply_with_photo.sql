@@ -69,6 +69,8 @@ create table chat_message (
   cm_id int8 not null default nextval('chat_message_seq'),
   cm_thread_id int8 not null,
   cm_user_id int8 not null,
+  cm_type varchar(32) not null,
+  cm_uuid varchar(36),
   cm_text varchar(1024),
   cm_deleted boolean not null,
   cm_created_date timestamp not null,

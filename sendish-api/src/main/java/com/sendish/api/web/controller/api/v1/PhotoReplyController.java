@@ -43,6 +43,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/v1.0/photo-replies")
@@ -117,6 +118,7 @@ public class PhotoReplyController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			List<PhotoReplyDto> photoReplies = photoReplyService.findByPhotoId(photoId, user.getUserId(), page);
+
 			return new ResponseEntity<>(photoReplies, HttpStatus.OK);
 		}
 	}
@@ -132,6 +134,8 @@ public class PhotoReplyController {
 		if (chatThread == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
+            chatThread.getMessages().stream().forEach(this::mapPhotoUrl);
+
 			return new ResponseEntity<>(chatThread, HttpStatus.OK);
 		}
 	}
@@ -163,6 +167,8 @@ public class PhotoReplyController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			List<ChatMessageDto> msgs = chatServiceImpl.findByThreadId(chatThread.getId(), page);
+            msgs.stream().forEach(this::mapPhotoUrl);
+
 			return new ResponseEntity<>(msgs, HttpStatus.OK);
 		}
 	}
@@ -181,6 +187,7 @@ public class PhotoReplyController {
 		}
 		
 		ChatMessageDto chatMessageDto = photoReplyService.newMessage(newMessage);
+		mapPhotoUrl(chatMessageDto);
     	
         return new ResponseEntity<>(chatMessageDto, HttpStatus.OK);
     }
@@ -249,6 +256,23 @@ public class PhotoReplyController {
             return new ResponseEntity<>(isr, headers, HttpStatus.OK);
         } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    private void mapPhotoUrl(ChatMessageDto chatMessageDto) {
+        if (chatMessageDto.getType().equals(ChatMessageDto.ChatMessageDtoType.IMG)) {
+            switch ( chatMessageDto.getImageType() ) {
+                case IMAGE_PHOTO:
+                    chatMessageDto.setRelativePath(UriComponentsBuilder.fromPath("/api/v1.0/photos/{photoUUID}/view")
+                            .buildAndExpand(chatMessageDto.getImageUuid())
+                            .toUriString());
+                    break;
+                case IMAGE_PHOTO_REPLY:
+                    chatMessageDto.setRelativePath(UriComponentsBuilder.fromPath("/api/v1.0/photo-replies/{photoReplyUUID}/view")
+                            .buildAndExpand(chatMessageDto.getImageUuid())
+                            .toUriString());
+                    break;
+            }
         }
     }
 

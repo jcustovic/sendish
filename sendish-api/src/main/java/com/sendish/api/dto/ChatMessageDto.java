@@ -1,17 +1,21 @@
 package com.sendish.api.dto;
 
+import com.sendish.repository.model.jpa.ChatMessageType;
+
 public class ChatMessageDto extends BaseEntityDto {
 
 	private static final long serialVersionUID = 1L;
 
-	public enum ChatMessageDtoType {
+    public enum ChatMessageDtoType {
 		TEXT, IMG
 	}
 
-	private ChatMessageDtoType type;
+    private ChatMessageDtoType type;
 	private String text;
 	private String timeAgo;
 	private String imageUuid;
+	private ChatMessageType imageType;
+	private String relativePath;
 	private String displayName;
 
 	// Getters & setters
@@ -46,6 +50,22 @@ public class ChatMessageDto extends BaseEntityDto {
 
 	public void setImageUuid(String imageUuid) {
 		this.imageUuid = imageUuid;
+	}
+
+    public ChatMessageType getImageType() {
+        return imageType;
+    }
+
+    public void setImageType(ChatMessageType imageType) {
+        this.imageType = imageType;
+    }
+
+    public String getRelativePath() {
+		return relativePath;
+	}
+
+	public void setRelativePath(String relativePath) {
+		this.relativePath = relativePath;
 	}
 
 	public String getDisplayName() {

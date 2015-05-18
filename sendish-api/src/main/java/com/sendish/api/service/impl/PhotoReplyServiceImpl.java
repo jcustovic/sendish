@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import com.sendish.api.dto.*;
 import com.sendish.api.util.CityUtils;
 import com.sendish.push.notification.AsyncNotificationProvider;
+import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.User;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,8 +91,14 @@ public class PhotoReplyServiceImpl {
 		photoReply.setStorageId(fileStoreId);
 
 		photoReply = photoReplyRepository.save(photoReply);
-		chatService.createChatForPhotoReply(photoReply);
-        photoVoteService.likeReceived(photoReply.getUser().getId(), photoReply.getPhoto().getId());
+        ChatThread chatThread = chatService.createChatForPhotoReply(photoReply);
+
+        // Insert first 2 messages - original photo and reply photo
+        Photo originalPhoto = photoReply.getPhoto();
+        chatService.newPhotoImageChatMessage(chatThread.getId(), originalPhoto.getUser().getId(), originalPhoto.getUuid(), originalPhoto.getDescription());
+        chatService.newPhotoReplyImageChatMessage(chatThread.getId(), photoReply.getUser().getId(), photoReply.getUuid(), photoReply.getDescription());
+
+        photoVoteService.likeReceived(photoReply.getPhoto().getId(), photoReply.getUser().getId());
 
 		Long photoOwnerId = photoReply.getPhoto().getUser().getId();
 
@@ -129,16 +136,15 @@ public class PhotoReplyServiceImpl {
 		// TODO: Get name from ChatTreadUser
 		// chatThreadDto.setName();
 		List<ChatMessageDto> messages = chatService.findByThreadId(chatThread.getId(), 0);
-		messages.add(0, mapPhotoReplyImageToMessageDto(chatThread.getPhotoReply()));
 
 		chatThreadDto.setMessages(messages);
 		
 		return chatThreadDto;
 	}
 
-	public List<PhotoReplyDto> findAll(Long userId, Integer page) {
+    public List<PhotoReplyDto> findAll(Long userId, Integer page) {
 		List<ChatThread> photoReplyChatThreads = chatThreadRepository.findPhotoReplyThreadsByUserId(userId,
-				new PageRequest(page, PHOTO_REPLIES_PAGE_SIZE, Direction.DESC, "chatThread.lastActivity"));
+                new PageRequest(page, PHOTO_REPLIES_PAGE_SIZE, Direction.DESC, "chatThread.lastActivity"));
 
 		return photoReplyChatThreads.stream()
 				.map(chatThread -> mapToPhotoReplyDto(chatThread, userId))
@@ -162,7 +168,7 @@ public class PhotoReplyServiceImpl {
 		ChatThread chatThread = chatService.findThreadByPhotoReplyId(newMessage.getPhotoReplyId());
 
 		User sender = userRepository.findOne(newMessage.getUserId());
-		ChatMessageDto chatMessageDto = chatService.newChatMessage(chatThread.getId(), sender.getId(), newMessage.getMessage());
+		ChatMessageDto chatMessageDto = chatService.newTextChatMessage(chatThread.getId(), sender.getId(), newMessage.getMessage());
 		
 		PhotoReply photoReply = chatThread.getPhotoReply();
 		Long userReceivingReplyId;
@@ -196,7 +202,7 @@ public class PhotoReplyServiceImpl {
 
 	public List<PhotoReplyDto> findByPhotoId(Long photoId, Long userId, Integer page) {
 		List<ChatThread> photoReplyChats = chatThreadRepository.findByPhotoReplyPhotoId(photoId,
-				new PageRequest(page, PHOTO_REPLIES_PAGE_SIZE, Direction.DESC, "lastActivity"));
+                new PageRequest(page, PHOTO_REPLIES_PAGE_SIZE, Direction.DESC, "lastActivity"));
 
 		return photoReplyChats.stream()
 				.map(chatThread -> mapToPhotoReplyDto(chatThread, userId))
@@ -219,8 +225,8 @@ public class PhotoReplyServiceImpl {
 	private PhotoReplyDto mapToPhotoReplyDto(ChatThread chatThread, Long userId) {
 		PhotoReply photoReply = chatThread.getPhotoReply();
 		PhotoReplyDto photoReplyDto = new PhotoReplyDto();
-		photoReplyDto.setTimeAgo(prettyTime.format(chatThread.getLastActivity().toDate()));
-		photoReplyDto.setId(photoReply.getId());
+        photoReplyDto.setTimeAgo(prettyTime.format(chatThread.getLastActivity().toDate()));
+        photoReplyDto.setId(photoReply.getId());
 		photoReplyDto.setImageUuid(photoReply.getUuid());
 		if (photoReply.getUser().getId().equals(userId)) {
 			photoReplyDto.setReceived(false);
@@ -241,17 +247,6 @@ public class PhotoReplyServiceImpl {
 		photoReplyNotifFields.put("REFERENCE_ID", photoReply.getId());
 
 		notificationProvider.sendPlainTextNotification(text, photoReplyNotifFields, receivingUserId);
-	}
-
-	private ChatMessageDto mapPhotoReplyImageToMessageDto(PhotoReply photoReply) {
-		ChatMessageDto dto = new ChatMessageDto();
-		dto.setType(ChatMessageDto.ChatMessageDtoType.IMG);
-		dto.setImageUuid(photoReply.getUuid());
-		dto.setText(photoReply.getDescription());
-		dto.setDisplayName(UserUtils.getDisplayName(photoReply.getUser()));
-		dto.setTimeAgo(prettyTime.format(photoReply.getCreatedDate().toDate()));
-
-		return dto;
 	}
 
 }

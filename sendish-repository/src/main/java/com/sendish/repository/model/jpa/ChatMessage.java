@@ -23,6 +23,12 @@ public class ChatMessage extends BaseEntity {
 	@JoinColumn(name = "cm_user_id", nullable = false)
 	private User user;
 
+	@Column(name = "cm_type", length = 32, nullable = false)
+	private ChatMessageType type;
+
+	@Column(name = "cm_uuid", length = 36)
+	private String imageUuid;
+
 	@Column(name = "cm_text", length = 1024)
 	private String text;
 
@@ -56,7 +62,23 @@ public class ChatMessage extends BaseEntity {
 		this.user = user;
 	}
 
-	public String getText() {
+    public String getImageUuid() {
+        return imageUuid;
+    }
+
+    public void setImageUuid(String imageUuid) {
+        this.imageUuid = imageUuid;
+    }
+
+    public ChatMessageType getType() {
+        return type;
+    }
+
+    public void setType(ChatMessageType type) {
+        this.type = type;
+    }
+
+    public String getText() {
 		return text;
 	}
 
