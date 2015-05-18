@@ -23,6 +23,7 @@ public class ChatMessage extends BaseEntity {
 	@JoinColumn(name = "cm_user_id", nullable = false)
 	private User user;
 
+    @Enumerated(EnumType.STRING)
 	@Column(name = "cm_type", length = 32, nullable = false)
 	private ChatMessageType type;
 
