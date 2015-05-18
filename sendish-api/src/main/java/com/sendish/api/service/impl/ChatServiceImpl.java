@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.sendish.repository.model.jpa.*;
+
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.ChatMessageDto;
+import com.sendish.api.dto.ChatMessageImageDto;
 import com.sendish.api.dto.ChatMessageDto.ChatMessageDtoType;
 import com.sendish.api.util.UserUtils;
 import com.sendish.repository.ChatMessageRepository;
@@ -115,9 +117,14 @@ public class ChatServiceImpl {
         if (message.getType().equals(ChatMessageType.TEXT)) {
             dto.setType(ChatMessageDtoType.TEXT);
         } else {
-            dto.setType(ChatMessageDtoType.IMG);
-            dto.setImageType(message.getType());
-            dto.setImageUuid(message.getImageUuid());
+        	dto.setType(ChatMessageDtoType.IMG);
+        	ChatMessageImageDto image = new ChatMessageImageDto();
+        	image.setType(message.getType());
+        	image.setUuid(message.getImageUuid());
+        	// TODO: Get real width and height! For now we only use original image size 640x640px
+        	image.setHeight(640);
+        	image.setWidth(640);
+        	dto.setImage(image);
         }
 		dto.setText(message.getText());
 		dto.setDisplayName(UserUtils.getDisplayName(message.getUser()));

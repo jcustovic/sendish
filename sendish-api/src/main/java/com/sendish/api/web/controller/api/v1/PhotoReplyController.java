@@ -8,8 +8,8 @@ import javax.validation.Valid;
 import com.sendish.api.dto.*;
 import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.api.web.controller.validator.ReportPhotoReplyValidator;
-
 import com.sendish.repository.model.jpa.Photo;
+
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -43,6 +43,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
@@ -261,17 +262,20 @@ public class PhotoReplyController {
 
     private void mapPhotoUrl(ChatMessageDto chatMessageDto) {
         if (chatMessageDto.getType().equals(ChatMessageDto.ChatMessageDtoType.IMG)) {
-            switch ( chatMessageDto.getImageType() ) {
+        	ChatMessageImageDto img = chatMessageDto.getImage();
+            switch ( img.getType() ) {
                 case IMAGE_PHOTO:
-                    chatMessageDto.setRelativePath(UriComponentsBuilder.fromPath("/api/v1.0/photos/{photoUUID}/view")
-                            .buildAndExpand(chatMessageDto.getImageUuid())
+                    img.setRelativePath(UriComponentsBuilder.fromPath("/api/v1.0/photos/{photoUUID}/view")
+                            .buildAndExpand(img.getUuid())
                             .toUriString());
                     break;
                 case IMAGE_PHOTO_REPLY:
-                    chatMessageDto.setRelativePath(UriComponentsBuilder.fromPath("/api/v1.0/photo-replies/{photoReplyUUID}/view")
-                            .buildAndExpand(chatMessageDto.getImageUuid())
+                	img.setRelativePath(UriComponentsBuilder.fromPath("/api/v1.0/photo-replies/{photoReplyUUID}/view")
+                            .buildAndExpand(img.getUuid())
                             .toUriString());
                     break;
+				default:
+					break;
             }
         }
     }

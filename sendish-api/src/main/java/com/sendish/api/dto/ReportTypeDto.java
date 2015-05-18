@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 public class ReportTypeDto implements Serializable {
 
-    private String value;
+	private static final long serialVersionUID = 1L;
+	
+	private String value;
     private String name;
     private Boolean requiresText;
 
