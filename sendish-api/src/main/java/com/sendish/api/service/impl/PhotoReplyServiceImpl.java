@@ -230,11 +230,11 @@ public class PhotoReplyServiceImpl {
 		photoReplyDto.setImageUuid(photoReply.getUuid());
 		if (photoReply.getUser().getId().equals(userId)) {
 			photoReplyDto.setReceived(false);
-			photoReplyDto.setDisplayName(UserUtils.getDisplayName(photoReply.getPhoto().getUser()));
+			photoReplyDto.setDisplayName(UserUtils.getDisplayNameWithCity(photoReply.getPhoto().getUser()));
 			photoReplyDto.setMessage("You photo replied to ");
 		} else {
 			photoReplyDto.setReceived(true);
-			photoReplyDto.setDisplayName(UserUtils.getDisplayName(photoReply.getUser()));
+			photoReplyDto.setDisplayName(UserUtils.getDisplayNameWithCity(photoReply.getUser()));
 			photoReplyDto.setMessage(" replied with photo");
 		}
 		

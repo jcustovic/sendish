@@ -43,9 +43,6 @@ public class HotPhotoServiceImpl {
     @Autowired
     private PhotoRepository photoRepository;
 
-    @Autowired
-    private PhotoSenderServiceImpl photoSenderService;
-
     public List<PhotoDto> findAll(Integer page) {
         Page<HotPhoto> photos = hotPhotoRepository.findAll(new PageRequest(page, HOT_PHOTO_PAGE_SIZE, Direction.DESC, "selectedTime"));
 
@@ -82,6 +79,7 @@ public class HotPhotoServiceImpl {
 
         hotPhotoRepository.save(hotPhoto);
 
+        // TODO: Don't stop the photo when it hits the hot list. Make it travel :)
         // photoSenderService.stopSending(photoId, "Photo reached hot list");
 
         Photo photo = photoRepository.findOne(photoId);

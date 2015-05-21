@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
-import com.sendish.api.thumbnailator.filter.GaussianBlurFilter;
 import com.sendish.api.thumbnailator.filter.TransparencyColorFilter;
 import com.sendish.repository.PhotoRepository;
 import com.sendish.repository.ResizedPhotoRepository;
@@ -53,7 +52,7 @@ public class ResizePhotoServiceImpl implements ResizePhotoService {
         KEY_SIZE_MAP.put("list_square_small_blur", new int[] { 160, 160 });
     }
 
-    private final GaussianBlurFilter blurFilter = new GaussianBlurFilter(10);
+    // private final GaussianBlurFilter blurFilter = new GaussianBlurFilter(10);
     private final TransparencyColorFilter transparencyColorFilter = new TransparencyColorFilter(0.8f, new Color(42, 48, 63));
 
     @Autowired
@@ -99,7 +98,7 @@ public class ResizePhotoServiceImpl implements ResizePhotoService {
                 thumbnails.crop(Positions.CENTER);
             }
             if (sizeKey.endsWith("blur")) {
-            	thumbnails.addFilter(blurFilter);
+            	//thumbnails.addFilter(blurFilter); TODO: For now we don't blur
             	thumbnails.addFilter(transparencyColorFilter);
 
                 // Add watermark
