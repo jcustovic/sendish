@@ -127,6 +127,7 @@ public class ChatServiceImpl {
         	dto.setImage(image);
         }
 		dto.setText(message.getText());
+        dto.setUserId(message.getUser().getId());
 		dto.setDisplayName(UserUtils.getDisplayName(message.getUser()));
 		dto.setTimeAgo(prettyTime.format(message.getCreatedDate().toDate()));
 		

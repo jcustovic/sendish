@@ -9,6 +9,7 @@ public class ChatMessageDto extends BaseEntityDto {
 	}
 
 	private ChatMessageDtoType type;
+    private Long userId;
 	private String text;
 	private ChatMessageImageDto image;
 	private String timeAgo;
@@ -24,7 +25,15 @@ public class ChatMessageDto extends BaseEntityDto {
 		this.type = type;
 	}
 
-	public String getText() {
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getText() {
 		return text;
 	}
 
