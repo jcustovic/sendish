@@ -8,7 +8,6 @@ public class ReceivedPhotoDetailsDto extends CommonPhotoDetailsDto {
 	private Boolean report;
 	private Boolean opened;
 	private Boolean forceRating = false;
-	private Long photoReplyId;
 
 	public Boolean getLike() {
 		return like;
@@ -42,12 +41,4 @@ public class ReceivedPhotoDetailsDto extends CommonPhotoDetailsDto {
 		this.forceRating = forceRating;
 	}
 	
-	public Long getPhotoReplyId() {
-		return photoReplyId;
-	}
-
-	public void setPhotoReplyId(Long photoReplyId) {
-		this.photoReplyId = photoReplyId;
-	}
-
 }

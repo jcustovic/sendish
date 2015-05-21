@@ -6,9 +6,12 @@ import java.util.stream.Collectors;
 import com.sendish.api.dto.CommonPhotoDetailsDto;
 import com.sendish.api.dto.PhotoDetailsDto;
 import com.sendish.api.service.impl.PhotoCommentServiceImpl;
+import com.sendish.repository.PhotoReplyRepository;
 import com.sendish.repository.PhotoVoteRepository;
+import com.sendish.repository.model.jpa.PhotoReply;
 import com.sendish.repository.model.jpa.PhotoVote;
 import com.sendish.repository.model.jpa.PhotoVoteId;
+
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,9 @@ public class PhotoDtoMapper {
 
     @Autowired
     private PhotoVoteRepository photoVoteRepository;
+    
+    @Autowired
+    private PhotoReplyRepository photoReplyRepository;
 
     public List<PhotoDto> mapHotToPhotoDto(List<HotPhoto> photos, int maxLocationNameLength) {
         return photos.stream().map(photo -> mapToPhotoDto(photo.getPhoto(), maxLocationNameLength)).collect(Collectors.toList());
@@ -79,7 +85,13 @@ public class PhotoDtoMapper {
 
     public void mapToCommonPhotoDetailsDto(Photo photo, CommonPhotoDetailsDto photoDetailsDto, Long userId, int locationMaxLength) {
         mapToPhotoDto(photo, photoDetailsDto, locationMaxLength);
+        
         photoDetailsDto.setComments(photoCommentService.findFirstByPhotoId(photo.getId(), userId, MAX_COMMENTS_IN_PHOTO_DETAILS));
+        
+        PhotoReply photoReply = photoReplyRepository.findByUserIdAndPhotoId(userId, photo.getId());
+        if (photoReply != null) {
+        	photoDetailsDto.setPhotoReplyId(photoReply.getId());
+        }
     }
 
     public PhotoDetailsDto mapToPhotoDetailsDto(Photo photo, Long userId, int locationMaxLength) {
