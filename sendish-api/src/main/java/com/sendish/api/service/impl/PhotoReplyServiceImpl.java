@@ -97,7 +97,7 @@ public class PhotoReplyServiceImpl {
         chatService.newPhotoImageChatMessage(chatThread.getId(), originalPhoto.getUser().getId(), originalPhoto.getUuid(), originalPhoto.getDescription());
         chatService.newPhotoReplyImageChatMessage(chatThread.getId(), photoReply.getUser().getId(), photoReply.getUuid(), photoReply.getDescription());
 
-        photoVoteService.likeReceived(photoReply.getPhoto().getId(), photoReply.getUser().getId());
+        photoVoteService.likePhoto(photoReply.getPhoto().getId(), photoReply.getUser().getId());
 
 		Long photoOwnerId = photoReply.getPhoto().getUser().getId();
 
