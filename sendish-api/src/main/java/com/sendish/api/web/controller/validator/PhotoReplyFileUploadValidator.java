@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.sendish.repository.model.jpa.Photo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,6 @@ import com.sendish.api.dto.PhotoReplyFileUpload;
 import com.sendish.api.service.impl.PhotoReplyServiceImpl;
 import com.sendish.api.service.impl.PhotoServiceImpl;
 import com.sendish.api.util.ImageUtils;
-import com.sendish.repository.model.jpa.PhotoReceiver;
 import com.sendish.repository.model.jpa.PhotoReply;
 
 @Component
@@ -59,14 +59,16 @@ public class PhotoReplyFileUploadValidator implements Validator {
         if (!allowedContentTypes.contains(photoReplyUpload.getImage().getContentType())) {
             errors.rejectValue("image", null, "Content type not allowed");
         }
-        
-        PhotoReceiver photoReceiver = photoService.findReceivedByPhotoIdAndUserId(photoReplyUpload.getPhotoId(), photoReplyUpload.getUserId());
-        if (photoReceiver == null) {
+
+        Photo photo = photoService.findOne(photoReplyUpload.getPhotoId());
+        if (photo == null) {
         	errors.rejectValue("photoId", null, "Photo not found");
+        } else if (photo.getUser().getId().equals(photoReplyUpload.getUserId())) {
+            errors.rejectValue("photoId", null, "You cannot reply to your own photo");
         } else {
         	PhotoReply photoReply = photoReplyService.findByUserIdAndPhotoId(photoReplyUpload.getUserId(), photoReplyUpload.getPhotoId());
         	if (photoReply != null) {
-        		errors.rejectValue("photoId", null, "Photo reply already sent for specified photo");	
+        		errors.rejectValue("photoId", null, "Photo reply already sent for specified photo");
         	}
         }
 

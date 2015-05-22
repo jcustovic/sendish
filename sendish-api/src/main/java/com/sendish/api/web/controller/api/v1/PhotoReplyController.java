@@ -55,22 +55,22 @@ public class PhotoReplyController {
     private PhotoReplyServiceImpl photoReplyService;
 	
 	@Autowired
-    private PhotoReplyFileUploadValidator photoReplyFileUploadValidator;
-	
-	@Autowired
 	private FileStore fileStore;
 	
 	@Autowired
 	private ChatServiceImpl chatServiceImpl;
+
+	@Autowired
+	private PhotoServiceImpl photoService;
+
+	@Autowired
+	private PhotoReplyFileUploadValidator photoReplyFileUploadValidator;
 	
 	@Autowired
 	private NewPhotoReplyMessageValidator newPhotoReplyMessageValidator;
 
 	@Autowired
 	private ReportPhotoReplyValidator reportPhotoReplyValidator;
-
-	@Autowired
-	private PhotoServiceImpl photoService;
 	
 	@RequestMapping(method = RequestMethod.POST)
     @ApiOperation(value = "Reply with photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created photo comment")
