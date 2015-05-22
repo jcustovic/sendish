@@ -50,7 +50,7 @@ public class UserActivityServiceImpl {
 	@Autowired
     private StringRedisTemplate template;
 	
-	public List<ActivityItemDto> getActivitites(Long userId, Integer page) {
+	public List<ActivityItemDto> findAll(Long userId, Integer page) {
 		List<UserActivity> activity = findUserActivity(userId, page);
 		if (page == 0) {
 			statisticsService.markActivitiesAsRead(userId);

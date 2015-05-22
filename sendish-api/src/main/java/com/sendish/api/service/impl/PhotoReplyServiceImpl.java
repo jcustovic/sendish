@@ -145,6 +145,9 @@ public class PhotoReplyServiceImpl {
     public List<PhotoReplyDto> findAll(Long userId, Integer page) {
 		List<ChatThread> photoReplyChatThreads = chatThreadRepository.findPhotoReplyThreadsByUserId(userId,
                 new PageRequest(page, PHOTO_REPLIES_PAGE_SIZE, Direction.DESC, "chatThread.lastActivity"));
+        if (page == 0) {
+            statisticsService.markPhotoReplyActivitiesAsRead(userId);
+        }
 
 		return photoReplyChatThreads.stream()
 				.map(chatThread -> mapToPhotoReplyDto(chatThread, userId))

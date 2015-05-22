@@ -30,7 +30,7 @@ public class ActivitiesController {
     	@ApiResponse(code = 200, message = "OK")
     })
     public List<ActivityItemDto> getActivityList(@RequestParam(defaultValue = "0") Integer page, AuthUser user) {
-        return userActivityService.getActivitites(user.getUserId(), page);
+        return userActivityService.findAll(user.getUserId(), page);
     }
 
 }
