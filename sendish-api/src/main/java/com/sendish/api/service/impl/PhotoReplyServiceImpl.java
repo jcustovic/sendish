@@ -9,7 +9,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.sendish.api.dto.*;
-import com.sendish.api.util.CityUtils;
 import com.sendish.push.notification.AsyncNotificationProvider;
 import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.User;
@@ -106,7 +105,7 @@ public class PhotoReplyServiceImpl {
 		statisticsService.setNewPhotoReplyActivity(photoOwnerId);
 
 		User sender = photoReply.getUser();
-		String text = CityUtils.getTrimmedLocationName(sender.getDetails().getCurrentCity()) + " replied with photo";
+		String text = UserUtils.getDisplayNameWithCity(sender) + " replied with photo";
 		sendPhotoReplyNewsNotification(photoOwnerId, text, photoReply);
 
 		userActivityService.addNewPhotoReplyActivity(photoReply);
@@ -122,12 +121,12 @@ public class PhotoReplyServiceImpl {
 		return photoReplyRepository.findByUuid(photoReplyUUID);
 	}
 	
-	public ChatThread findChatThreadByPhotoReplyId(Long photoReplyId) {
-		return chatService.findThreadByPhotoReplyId(photoReplyId);
+	public ChatThread findThreadByPhotoReplyIdAndUserId(Long photoReplyId, Long userId) {
+		return chatService.findThreadByPhotoReplyIdAndUserId(photoReplyId, userId);
 	}
 
-	public ChatThreadDetailsDto findChatThreadWithFirstPageByPhotoReplyId(Long photoReplyId, Long userId) {
-		ChatThread chatThread = chatService.findThreadByPhotoReplyId(photoReplyId);
+	public ChatThreadDetailsDto findChatThreadWithFirstPageByPhotoReplyIdAndUserId(Long photoReplyId, Long userId) {
+		ChatThread chatThread = chatService.findThreadByPhotoReplyIdAndUserId(photoReplyId, userId);
 		if (chatThread == null) {
 			return null;	
 		}
@@ -181,7 +180,7 @@ public class PhotoReplyServiceImpl {
 			userReceivingReplyId = photoReply.getUser().getId();
 		}
 		statisticsService.setNewPhotoReplyActivity(userReceivingReplyId);
-		String text = CityUtils.getTrimmedLocationName(sender.getDetails().getCurrentCity()) + " replied";
+        String text = UserUtils.getDisplayName(sender) + " replied";
 		sendPhotoReplyNewsNotification(userReceivingReplyId, text, photoReply);
 		
 		return chatMessageDto;
@@ -234,11 +233,11 @@ public class PhotoReplyServiceImpl {
 		if (photoReply.getUser().getId().equals(userId)) {
 			photoReplyDto.setReceived(false);
 			photoReplyDto.setDisplayName(UserUtils.getDisplayNameWithCity(photoReply.getPhoto().getUser()));
-			photoReplyDto.setMessage(" received your photo reply");
+			photoReplyDto.setMessage("received your photo reply");
 		} else {
 			photoReplyDto.setReceived(true);
 			photoReplyDto.setDisplayName(UserUtils.getDisplayNameWithCity(photoReply.getUser()));
-			photoReplyDto.setMessage(" replied with photo");
+			photoReplyDto.setMessage("replied with photo");
 		}
 		
 		return photoReplyDto;

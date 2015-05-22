@@ -131,7 +131,7 @@ public class PhotoReplyController {
     	@ApiResponse(code = 404, message = "Photo reply not found")
     })
 	public ResponseEntity<ChatThreadDetailsDto> getChatThreadForPhotoReply(@PathVariable Long photoReplyId, AuthUser user) {
-		ChatThreadDetailsDto chatThread = photoReplyService.findChatThreadWithFirstPageByPhotoReplyId(photoReplyId, user.getUserId());
+		ChatThreadDetailsDto chatThread = photoReplyService.findChatThreadWithFirstPageByPhotoReplyIdAndUserId(photoReplyId, user.getUserId());
 		if (chatThread == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
@@ -163,7 +163,7 @@ public class PhotoReplyController {
     })
 	public ResponseEntity<List<ChatMessageDto>> getChatMessagesForPhotoReply(@PathVariable Long photoReplyId, @RequestParam(defaultValue = "0") Integer page,
 			AuthUser user) {
-		ChatThread chatThread = photoReplyService.findChatThreadByPhotoReplyId(photoReplyId);
+		ChatThread chatThread = photoReplyService.findThreadByPhotoReplyIdAndUserId(photoReplyId, user.getUserId());
 		if (chatThread == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {

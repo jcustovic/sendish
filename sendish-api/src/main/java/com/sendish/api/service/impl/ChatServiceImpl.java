@@ -65,6 +65,10 @@ public class ChatServiceImpl {
 	public ChatThread findThreadByPhotoReplyId(Long photoReplyId) {
 		return chatThreadRepository.findByPhotoReplyId(photoReplyId);
 	}
+
+    public ChatThread findThreadByPhotoReplyIdAndUserId(Long photoReplyId, Long userId) {
+        return chatThreadRepository.findByPhotoReplyIdAndUserId(photoReplyId, userId);
+    }
 	
 	public List<ChatMessageDto> findByThreadId(Long chatThreadId, Integer page) {
 		List<ChatMessage> messages = chatMessageRepository.findByChatThreadId(chatThreadId, 

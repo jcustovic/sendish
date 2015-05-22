@@ -20,6 +20,11 @@ public interface ChatThreadRepository extends JpaRepository<ChatThread, Long> {
 	
 	ChatThread findByPhotoReplyId(Long photoReplyId);
 
+    @Query("SELECT ctu.chatThread FROM ChatThreadUser ctu JOIN ctu.chatThread ct WHERE ct.photoReply.id = ?1 "
+            + "AND ct.photoReply.deleted = FALSE "
+            + "AND ctu.user.id = ?2")
+	ChatThread findByPhotoReplyIdAndUserId(Long photoReplyId, Long userId);
+
 	List<ChatThread> findByPhotoReplyPhotoId(Long photoId, Pageable page);
 
 }

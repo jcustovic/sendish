@@ -36,7 +36,7 @@ create sequence chat_thread_seq;
 
 create table chat_thread (
   cth_id int8 not null default nextval('chat_thread_seq'),
-  cth_photo_reply_id int8 not null,
+  cth_photo_reply_id int8 not null unique,
   cth_last_activity_time timestamp not null,
   cth_created_date timestamp not null,
 
