@@ -97,9 +97,8 @@ public class PhotoDtoMapper {
     public PhotoDetailsDto mapToPhotoDetailsDto(Photo photo, Long userId, int locationMaxLength) {
         PhotoDetailsDto photoDetails = new PhotoDetailsDto();
 
-        mapToPhotoDto(photo, photoDetails, locationMaxLength);
+        mapToCommonPhotoDetailsDto(photo, photoDetails, userId, locationMaxLength);
 
-        photoDetails.setComments(photoCommentService.findFirstByPhotoId(photo.getId(), userId, MAX_COMMENTS_IN_PHOTO_DETAILS));
         PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photo.getId()));
         if (vote == null) {
             photoDetails.setForceRating(true);
