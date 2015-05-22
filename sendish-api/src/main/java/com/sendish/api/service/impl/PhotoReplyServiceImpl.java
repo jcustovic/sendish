@@ -234,7 +234,7 @@ public class PhotoReplyServiceImpl {
 		if (photoReply.getUser().getId().equals(userId)) {
 			photoReplyDto.setReceived(false);
 			photoReplyDto.setDisplayName(UserUtils.getDisplayNameWithCity(photoReply.getPhoto().getUser()));
-			photoReplyDto.setMessage("You photo replied to ");
+			photoReplyDto.setMessage(" received your photo reply");
 		} else {
 			photoReplyDto.setReceived(true);
 			photoReplyDto.setDisplayName(UserUtils.getDisplayNameWithCity(photoReply.getUser()));

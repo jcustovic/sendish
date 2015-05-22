@@ -116,8 +116,10 @@ public class ChatServiceImpl {
 		dto.setId(message.getId());
         if (message.getType().equals(ChatMessageType.TEXT)) {
             dto.setType(ChatMessageDtoType.TEXT);
+            dto.setDisplayName(UserUtils.getDisplayName(message.getUser()));
         } else {
         	dto.setType(ChatMessageDtoType.IMG);
+            dto.setDisplayName(UserUtils.getDisplayNameWithCity(message.getUser()));
         	ChatMessageImageDto image = new ChatMessageImageDto();
         	image.setType(message.getType());
         	image.setUuid(message.getImageUuid());
@@ -128,7 +130,6 @@ public class ChatServiceImpl {
         }
 		dto.setText(message.getText());
         dto.setUserId(message.getUser().getId());
-		dto.setDisplayName(UserUtils.getDisplayName(message.getUser()));
 		dto.setTimeAgo(prettyTime.format(message.getCreatedDate().toDate()));
 		
 		return dto;
