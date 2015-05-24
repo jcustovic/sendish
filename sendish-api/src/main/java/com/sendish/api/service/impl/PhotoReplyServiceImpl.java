@@ -154,10 +154,9 @@ public class PhotoReplyServiceImpl {
 
     private void addDisplayName(ChatMessageDto message, Long photoReplyOwnerId, String photoOwnerName, String photoReplyOwnerName) {
     	if (message.getUserId().equals(photoReplyOwnerId)) {
-    		message.setDisplayName(photoOwnerName);
+    		message.setDisplayName(photoReplyOwnerName);
     	} else {
-    		// message.setDisplayName(photoReplyOwnerName);
-    		message.setDisplayName("");
+    		message.setDisplayName(photoOwnerName);
     	}
 	}
 
