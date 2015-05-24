@@ -3,8 +3,6 @@ package com.sendish.api.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.sendish.repository.model.jpa.*;
-
 import org.joda.time.DateTime;
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +12,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sendish.api.dto.ChatMessageDto;
-import com.sendish.api.dto.ChatMessageImageDto;
 import com.sendish.api.dto.ChatMessageDto.ChatMessageDtoType;
-import com.sendish.api.util.UserUtils;
+import com.sendish.api.dto.ChatMessageImageDto;
 import com.sendish.repository.ChatMessageRepository;
 import com.sendish.repository.ChatThreadRepository;
 import com.sendish.repository.ChatThreadUserRepository;
 import com.sendish.repository.UserRepository;
+import com.sendish.repository.model.jpa.ChatMessage;
+import com.sendish.repository.model.jpa.ChatMessageType;
+import com.sendish.repository.model.jpa.ChatThread;
+import com.sendish.repository.model.jpa.ChatThreadUser;
+import com.sendish.repository.model.jpa.ChatThreadUserId;
+import com.sendish.repository.model.jpa.PhotoReply;
 
 @Service
 @Transactional
@@ -120,10 +123,12 @@ public class ChatServiceImpl {
 		dto.setId(message.getId());
         if (message.getType().equals(ChatMessageType.TEXT)) {
             dto.setType(ChatMessageDtoType.TEXT);
-            dto.setDisplayName(UserUtils.getDisplayName(message.getUser()));
+            // TODO: Since we override not needed for now!
+            // dto.setDisplayName(UserUtils.getDisplayName(message.getUser()));
         } else {
         	dto.setType(ChatMessageDtoType.IMG);
-            dto.setDisplayName(UserUtils.getDisplayNameWithCity(message.getUser()));
+        	// TODO: Since we override not needed for now!
+            // dto.setDisplayName(UserUtils.getDisplayNameWithCity(message.getUser()));
         	ChatMessageImageDto image = new ChatMessageImageDto();
         	image.setType(message.getType());
         	image.setUuid(message.getImageUuid());

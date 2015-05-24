@@ -12,6 +12,7 @@ import com.sendish.api.dto.*;
 import com.sendish.push.notification.AsyncNotificationProvider;
 import com.sendish.repository.model.jpa.Photo;
 import com.sendish.repository.model.jpa.User;
+
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sendish.api.store.FileStore;
+import com.sendish.api.util.CityUtils;
 import com.sendish.api.util.ImageUtils;
 import com.sendish.api.util.UserUtils;
 import com.sendish.repository.ChatThreadRepository;
@@ -130,18 +132,36 @@ public class PhotoReplyServiceImpl {
 		if (chatThread == null) {
 			return null;	
 		}
+		PhotoReply photoReply = chatThread.getPhotoReply();
+		Long photoReplyOwnerId = photoReply.getUser().getId();
+		String photoOwnerName = CityUtils.getTrimmedLocationName(photoReply.getPhoto().getCity());
+		String photoReplyOwnerName = CityUtils.getTrimmedLocationName(photoReply.getUser().getDetails().getCurrentCity());
+		
 		ChatThreadDetailsDto chatThreadDto = new ChatThreadDetailsDto();
 		chatThreadDto.setId(chatThread.getId());
-		// TODO: Get name from ChatTreadUser
-		// chatThreadDto.setName();
+		if (photoReplyOwnerId.equals(userId)) {
+			chatThreadDto.setName(photoOwnerName);
+		} else {
+			chatThreadDto.setName(photoReplyOwnerName);			
+		}
 		List<ChatMessageDto> messages = chatService.findByThreadId(chatThread.getId(), 0);
+		messages.stream().forEach(m -> addDisplayName(m, photoReplyOwnerId, photoOwnerName, photoReplyOwnerName));
 
 		chatThreadDto.setMessages(messages);
 		
 		return chatThreadDto;
 	}
 
-    public List<PhotoReplyDto> findAll(Long userId, Integer page) {
+    private void addDisplayName(ChatMessageDto message, Long photoReplyOwnerId, String photoOwnerName, String photoReplyOwnerName) {
+    	if (message.getUserId().equals(photoReplyOwnerId)) {
+    		message.setDisplayName(photoOwnerName);
+    	} else {
+    		// message.setDisplayName(photoReplyOwnerName);
+    		message.setDisplayName("");
+    	}
+	}
+
+	public List<PhotoReplyDto> findAll(Long userId, Integer page) {
 		List<ChatThread> photoReplyChatThreads = chatThreadRepository.findPhotoReplyThreadsByUserId(userId,
                 new PageRequest(page, PHOTO_REPLIES_PAGE_SIZE, Direction.DESC, "chatThread.lastActivity"));
         if (page == 0) {
@@ -232,11 +252,12 @@ public class PhotoReplyServiceImpl {
 		photoReplyDto.setImageUuid(photoReply.getUuid());
 		if (photoReply.getUser().getId().equals(userId)) {
 			photoReplyDto.setReceived(false);
-			photoReplyDto.setDisplayName(UserUtils.getDisplayNameWithCity(photoReply.getPhoto().getUser()));
+			photoReplyDto.setDisplayName(CityUtils.getLocationName(photoReply.getPhoto().getCity()));
 			//photoReplyDto.setMessage("received your photo reply");
 		} else {
 			photoReplyDto.setReceived(true);
-			photoReplyDto.setDisplayName(UserUtils.getDisplayNameWithCity(photoReply.getUser()));
+			photoReplyDto.setDisplayName(CityUtils.getLocationName(photoReply.getUser().getDetails().getCurrentCity()));
+			//photoReplyDto.setDisplayName(UserUtils.getDisplayNameWithCity(photoReply.getUser()));
 			//photoReplyDto.setMessage("replied with photo");
 		}
 		photoReplyDto.setMessage("");
