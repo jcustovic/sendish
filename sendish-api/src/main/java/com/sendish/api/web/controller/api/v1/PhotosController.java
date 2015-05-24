@@ -160,6 +160,22 @@ public class PhotosController {
     public List<PhotoDto> findPhotosNearby(@PathVariable Long cityId, @RequestParam(defaultValue = "0") Integer page) {
         return photoService.findNearbyByCity(cityId, page);
     }
+    
+    @RequestMapping(value = "/{photoId}/traveled", method = RequestMethod.GET)
+    @ApiOperation(value = "Get where the photo has traveled")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
+    })
+    public ResponseEntity<List<PhotoTraveledDto>> traveledLocations(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page, AuthUser user) {
+        Photo photo = photoService.findOne(photoId);
+        if (photo == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            List<PhotoTraveledDto> traveledLocations = photoService.getTraveledLocations(photoId, page);
+            return new ResponseEntity<>(traveledLocations, HttpStatus.OK);
+        }
+    }
 
     @RequestMapping(value = "/sendish-upload", method = RequestMethod.POST)
     @ApiOperation(value = "Upload new photo", notes = "If all si OK and you get code 201 check Location header to point you to the newly created photo", response = Void.class)
@@ -229,6 +245,11 @@ public class PhotosController {
         }
     }
 
+    /**
+     * Use traveledLocations
+     * 
+     */
+    @Deprecated
     @RequestMapping(value = "/sent/{photoId}/traveled", method = RequestMethod.GET)
     @ApiOperation(value = "Get where the sent photo has traveled")
     @ApiResponses({

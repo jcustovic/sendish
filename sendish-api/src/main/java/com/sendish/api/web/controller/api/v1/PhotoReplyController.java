@@ -144,7 +144,7 @@ public class PhotoReplyController {
 	@RequestMapping(value = "/{photoReplyId}", method = RequestMethod.DELETE)
 	@ApiOperation(value = "Delete photo reply")
     @ApiResponses({
-    	@ApiResponse(code = 201, message = "Deleted"),
+    	@ApiResponse(code = 204, message = "Deleted"),
     	@ApiResponse(code = 404, message = "Photo reply not found")
     })
 	public ResponseEntity<ChatThreadDetailsDto> delete(@PathVariable Long photoReplyId, AuthUser user) {

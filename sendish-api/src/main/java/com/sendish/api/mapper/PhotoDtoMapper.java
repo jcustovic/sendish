@@ -101,7 +101,7 @@ public class PhotoDtoMapper {
 
         PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photo.getId()));
         if (vote == null) {
-            photoDetails.setForceRating(true);
+            photoDetails.setForceRating(false); // TODO: We don't force rating for now.
         } else {
             photoDetails.setLike(vote.getLike());
         }
