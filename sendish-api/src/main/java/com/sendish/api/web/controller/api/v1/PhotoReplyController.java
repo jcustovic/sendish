@@ -31,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.sendish.api.security.userdetails.AuthUser;
-import com.sendish.api.service.impl.ChatServiceImpl;
 import com.sendish.api.service.impl.PhotoReplyServiceImpl;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
@@ -57,9 +56,6 @@ public class PhotoReplyController {
 	@Autowired
 	private FileStore fileStore;
 	
-	@Autowired
-	private ChatServiceImpl chatServiceImpl;
-
 	@Autowired
 	private PhotoServiceImpl photoService;
 
@@ -167,7 +163,7 @@ public class PhotoReplyController {
 		if (chatThread == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
-			List<ChatMessageDto> msgs = chatServiceImpl.findByThreadId(chatThread.getId(), page);
+			List<ChatMessageDto> msgs = photoReplyService.findChatMessagesByChatThreadId(chatThread.getId(), page);
             msgs.stream().forEach(this::mapPhotoUrl);
 
 			return new ResponseEntity<>(msgs, HttpStatus.OK);

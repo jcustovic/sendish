@@ -272,4 +272,20 @@ public class PhotoReplyServiceImpl {
 		notificationProvider.sendPlainTextNotification(text, photoReplyNotifFields, receivingUserId);
 	}
 
+	public List<ChatMessageDto> findChatMessagesByChatThreadId(Long chatThreadId, Integer page) {
+		ChatThread chatThread = chatService.findThreadByThreadId(chatThreadId);
+		if (chatThread == null) {
+			return null;	
+		}
+		PhotoReply photoReply = chatThread.getPhotoReply();
+		Long photoReplyOwnerId = photoReply.getUser().getId();
+		String photoOwnerName = CityUtils.getTrimmedLocationName(photoReply.getPhoto().getCity());
+		String photoReplyOwnerName = CityUtils.getTrimmedLocationName(photoReply.getUser().getDetails().getCurrentCity());
+		
+		List<ChatMessageDto> messages = chatService.findByThreadId(chatThreadId, page);
+		messages.stream().forEach(m -> addDisplayName(m, photoReplyOwnerId, photoOwnerName, photoReplyOwnerName));
+		
+		return messages;
+	}
+
 }

@@ -91,6 +91,10 @@ public class ChatServiceImpl {
 		}
 	}
 	
+	public ChatThread findThreadByThreadId(Long chatThreadId) {
+		return chatThreadRepository.findOne(chatThreadId);
+	}
+	
 	public ChatMessageDto newTextChatMessage(Long chatThreadId, Long userId, String text) {
         return newChatMessage(chatThreadId, userId, ChatMessageType.TEXT, null, text);
 	}
