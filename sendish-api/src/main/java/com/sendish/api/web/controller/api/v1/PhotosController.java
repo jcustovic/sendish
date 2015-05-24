@@ -246,12 +246,11 @@ public class PhotosController {
     }
 
     /**
-     * Use traveledLocations
-     * 
+     * @see #traveledLocations(Long, Integer, AuthUser)
      */
     @Deprecated
     @RequestMapping(value = "/sent/{photoId}/traveled", method = RequestMethod.GET)
-    @ApiOperation(value = "Get where the sent photo has traveled")
+    @ApiOperation(value = "Get where the sent photo has traveled", notes = "DEPRECATED! Use /api/v1.0/photos/{photoId}/traveled")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Not found")

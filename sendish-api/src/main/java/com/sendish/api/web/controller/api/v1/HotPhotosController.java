@@ -3,8 +3,8 @@ package com.sendish.api.web.controller.api.v1;
 import java.util.List;
 
 import com.sendish.api.service.ResizePhotoService;
-
 import com.sendish.api.service.impl.PhotoVoteServiceImpl;
+
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -166,8 +166,12 @@ public class HotPhotosController {
         }
     }
 
+    /**
+     * @see PhotosController#traveledLocations(Long, Integer, AuthUser)
+     */
+    @Deprecated
     @RequestMapping(value = "/{photoId}/traveled", method = RequestMethod.GET)
-    @ApiOperation(value = "Get where the hot photo has traveled")
+    @ApiOperation(value = "Get where the hot photo has traveled", notes = "DEPRECATED! Use /api/v1.0/photos/{photoId}/traveled")
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 404, message = "Photo not found")

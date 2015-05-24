@@ -19,6 +19,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -58,7 +59,7 @@ public class ReceivedPhotosController {
     @RequestMapping(method = RequestMethod.GET)
     @ApiOperation(value = "Get received photos list", notes = "This method will return the list of received photos")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK")
+        @ApiResponse(code = 200, message = "OK")
     })
     public List<ReceivedPhotoDto> getReceivedPhotos(@RequestParam(defaultValue = "0") Integer page, AuthUser user) {
         return photoService.findAutoReceivedByUserId(user.getUserId(), page);
@@ -67,8 +68,8 @@ public class ReceivedPhotosController {
     @RequestMapping(value = "/{photoId}", method = RequestMethod.GET)
     @ApiOperation(value = "Get received photo details", notes = "Always try to send GPS coordinates if you open the details for the FIRST TIME ONLY!")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<ReceivedPhotoDetailsDto> receivedPhotoDetails(@PathVariable Long photoId, AuthUser user,
                                                                         @ModelAttribute LocationDto location, BindingResult bindingResult) throws BindException {
@@ -91,8 +92,8 @@ public class ReceivedPhotosController {
     @RequestMapping(value = "/{photoId}", method = RequestMethod.DELETE)
     @ApiOperation(value = "Delete received photo")
     @ApiResponses({
-            @ApiResponse(code = 204, message = "Photo deleted"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 204, message = "Photo deleted"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<Void> deleteReceived(@PathVariable Long photoId, AuthUser user) {
         PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
@@ -104,11 +105,15 @@ public class ReceivedPhotosController {
         }
     }
 
+    /**
+     * @see PhotosController#traveledLocations(Long, Integer, AuthUser)
+     */
+    @Deprecated
     @RequestMapping(value = "/{photoId}/traveled", method = RequestMethod.GET)
-    @ApiOperation(value = "Get where received photo has traveled")
+    @ApiOperation(value = "Get where received photo has traveled", notes = "DEPRECATED! Use /api/v1.0/photos/{photoId}/traveled")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<List<PhotoTraveledDto>> receivedTraveled(@PathVariable Long photoId, @RequestParam(defaultValue = "0") Integer page, AuthUser user) {
         PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
@@ -123,8 +128,8 @@ public class ReceivedPhotosController {
     @RequestMapping(value = "/{photoUUID}/view", method = RequestMethod.GET)
     @ApiOperation(value = "View received photo in original size")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<InputStreamResource> viewOriginalReceived(@PathVariable String photoUUID, WebRequest webRequest, AuthUser user) {
         Photo photo = photoService.findReceivedByPhotoUuid(photoUUID, user.getUserId());
@@ -139,8 +144,8 @@ public class ReceivedPhotosController {
     @RequestMapping(value = "/{photoUUID}/view/{sizeKey}", method = RequestMethod.GET)
     @ApiOperation(value = "View received photo in different size")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 404, message = "Not found")
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 404, message = "Not found")
     })
     public ResponseEntity<InputStreamResource> viewReceived(@PathVariable String photoUUID, @PathVariable String sizeKey,
                                                             WebRequest webRequest, AuthUser user) {
@@ -156,8 +161,8 @@ public class ReceivedPhotosController {
     @RequestMapping(value = "/{photoId}/like", method = RequestMethod.PUT)
     @ApiOperation(value = "Like received given photo")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
-            @ApiResponse(code = 204, message = "OK")
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "OK")
     })
     public ResponseEntity<Void> like(@PathVariable Long photoId, AuthUser user) {
         PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
@@ -172,8 +177,8 @@ public class ReceivedPhotosController {
     @RequestMapping(value = "/{photoId}/dislike", method = RequestMethod.PUT)
     @ApiOperation(value = "Dislike received given photo")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
-            @ApiResponse(code = 204, message = "OK")
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "OK")
     })
     public ResponseEntity<Void> dislike(@PathVariable Long photoId, AuthUser user) {
         PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
@@ -188,8 +193,8 @@ public class ReceivedPhotosController {
     @RequestMapping(value = "/{photoId}/report", method = RequestMethod.PUT)
     @ApiOperation(value = "Report received given photo", notes = "Reason must be provided and reasonText is optional")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
-            @ApiResponse(code = 204, message = "OK")
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "OK")
     })
     public ResponseEntity<Void> report(@PathVariable Long photoId, @RequestParam String reason, @RequestParam(required = false) String reasonText, AuthUser user) {
         PhotoReceiver photo = photoService.findReceivedByPhotoIdAndUserId(photoId, user.getUserId());
