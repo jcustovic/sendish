@@ -79,7 +79,6 @@ public class HotPhotoServiceImpl {
 
         hotPhotoRepository.save(hotPhoto);
 
-        // TODO: Don't stop the photo when it hits the hot list. Make it travel :)
         // photoSenderService.stopSending(photoId, "Photo reached hot list");
 
         Photo photo = photoRepository.findOne(photoId);

@@ -85,7 +85,7 @@ public class PhotoReplyController {
 		PhotoReply photoReply = photoReplyService.processNew(photoReplyFileUpload);
     	
     	final URI location = ServletUriComponentsBuilder
-                .fromCurrentServletMapping().path("/api/v1.0/photo-replies/chat/{id}").build()
+                .fromCurrentServletMapping().path("/api/v1.0/photo-replies/{photoReplyId}").build()
                 .expand(photoReply.getId()).toUri();
 
         HttpHeaders headers = new HttpHeaders();
@@ -131,7 +131,7 @@ public class PhotoReplyController {
 		if (chatThread == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
-            chatThread.getMessages().stream().forEach(this::mapPhotoUrl);
+            chatThread.getMessages().stream().forEach(this::addPhotoUrl);
 
 			return new ResponseEntity<>(chatThread, HttpStatus.OK);
 		}
@@ -164,7 +164,7 @@ public class PhotoReplyController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
 			List<ChatMessageDto> msgs = photoReplyService.findChatMessagesByChatThreadId(chatThread.getId(), page);
-            msgs.stream().forEach(this::mapPhotoUrl);
+            msgs.stream().forEach(this::addPhotoUrl);
 
 			return new ResponseEntity<>(msgs, HttpStatus.OK);
 		}
@@ -184,7 +184,7 @@ public class PhotoReplyController {
 		}
 		
 		ChatMessageDto chatMessageDto = photoReplyService.newMessage(newMessage);
-		mapPhotoUrl(chatMessageDto);
+		addPhotoUrl(chatMessageDto);
     	
         return new ResponseEntity<>(chatMessageDto, HttpStatus.OK);
     }
@@ -256,7 +256,7 @@ public class PhotoReplyController {
         }
     }
 
-    private void mapPhotoUrl(ChatMessageDto chatMessageDto) {
+    private void addPhotoUrl(ChatMessageDto chatMessageDto) {
         if (chatMessageDto.getType().equals(ChatMessageDto.ChatMessageDtoType.IMG)) {
         	ChatMessageImageDto img = chatMessageDto.getImage();
             switch ( img.getType() ) {

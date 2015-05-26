@@ -127,16 +127,16 @@ public class ChatServiceImpl {
 		dto.setId(message.getId());
         if (message.getType().equals(ChatMessageType.TEXT)) {
             dto.setType(ChatMessageDtoType.TEXT);
-            // TODO: Since we override not needed for now!
+            // TODO: Since we override in the photo reply service we don't need this for now!
             // dto.setDisplayName(UserUtils.getDisplayName(message.getUser()));
         } else {
         	dto.setType(ChatMessageDtoType.IMG);
-        	// TODO: Since we override not needed for now!
+            // TODO: Since we override in the photo reply service we don't need this for now!
             // dto.setDisplayName(UserUtils.getDisplayNameWithCity(message.getUser()));
         	ChatMessageImageDto image = new ChatMessageImageDto();
         	image.setType(message.getType());
         	image.setUuid(message.getImageUuid());
-        	// TODO: Get real width and height! For now we only use original image size 640x640px
+        	// TODO: Get real width and height! For now we only use original image where the size iz always 640x640px
         	image.setHeight(640);
         	image.setWidth(640);
         	dto.setImage(image);

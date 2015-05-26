@@ -1,6 +1,7 @@
 package com.sendish.api.photo;
 
 import com.sendish.api.service.MailSenderService;
+import com.sendish.api.service.impl.HotPhotoServiceImpl;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.store.exception.ResourceNotFoundException;
 import com.sendish.repository.PhotoRepository;
@@ -12,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -31,8 +33,6 @@ public class HotPhotoDecider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HotPhotoDecider.class);
 
-	private static final int MIN_LIKES_COUNT_FOR_HOT_LIST = 15;
-
 	@Autowired
 	private HotPhotoRepository hotPhotoRepository;
 
@@ -48,20 +48,33 @@ public class HotPhotoDecider {
     @Autowired
     private FileStore fileStore;
 
+    @Autowired
+    private HotPhotoServiceImpl hotPhotoService;
+
+    @Value("${app.photo.hot.required_count:10}")
+    private int likesCountRequiredForHotList;
+
+    @Value("${app.photo.hot.auto_assign:true}")
+    private boolean autoAssign;
+
 	@Async
 	public void decide(Long photoId, Long likeCount) {
         try {
             // TODO: Maybe consider greater also and somehow mark that the mail was sent already so we don't spam!
-            if (likeCount == MIN_LIKES_COUNT_FOR_HOT_LIST) {
+            if (likeCount == likesCountRequiredForHotList) {
                 HotPhoto hotPhoto = hotPhotoRepository.findOne(photoId);
                 if (hotPhoto == null) {
                     Photo photo = photoRepository.findOne(photoId);
+
+                    if (autoAssign) {
+                        hotPhotoService.newHotPhoto(photoId);
+                    }
+
                     PhotoStatistics photoStat = photoStatisticsRepository.findOne(photoId);
                     Map<String, Object> variables = new HashMap<>();
                     variables.put("photo", photo);
                     variables.put("photoStat", photoStat);
                     variables.put("likeCount", likeCount);
-                    // TODO: Description in template and number of dislikes from DB
 
                     Map<String, byte[]> inlineImages = getInlineImages(photo);
 

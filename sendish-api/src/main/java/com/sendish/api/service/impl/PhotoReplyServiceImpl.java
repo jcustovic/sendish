@@ -145,19 +145,11 @@ public class PhotoReplyServiceImpl {
 			chatThreadDto.setName(photoReplyOwnerName);			
 		}
 		List<ChatMessageDto> messages = chatService.findByThreadId(chatThread.getId(), 0);
-		messages.stream().forEach(m -> addDisplayName(m, photoReplyOwnerId, photoOwnerName, photoReplyOwnerName));
+		messages.stream().forEach(m -> overrideDisplayName(m, photoReplyOwnerId, photoOwnerName, photoReplyOwnerName));
 
 		chatThreadDto.setMessages(messages);
 		
 		return chatThreadDto;
-	}
-
-    private void addDisplayName(ChatMessageDto message, Long photoReplyOwnerId, String photoOwnerName, String photoReplyOwnerName) {
-    	if (message.getUserId().equals(photoReplyOwnerId)) {
-    		message.setDisplayName(photoReplyOwnerName);
-    	} else {
-    		message.setDisplayName(photoOwnerName);
-    	}
 	}
 
 	public List<PhotoReplyDto> findAll(Long userId, Integer page) {
@@ -229,48 +221,6 @@ public class PhotoReplyServiceImpl {
 				.map(chatThread -> mapToPhotoReplyDto(chatThread, userId))
 				.collect(Collectors.toList());
 	}
-	
-	private PhotoReply mapToPhotoReply(PhotoReplyFileUpload photoReplyFileUpload, MultipartFile file) {
-		PhotoReply photoReply = new PhotoReply();
-		photoReply.setUser(userRepository.findOne(photoReplyFileUpload.getUserId()));
-		photoReply.setPhoto(photoRepository.findOne(photoReplyFileUpload.getPhotoId()));
-		photoReply.setName(file.getName());
-		photoReply.setContentType(file.getContentType());
-		photoReply.setSize(file.getSize());
-		photoReply.setDescription(photoReplyFileUpload.getDescription());
-		photoReply.setUuid(UUID.randomUUID().toString());
-
-		return photoReply;
-	}
-	
-	private PhotoReplyDto mapToPhotoReplyDto(ChatThread chatThread, Long userId) {
-		PhotoReply photoReply = chatThread.getPhotoReply();
-		PhotoReplyDto photoReplyDto = new PhotoReplyDto();
-        photoReplyDto.setTimeAgo(prettyTime.format(chatThread.getLastActivity().toDate()));
-        photoReplyDto.setId(photoReply.getId());
-		photoReplyDto.setImageUuid(photoReply.getUuid());
-		if (photoReply.getUser().getId().equals(userId)) {
-			photoReplyDto.setReceived(false);
-			photoReplyDto.setDisplayName(CityUtils.getLocationName(photoReply.getPhoto().getCity()));
-			//photoReplyDto.setMessage("received your photo reply");
-		} else {
-			photoReplyDto.setReceived(true);
-			photoReplyDto.setDisplayName(CityUtils.getLocationName(photoReply.getUser().getDetails().getCurrentCity()));
-			//photoReplyDto.setDisplayName(UserUtils.getDisplayNameWithCity(photoReply.getUser()));
-			//photoReplyDto.setMessage("replied with photo");
-		}
-		photoReplyDto.setMessage("");
-		
-		return photoReplyDto;
-	}
-
-	private void sendPhotoReplyNewsNotification(Long receivingUserId, String text, PhotoReply photoReply) {
-		Map<String, Object> photoReplyNotifFields = new HashMap<>();
-		photoReplyNotifFields.put("TYPE", "OPEN_PHOTO_REPLY");
-		photoReplyNotifFields.put("REFERENCE_ID", photoReply.getId());
-
-		notificationProvider.sendPlainTextNotification(text, photoReplyNotifFields, receivingUserId);
-	}
 
 	public List<ChatMessageDto> findChatMessagesByChatThreadId(Long chatThreadId, Integer page) {
 		ChatThread chatThread = chatService.findThreadByThreadId(chatThreadId);
@@ -283,9 +233,59 @@ public class PhotoReplyServiceImpl {
 		String photoReplyOwnerName = CityUtils.getTrimmedLocationName(photoReply.getUser().getDetails().getCurrentCity());
 		
 		List<ChatMessageDto> messages = chatService.findByThreadId(chatThreadId, page);
-		messages.stream().forEach(m -> addDisplayName(m, photoReplyOwnerId, photoOwnerName, photoReplyOwnerName));
+		messages.stream().forEach(m -> overrideDisplayName(m, photoReplyOwnerId, photoOwnerName, photoReplyOwnerName));
 		
 		return messages;
 	}
+
+    private PhotoReply mapToPhotoReply(PhotoReplyFileUpload photoReplyFileUpload, MultipartFile file) {
+        PhotoReply photoReply = new PhotoReply();
+        photoReply.setUser(userRepository.findOne(photoReplyFileUpload.getUserId()));
+        photoReply.setPhoto(photoRepository.findOne(photoReplyFileUpload.getPhotoId()));
+        photoReply.setName(file.getName());
+        photoReply.setContentType(file.getContentType());
+        photoReply.setSize(file.getSize());
+        photoReply.setDescription(photoReplyFileUpload.getDescription());
+        photoReply.setUuid(UUID.randomUUID().toString());
+
+        return photoReply;
+    }
+
+    private PhotoReplyDto mapToPhotoReplyDto(ChatThread chatThread, Long userId) {
+        PhotoReply photoReply = chatThread.getPhotoReply();
+        PhotoReplyDto photoReplyDto = new PhotoReplyDto();
+        photoReplyDto.setTimeAgo(prettyTime.format(chatThread.getLastActivity().toDate()));
+        photoReplyDto.setId(photoReply.getId());
+        photoReplyDto.setImageUuid(photoReply.getUuid());
+        if (photoReply.getUser().getId().equals(userId)) {
+            photoReplyDto.setReceived(false);
+            photoReplyDto.setDisplayName(CityUtils.getLocationName(photoReply.getPhoto().getCity()));
+            //photoReplyDto.setMessage("received your photo reply");
+        } else {
+            photoReplyDto.setReceived(true);
+            photoReplyDto.setDisplayName(CityUtils.getLocationName(photoReply.getUser().getDetails().getCurrentCity()));
+            //photoReplyDto.setDisplayName(UserUtils.getDisplayNameWithCity(photoReply.getUser()));
+            //photoReplyDto.setMessage("replied with photo");
+        }
+        photoReplyDto.setMessage("");
+
+        return photoReplyDto;
+    }
+
+    private void overrideDisplayName(ChatMessageDto message, Long photoReplyOwnerId, String photoOwnerName, String photoReplyOwnerName) {
+        if (message.getUserId().equals(photoReplyOwnerId)) {
+            message.setDisplayName(photoReplyOwnerName);
+        } else {
+            message.setDisplayName(photoOwnerName);
+        }
+    }
+
+    private void sendPhotoReplyNewsNotification(Long receivingUserId, String text, PhotoReply photoReply) {
+        Map<String, Object> photoReplyNotifFields = new HashMap<>();
+        photoReplyNotifFields.put("TYPE", "OPEN_PHOTO_REPLY");
+        photoReplyNotifFields.put("REFERENCE_ID", photoReply.getId());
+
+        notificationProvider.sendPlainTextNotification(text, photoReplyNotifFields, receivingUserId);
+    }
 
 }

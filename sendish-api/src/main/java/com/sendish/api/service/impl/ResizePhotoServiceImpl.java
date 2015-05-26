@@ -98,7 +98,7 @@ public class ResizePhotoServiceImpl implements ResizePhotoService {
                 thumbnails.crop(Positions.CENTER);
             }
             if (sizeKey.endsWith("blur")) {
-            	//thumbnails.addFilter(blurFilter); TODO: For now we don't blur
+            	//thumbnails.addFilter(blurFilter);
             	thumbnails.addFilter(transparencyColorFilter);
 
                 // Add watermark

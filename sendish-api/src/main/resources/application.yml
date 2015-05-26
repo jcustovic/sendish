@@ -72,3 +72,7 @@ app:
   image:
     overlay:
       sendish_logo: classpath:app/image/sendish_64x64.png
+  photo:
+    hot:
+      required_count: 15
+      auto_assign: true

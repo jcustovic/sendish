@@ -52,7 +52,6 @@ public class PhotoVoteServiceImpl {
 		return photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
 	}
 
-	// TODO: Maybe allow changing dislike to like?
 	public void likePhoto(Long photoId, Long userId) {
 		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
 		if (vote == null) {
@@ -90,7 +89,6 @@ public class PhotoVoteServiceImpl {
 		}
 	}
 
-	// TODO: Maybe allow changing like to dislike?
 	public void dislikeReceived(Long photoId, Long userId) {
 		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
 		if (vote == null) {

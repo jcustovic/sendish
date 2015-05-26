@@ -62,7 +62,6 @@ public class PhotoCommentServiceImpl {
     private UserActivityServiceImpl userActivityService;
 	
 	public PhotoComment save(NewCommentDto commentDto) {
-		 // TODO: Maybe restrict only to my photos or received photos?
 		Photo photo = photoRepository.findOne(commentDto.getPhotoId());
 		User user = userRepository.findOne(commentDto.getUserId());
 		
@@ -205,7 +204,6 @@ public class PhotoCommentServiceImpl {
         PhotoCommentVote photoCommentVote = photoCommentVoteRepository.findOne(new PhotoCommentVoteId(userId, photoCommentId));
         if (photoCommentVote == null) {
         	User user = userRepository.findOne(userId);
-            // TODO: Maybe allow vote change?
         	PhotoComment comment = photoCommentRepository.findOne(photoCommentId);
             PhotoCommentVote newVote = new PhotoCommentVote();
             newVote.setLike(like);
