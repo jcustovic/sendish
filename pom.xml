@@ -37,7 +37,7 @@
 		<prettytime.version>3.2.7.Final</prettytime.version>
 		<javax.mail.version>1.4.7</javax.mail.version>
 		<commons-io.version>2.4</commons-io.version>
-		<commons-lang3.version>3.3.2</commons-lang3.version>
+		<commons-lang3.version>3.4</commons-lang3.version>
 		<scala-library.version>2.10.4</scala-library.version>
 		<apns.version>0.2.3</apns.version>
 		<thumbnailator.version>0.4.8</thumbnailator.version>
