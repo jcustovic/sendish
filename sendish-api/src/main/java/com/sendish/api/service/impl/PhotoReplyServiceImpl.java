@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.util.CityUtils;
 import com.sendish.api.util.ImageUtils;
-import com.sendish.api.util.UserUtils;
 import com.sendish.repository.ChatThreadRepository;
 import com.sendish.repository.PhotoReplyRepository;
 import com.sendish.repository.PhotoRepository;
@@ -107,7 +106,7 @@ public class PhotoReplyServiceImpl {
 		statisticsService.setNewPhotoReplyActivity(photoOwnerId);
 
 		User sender = photoReply.getUser();
-		String text = UserUtils.getDisplayNameWithCity(sender) + " replied with photo";
+		String text = CityUtils.getTrimmedLocationName(sender.getDetails().getCurrentCity()) + " replied with photo";
 		sendPhotoReplyNewsNotification(photoOwnerId, text, photoReply);
 
 		userActivityService.addNewPhotoReplyActivity(photoReply);
@@ -191,7 +190,7 @@ public class PhotoReplyServiceImpl {
 			userReceivingReplyId = photoReply.getUser().getId();
 		}
 		statisticsService.setNewPhotoReplyActivity(userReceivingReplyId);
-        String text = UserUtils.getDisplayName(sender) + " replied";
+        String text = CityUtils.getTrimmedLocationName(sender.getDetails().getCurrentCity()) + " replied";
 		sendPhotoReplyNewsNotification(userReceivingReplyId, text, photoReply);
 		
 		return chatMessageDto;
