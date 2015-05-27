@@ -118,6 +118,19 @@ public class PhotosController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
     }
+    
+    @RequestMapping(value = "/{photoUuid}/report", method = RequestMethod.PUT)
+    @ApiOperation(value = "Report given photo")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "NOT USED! 204 will be returned"),
+        @ApiResponse(code = 204, message = "OK"),
+        @ApiResponse(code = 400, message = "You are trying to report your photo"),
+        @ApiResponse(code = 404, message = "Photo not found")
+    })
+    public ResponseEntity<Void> reportPhoto(@PathVariable String photoUuid, AuthUser user) {
+    	// TODO: Implement report
+        return dislikePhoto(photoUuid, user);
+    }
 
     @RequestMapping(value = "/{photoUuid}/view", method = RequestMethod.GET)
     @ApiOperation(value = "View photo in original size")
