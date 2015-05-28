@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
-import org.ocpsoft.prettytime.PrettyTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -30,8 +31,8 @@ import com.sendish.repository.model.jpa.PhotoReply;
 public class ChatServiceImpl {
 	
 	private static final int CHAT_MESSAGE_PAGE_SIZE = 20;
-	
-	private static PrettyTime prettyTime = new PrettyTime();
+
+    private static DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("H:mm");
 	
 	@Autowired
 	private ChatThreadRepository chatThreadRepository;
@@ -143,7 +144,7 @@ public class ChatServiceImpl {
         }
 		dto.setText(message.getText());
         dto.setUserId(message.getUser().getId());
-		dto.setTimeAgo(prettyTime.format(message.getCreatedDate().toDate()));
+		dto.setTimeAgo(message.getCreatedDate().toString(TIME_FORMATTER));
 		
 		return dto;
 	}
