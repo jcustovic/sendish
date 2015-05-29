@@ -118,6 +118,10 @@ public class PhotoCommentServiceImpl {
         return photoCommentRepository.findOne(photoCommentId);
     }
 
+    public PhotoComment findNotDeletedById(Long photoCommentId) {
+        return photoCommentRepository.findNotDeletedById(photoCommentId);
+    }
+
     public void delete(Long photoCommentId) {
         PhotoComment photoComment = photoCommentRepository.findOne(photoCommentId);
         photoComment.setDeleted(true);

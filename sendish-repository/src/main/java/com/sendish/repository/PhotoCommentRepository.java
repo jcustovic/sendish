@@ -13,7 +13,10 @@ import com.sendish.repository.model.jpa.PhotoComment;
 @Transactional(propagation = Propagation.MANDATORY)
 public interface PhotoCommentRepository extends JpaRepository<PhotoComment, Long> {
 
-	@Query("SELECT pc FROM PhotoComment pc where pc.photo.id = ?1 AND pc.deleted = false")
+	@Query("SELECT pc FROM PhotoComment pc WHERE pc.photo.id = ?1 AND pc.deleted = false")
 	List<PhotoComment> findByPhotoId(Long photoId, Pageable page);
+
+	@Query("SELECT pc FROM PhotoComment pc WHERE pc.id = ?1 AND pc.deleted = false")
+	PhotoComment findNotDeletedById(Long photoCommentId);
 
 }

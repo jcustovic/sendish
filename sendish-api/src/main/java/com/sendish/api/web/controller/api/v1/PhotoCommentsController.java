@@ -98,16 +98,20 @@ public class PhotoCommentsController {
         @ApiResponse(code = 404, message = "Comment not found or you are not the owner of the comment or photo")
     })
     public ResponseEntity<Void> delete(@PathVariable Long photoCommentId, AuthUser user) {
-        PhotoComment photoComment = photoCommentService.findOne(photoCommentId);
-        Long photoOwnerId = photoComment.getPhoto().getUser().getId();
-        Long commentOwnerId = photoComment.getUser().getId();
-        if (photoComment == null || !(photoOwnerId.equals(user.getUserId()) || commentOwnerId.equals(user.getUserId()))) {
+        PhotoComment photoComment = photoCommentService.findNotDeletedById(photoCommentId);
+        if (photoComment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        photoCommentService.delete(photoCommentId);
+        Long photoOwnerId = photoComment.getPhoto().getUser().getId();
+        Long commentOwnerId = photoComment.getUser().getId();
+        if (photoOwnerId.equals(user.getUserId()) || commentOwnerId.equals(user.getUserId())) {
+            photoCommentService.delete(photoCommentId);
 
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
     
     @RequestMapping(value = "/comment/{photoCommentId}/like", method = RequestMethod.PUT)
@@ -118,7 +122,7 @@ public class PhotoCommentsController {
         @ApiResponse(code = 400, message = "You vote on your own comment or validation error (bad request)")
     })
     public ResponseEntity<Void> like(@PathVariable Long photoCommentId, AuthUser user) {
-        PhotoComment photoComment = photoCommentService.findOne(photoCommentId);
+        PhotoComment photoComment = photoCommentService.findNotDeletedById(photoCommentId);
         if (photoComment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else if (photoComment.getUser().getId().equals(user.getUserId())) {
@@ -138,7 +142,7 @@ public class PhotoCommentsController {
         @ApiResponse(code = 400, message = "You vote on your own comment or validation error (bad request)")
     })
     public ResponseEntity<Void> dislike(@PathVariable Long photoCommentId, AuthUser user) {
-        PhotoComment photoComment = photoCommentService.findOne(photoCommentId);
+        PhotoComment photoComment = photoCommentService.findNotDeletedById(photoCommentId);
         if (photoComment == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else if (photoComment.getUser().getId().equals(user.getUserId())) {
