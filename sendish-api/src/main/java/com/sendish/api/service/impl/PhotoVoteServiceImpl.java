@@ -80,7 +80,7 @@ public class PhotoVoteServiceImpl {
 		User user = userRepository.findOne(userId);
 		savePhotoVote(photo, user, true);
 
-		Long likeCount = statisticsService.likePhoto(photoId, photoOwner);
+		Long likeCount = statisticsService.likePhoto(photoId, photoOwner.getId());
 		hotPhotoDecider.decide(photoId, likeCount);
 		rankingService.addPointsForLikedPhoto(photoOwner);
 

@@ -11,7 +11,6 @@ import com.sendish.api.redis.dto.CommentStatisticsDto;
 import com.sendish.api.redis.dto.PhotoStatisticsDto;
 import com.sendish.api.redis.dto.UserStatisticsDto;
 import com.sendish.api.redis.repository.RedisStatisticsRepository;
-import com.sendish.repository.model.jpa.User;
 
 @Service
 @Transactional
@@ -23,11 +22,11 @@ public class StatisticsServiceImpl {
 	@Autowired
 	private DBStatisticsSynchronizer dbStatisticsSynchronizer;
 
-	public Long likePhoto(Long photoId, User photoOwner) {
-		statisticsRepository.incrementTotalUserLikeCount(photoOwner.getId());
+	public Long likePhoto(Long photoId, Long photoOwnerId) {
+		statisticsRepository.incrementTotalUserLikeCount(photoOwnerId);
 		Long likeCount = statisticsRepository.likePhoto(photoId);
 
-		dbStatisticsSynchronizer.syncUserStat(photoOwner.getId());
+		dbStatisticsSynchronizer.syncUserStat(photoOwnerId);
 		dbStatisticsSynchronizer.syncPhotoStat(photoId);
 
 		return likeCount;

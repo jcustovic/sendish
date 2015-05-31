@@ -32,6 +32,8 @@ public class PhotoSendingDetails implements Serializable {
     @Column(name = "psd_send_status")
     private PhotoSendStatus sendStatus;
     
+    // TODO: Remove this field and the whole logic behind it!
+    @Deprecated
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "psd_last_photo_rec_id")
     private PhotoReceiver lastReceiver;
