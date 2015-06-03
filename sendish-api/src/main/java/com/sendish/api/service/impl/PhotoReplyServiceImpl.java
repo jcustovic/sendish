@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 import com.sendish.api.dto.*;
 import com.sendish.push.notification.AsyncNotificationProvider;
-import com.sendish.repository.model.jpa.Photo;
-import com.sendish.repository.model.jpa.User;
+import com.sendish.repository.*;
+import com.sendish.repository.model.jpa.*;
 
 import org.ocpsoft.prettytime.PrettyTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sendish.api.store.FileStore;
 import com.sendish.api.util.CityUtils;
 import com.sendish.api.util.ImageUtils;
-import com.sendish.repository.ChatThreadRepository;
-import com.sendish.repository.PhotoReplyRepository;
-import com.sendish.repository.PhotoRepository;
-import com.sendish.repository.UserRepository;
-import com.sendish.repository.model.jpa.ChatThread;
-import com.sendish.repository.model.jpa.PhotoReply;
 
 @Service
 @Transactional
@@ -56,6 +50,9 @@ public class PhotoReplyServiceImpl {
 	
 	@Autowired
 	private ChatThreadRepository chatThreadRepository;
+
+    @Autowired
+    private ChatThreadUserRepository chatThreadUserRepository;
 	
 	@Autowired
 	private StatisticsServiceImpl statisticsService;
@@ -181,22 +178,13 @@ public class PhotoReplyServiceImpl {
 
 		User sender = userRepository.findOne(newMessage.getUserId());
 		ChatMessageDto chatMessageDto = chatService.newTextChatMessage(chatThread.getId(), sender.getId(), newMessage.getMessage());
-		
-		PhotoReply photoReply = chatThread.getPhotoReply();
-		Long userReceivingReplyId;
-		if (photoReply.getUser().equals(sender)) {
-			userReceivingReplyId = photoReply.getPhoto().getUser().getId();
-		} else {
-			userReceivingReplyId = photoReply.getUser().getId();
-		}
-		statisticsService.setNewPhotoReplyActivity(userReceivingReplyId);
-        String text = CityUtils.getTrimmedLocationName(sender.getDetails().getCurrentCity()) + " replied";
-		sendPhotoReplyNewsNotification(userReceivingReplyId, text, photoReply);
+
+        notifyOtherActiveUsers(chatThread, sender);
 		
 		return chatMessageDto;
 	}
 
-	public void report(ReportPhotoReplyDto reportDto) {
+    public void report(ReportPhotoReplyDto reportDto) {
 		PhotoReply photoReply = findOne(reportDto.getPhotoReplyId());
 		photoReply.setDeleted(true);
 		photoReply.setReportedBy(userRepository.findOne(reportDto.getUserId()));
@@ -276,6 +264,23 @@ public class PhotoReplyServiceImpl {
             message.setDisplayName(photoReplyOwnerName);
         } else {
             message.setDisplayName(photoOwnerName);
+        }
+    }
+
+    private void notifyOtherActiveUsers(ChatThread chatThread, User sender) {
+        PhotoReply photoReply = chatThread.getPhotoReply();
+        Long userReceivingReplyId;
+        if (photoReply.getUser().equals(sender)) {
+            userReceivingReplyId = photoReply.getPhoto().getUser().getId();
+        } else {
+            userReceivingReplyId = photoReply.getUser().getId();
+        }
+        ChatThreadUserId id = new ChatThreadUserId(userReceivingReplyId, chatThread.getId());
+        ChatThreadUser chatUser = chatThreadUserRepository.findOne(id);
+        if (chatUser != null) {
+            statisticsService.setNewPhotoReplyActivity(userReceivingReplyId);
+            String text = CityUtils.getTrimmedLocationName(sender.getDetails().getCurrentCity()) + " replied";
+            sendPhotoReplyNewsNotification(userReceivingReplyId, text, photoReply);
         }
     }
 
