@@ -72,8 +72,8 @@ public class PhotoSenderServiceImpl {
 
 	public void resendPhotoOnLike(Long photoId) {
 		PhotoSendingDetails photoSendingDetails = photoSendingDetailsRepository.findOne(photoId);
-		if (photoSendingDetails == null) {
-			LOGGER.info("Photo with id {} doesn't have last receiver. It is probably auto sender photo!", photoId);
+		if (photoSendingDetails == null || PhotoStatus.STOPPED.equals(photoSendingDetails.getPhotoStatus())) {
+			LOGGER.debug("PhotoSendingDetails not found or photo is STOPPED. It is probably auto sender photo!", photoId);
 			return;
 		}
 		

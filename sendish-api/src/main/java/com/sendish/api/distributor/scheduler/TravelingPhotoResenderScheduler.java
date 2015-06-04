@@ -22,7 +22,7 @@ public class TravelingPhotoResenderScheduler {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(TravelingPhotoResenderScheduler.class);
 
-	public static final long ONE_MINUTE_DELAY = 60000L;
+	public static final long TWO_MINUTE_DELAY = 120000L;
 	public static final long MINUTE_DELAY = 60000L;
 
     @Autowired
@@ -31,7 +31,7 @@ public class TravelingPhotoResenderScheduler {
     @Autowired
     private PhotoSendingDetailsRepository photoSendingDetailsRepository;
 
-    @Scheduled(fixedDelay = ONE_MINUTE_DELAY, initialDelay = MINUTE_DELAY)
+    @Scheduled(fixedDelay = TWO_MINUTE_DELAY, initialDelay = MINUTE_DELAY)
     @Transactional
     public void resendTravelingPhotos() throws InterruptedException {
         LOGGER.info("Starting resend of traveling photos...");
