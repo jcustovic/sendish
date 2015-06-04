@@ -140,7 +140,9 @@ public class PhotoReplyServiceImpl {
 		} else {
 			chatThreadDto.setName(photoReplyOwnerName);			
 		}
-		List<ChatMessageDto> messages = chatService.findByThreadId(chatThread.getId(), 0);
+		User user = userRepository.findOne(userId);
+		String timezone = user.getDetails().getCurrentCity().getTimezone();
+		List<ChatMessageDto> messages = chatService.findByThreadId(chatThread.getId(), timezone, 0);
 		messages.stream().forEach(m -> overrideDisplayName(m, photoReplyOwnerId, photoOwnerName, photoReplyOwnerName));
 
 		chatThreadDto.setMessages(messages);
@@ -209,7 +211,7 @@ public class PhotoReplyServiceImpl {
 				.collect(Collectors.toList());
 	}
 
-	public List<ChatMessageDto> findChatMessagesByChatThreadId(Long chatThreadId, Integer page) {
+	public List<ChatMessageDto> findChatMessagesByChatThreadId(Long chatThreadId, Long userId, Integer page) {
 		ChatThread chatThread = chatService.findThreadByThreadId(chatThreadId);
 		if (chatThread == null) {
 			return null;	
@@ -219,7 +221,10 @@ public class PhotoReplyServiceImpl {
 		String photoOwnerName = CityUtils.getTrimmedLocationName(photoReply.getPhoto().getCity());
 		String photoReplyOwnerName = CityUtils.getTrimmedLocationName(photoReply.getUser().getDetails().getCurrentCity());
 		
-		List<ChatMessageDto> messages = chatService.findByThreadId(chatThreadId, page);
+		User user = userRepository.findOne(userId);
+		String timezone = user.getDetails().getCurrentCity().getTimezone();
+		
+		List<ChatMessageDto> messages = chatService.findByThreadId(chatThreadId, timezone, page);
 		messages.stream().forEach(m -> overrideDisplayName(m, photoReplyOwnerId, photoOwnerName, photoReplyOwnerName));
 		
 		return messages;
@@ -270,16 +275,19 @@ public class PhotoReplyServiceImpl {
     private void notifyOtherActiveUsers(ChatThread chatThread, User sender) {
         PhotoReply photoReply = chatThread.getPhotoReply();
         Long userReceivingReplyId;
+        City replyCity;
         if (photoReply.getUser().equals(sender)) {
             userReceivingReplyId = photoReply.getPhoto().getUser().getId();
+            replyCity = sender.getDetails().getCurrentCity();            
         } else {
             userReceivingReplyId = photoReply.getUser().getId();
+            replyCity = photoReply.getPhoto().getCity();
         }
         ChatThreadUserId id = new ChatThreadUserId(userReceivingReplyId, chatThread.getId());
         ChatThreadUser chatUser = chatThreadUserRepository.findOne(id);
         if (chatUser != null) {
             statisticsService.setNewPhotoReplyActivity(userReceivingReplyId);
-            String text = CityUtils.getTrimmedLocationName(sender.getDetails().getCurrentCity()) + " replied";
+            String text = CityUtils.getTrimmedLocationName(replyCity) + " replied";
             sendPhotoReplyNewsNotification(userReceivingReplyId, text, photoReply);
         }
     }

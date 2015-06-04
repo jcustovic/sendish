@@ -31,16 +31,6 @@ public class PhotoSendingDetails implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "psd_send_status")
     private PhotoSendStatus sendStatus;
-    
-    // TODO: Remove this field and the whole logic behind it!
-    @Deprecated
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "psd_last_photo_rec_id")
-    private PhotoReceiver lastReceiver;
-
-    @Version
-    @Column(name = "psd_version")
-    private Integer version;
 
     public Long getPhotoId() {
         return photoId;
@@ -80,18 +70,6 @@ public class PhotoSendingDetails implements Serializable {
 
     public void setSendStatus(PhotoSendStatus sendStatus) {
         this.sendStatus = sendStatus;
-    }
-
-    public PhotoReceiver getLastReceiver() {
-        return lastReceiver;
-    }
-
-    public void setLastReceiver(PhotoReceiver lastReceiver) {
-        this.lastReceiver = lastReceiver;
-    }
-
-    public Integer getVersion() {
-        return version;
     }
 
 }

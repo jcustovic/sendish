@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
@@ -25,10 +28,13 @@ import com.sendish.repository.model.jpa.ChatThread;
 import com.sendish.repository.model.jpa.ChatThreadUser;
 import com.sendish.repository.model.jpa.ChatThreadUserId;
 import com.sendish.repository.model.jpa.PhotoReply;
+import com.sendish.repository.model.jpa.User;
 
 @Service
 @Transactional
 public class ChatServiceImpl {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ChatServiceImpl.class);
 	
 	private static final int CHAT_MESSAGE_PAGE_SIZE = 20;
 
@@ -74,11 +80,11 @@ public class ChatServiceImpl {
         return chatThreadRepository.findByPhotoReplyIdAndUserId(photoReplyId, userId);
     }
 	
-	public List<ChatMessageDto> findByThreadId(Long chatThreadId, Integer page) {
+	public List<ChatMessageDto> findByThreadId(Long chatThreadId, String timezone, Integer page) {
 		List<ChatMessage> messages = chatMessageRepository.findByChatThreadId(chatThreadId, 
 				new PageRequest(page, CHAT_MESSAGE_PAGE_SIZE, Direction.DESC, "createdDate"));
 		
-		return messages.stream().map(this::mapToMessageDto).collect(Collectors.toList());
+		return messages.stream().map(msg -> mapToMessageDto(msg, timezone)).collect(Collectors.toList());
 	}
 	
 	public boolean removeUserFromChatThread(Long chatThreadId, Long userId) {
@@ -119,11 +125,14 @@ public class ChatServiceImpl {
         message.setType(type);
         message.setImageUuid(imageUuid);
         message.setText(text);
+        
+		User user = userRepository.findOne(userId);
+		String timezone = user.getDetails().getCurrentCity().getTimezone();
 
-        return mapToMessageDto(chatMessageRepository.save(message));
+        return mapToMessageDto(chatMessageRepository.save(message), timezone);
     }
 	
-	private ChatMessageDto mapToMessageDto(ChatMessage message) {
+	private ChatMessageDto mapToMessageDto(ChatMessage message, String timezoneStr) {
 		ChatMessageDto dto = new ChatMessageDto();
 		dto.setId(message.getId());
         if (message.getType().equals(ChatMessageType.TEXT)) {
@@ -144,9 +153,16 @@ public class ChatServiceImpl {
         }
 		dto.setText(message.getText());
         dto.setUserId(message.getUser().getId());
-		dto.setTimeAgo(message.getCreatedDate().toString(TIME_FORMATTER));
+        
+        try {
+        	DateTimeZone timezone = DateTimeZone.forID(timezoneStr);
+        	dto.setTimeAgo(message.getCreatedDate().toDateTime(timezone).toString(TIME_FORMATTER));
+        } catch (IllegalArgumentException e) {
+        	LOGGER.error(e.getMessage());
+        	dto.setTimeAgo(message.getCreatedDate().toString(TIME_FORMATTER));
+        }
 		
 		return dto;
 	}
-
+	
 }

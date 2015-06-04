@@ -163,7 +163,7 @@ public class PhotoReplyController {
 		if (chatThread == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
-			List<ChatMessageDto> msgs = photoReplyService.findChatMessagesByChatThreadId(chatThread.getId(), page);
+			List<ChatMessageDto> msgs = photoReplyService.findChatMessagesByChatThreadId(chatThread.getId(), user.getUserId(), page);
             msgs.stream().forEach(this::addPhotoUrl);
 
 			return new ResponseEntity<>(msgs, HttpStatus.OK);

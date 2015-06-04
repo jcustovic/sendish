@@ -44,7 +44,6 @@ public class PhotoSenderServiceImpl {
         } else {
             photoSendingDetails.setPhotoStatus(PhotoStatus.TRAVELING);
             photoSendingDetails.setSendStatus(PhotoSendStatus.SENT);
-            photoSendingDetails.setLastReceiver(receivers.get(receivers.size() - 1));
         }
 
         return photoSendingDetailsRepository.save(photoSendingDetails);
@@ -65,27 +64,20 @@ public class PhotoSenderServiceImpl {
         } else {
         	photoSendingDetails.setPhotoStatus(PhotoStatus.TRAVELING);
             photoSendingDetails.setSendStatus(PhotoSendStatus.SENT);
-            photoSendingDetails.setLastReceiver(receivers.get(receivers.size() - 1));
         }
         
+        // TODO: Multi-thread!
         photoSendingDetailsRepository.save(photoSendingDetails);
     }
 
-	public void resendPhotoOnLike(Long photoId, Long photoReceiverId) {
+	public void resendPhotoOnLike(Long photoId) {
 		PhotoSendingDetails photoSendingDetails = photoSendingDetailsRepository.findOne(photoId);
 		if (photoSendingDetails == null) {
 			LOGGER.info("Photo with id {} doesn't have last receiver. It is probably auto sender photo!", photoId);
 			return;
 		}
 		
-		// TODO: Maybe resend on every like! How to cope with PhotoSendingDetails @Version?
-		Long lastPhotoReceiverId = photoSendingDetails.getLastReceiver().getId();
-		
-		if (lastPhotoReceiverId.equals(photoReceiverId)) {
-			resendPhoto(photoId, 1);
-		} else {
-			LOGGER.debug("Not resending because photo receiver ({}) is not the last receiver ({})", photoReceiverId, lastPhotoReceiverId);
-		}
+		resendPhoto(photoId, 1);
 	}
 
 	public void stopSending(Long photoId, String stopReason) {

@@ -64,8 +64,7 @@ public class PhotoVoteServiceImpl {
 		PhotoVote vote = photoVoteRepository.findOne(new PhotoVoteId(userId, photoId));
 		if (vote == null) {
 			processPhotoLike(photoId, userId);
-			PhotoReceiver photoReceiver = photoReceiverRepository.findByPhotoIdAndUserId(photoId, userId);
-			asyncPhotoSenderService.resendPhotoOnLike(photoId, photoReceiver.getId());
+			asyncPhotoSenderService.resendPhotoOnLike(photoId);
 		}
 	}
 
