@@ -1,6 +1,5 @@
 package com.sendish.repository;
 
-import org.joda.time.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,8 +17,7 @@ public interface PhotoSendingDetailsRepository extends JpaRepository<PhotoSendin
 	@Query("SELECT psd.id FROM PhotoSendingDetails psd WHERE psd.photoStatus = ?1 AND psd.sendStatus = ?2")
 	Page<Long> findIdsByPhotoStatusAndSendStatus(PhotoStatus photoStatus, PhotoSendStatus sendStatus, Pageable page);
 	
-	@Query("SELECT psd.id FROM PhotoSendingDetails psd" //
-			+ " WHERE psd.photoStatus = 'TRAVELING' AND psd.sendStatus IN ('SENT', 'NO_USER') AND psd.lastReceiver.createdDate < ?1")
-	Page<Long> findTravelingPhotoIdsByLastSentGreatherThan(DateTime sentDate, Pageable page);
+	@Query("SELECT psd.id FROM PhotoSendingDetails psd WHERE psd.photoStatus = 'TRAVELING' AND psd.sendStatus IN ('SENT', 'NO_USER')")
+	Page<Long> findTravelingPhotoIdsByLastSentGreatherThan(Pageable page);
 
 }

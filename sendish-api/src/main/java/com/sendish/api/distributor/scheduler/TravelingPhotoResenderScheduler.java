@@ -1,7 +1,9 @@
 package com.sendish.api.distributor.scheduler;
 
-import com.sendish.api.service.impl.PhotoSenderServiceImpl;
-import org.joda.time.DateTime;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +14,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sendish.api.service.impl.PhotoSenderServiceImpl;
 import com.sendish.repository.PhotoSendingDetailsRepository;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class TravelingPhotoResenderScheduler {
@@ -36,7 +35,7 @@ public class TravelingPhotoResenderScheduler {
     @Transactional
     public void resendTravelingPhotos() throws InterruptedException {
         LOGGER.info("Starting resend of traveling photos...");
-    	Page<Long> photoIds = photoSendingDetailsRepository.findTravelingPhotoIdsByLastSentGreatherThan(DateTime.now().minusMinutes(2), new PageRequest(0, 10000, Sort.Direction.DESC, "photoId"));
+    	Page<Long> photoIds = photoSendingDetailsRepository.findTravelingPhotoIdsByLastSentGreatherThan(new PageRequest(0, 10000, Sort.Direction.DESC, "photoId"));
     	
     	LOGGER.info("Found {} photos that need to be resent.", photoIds.getTotalElements());
         ExecutorService executor = Executors.newFixedThreadPool(20);

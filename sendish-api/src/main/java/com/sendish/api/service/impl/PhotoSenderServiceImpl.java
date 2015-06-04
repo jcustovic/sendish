@@ -66,7 +66,7 @@ public class PhotoSenderServiceImpl {
             photoSendingDetails.setSendStatus(PhotoSendStatus.SENT);
         }
         
-        // TODO: Multi-thread!
+        // TODO: Multi-thread! Maybe record time when last user received photo?
         photoSendingDetailsRepository.save(photoSendingDetails);
     }
 
