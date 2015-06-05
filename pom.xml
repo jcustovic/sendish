@@ -24,18 +24,17 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 
-		<spring-boot.version>1.2.3.RELEASE</spring-boot.version>
-		<spring-social-facebook.version>2.0.1.RELEASE</spring-social-facebook.version>
+		<spring-boot.version>1.2.4.RELEASE</spring-boot.version>
 		<spring-data-releasetrain.version>Fowler-RELEASE</spring-data-releasetrain.version>
+
+		<hibernate.versionhibernate.version>4.3.10.Final</hibernate.versionhibernate.version>
 
 		<joda-time.version>2.7</joda-time.version>
 		<org.jadira.usertype.version>3.2.0.GA</org.jadira.usertype.version>
 		<hibernate-spatial.version>4.3</hibernate-spatial.version>
 		<vividsolutions.jts.version>1.13</vividsolutions.jts.version>
 		<swagger-springmvc.version>1.0.2</swagger-springmvc.version>
-		<hibernate.version>4.3.8.Final</hibernate.version>
 		<prettytime.version>3.2.7.Final</prettytime.version>
-		<javax.mail.version>1.4.7</javax.mail.version>
 		<commons-io.version>2.4</commons-io.version>
 		<commons-lang3.version>3.4</commons-lang3.version>
 		<scala-library.version>2.10.4</scala-library.version>
@@ -85,12 +84,6 @@
 						<artifactId>spring-data-releasetrain</artifactId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-
-			<dependency>
-				<groupId>org.springframework.social</groupId>
-				<artifactId>spring-social-facebook</artifactId>
-				<version>${spring-social-facebook.version}</version>
 			</dependency>
 
 			<dependency>
@@ -165,12 +158,6 @@
 				<groupId>org.ocpsoft.prettytime</groupId>
 				<artifactId>prettytime</artifactId>
 				<version>${prettytime.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>javax.mail</groupId>
-				<artifactId>mail</artifactId>
-				<version>${javax.mail.version}</version>
 			</dependency>
 
 			<dependency>
