@@ -207,7 +207,7 @@ public class PhotosController {
 
         // TODO: Maybe return also the locations where the image was sent if available!
         final URI location = ServletUriComponentsBuilder
-                .fromCurrentServletMapping().path("/api/v1.0/photos/{id}").build()
+                .fromCurrentServletMapping().path("/api/v1.0/photos/sent/{id}").build()
                 .expand(photoSendingDetails.getPhotoId()).toUri();
 
         HttpHeaders headers = new HttpHeaders();
