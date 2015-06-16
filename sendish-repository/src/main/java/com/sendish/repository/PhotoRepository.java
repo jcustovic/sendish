@@ -22,6 +22,7 @@ public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
     Photo findByUuid(String photoUuid);
 
+    @Query("SELECT p FROM Photo p WHERE p.city.country.id = ?1 AND p.deleted = false AND p.senderDeleted = false")
     List<Photo> findByCityCountryId(Long countryId, Pageable page);
 
 }

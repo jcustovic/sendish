@@ -250,6 +250,7 @@ public class PhotoServiceImpl {
     public void deletePhoto(Long photoId) {
         Photo photo = photoRepository.findOne(photoId);
         photo.setSenderDeleted(true);
+        // TODO: Maybe stop sending?
 
         photoRepository.save(photo);
     }
