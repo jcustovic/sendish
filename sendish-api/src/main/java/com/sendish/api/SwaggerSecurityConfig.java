@@ -25,7 +25,7 @@ public class SwaggerSecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .requestMatchers().antMatchers("/documentation/**", "/swagger-ui/**", "/api-docs/**").and()
             .csrf().disable()
-            .headers().frameOptions().disable().and()
+            .headers().frameOptions().disable()
             .authorizeRequests()
                 .antMatchers("/api-docs/admin/**").hasRole(ROLE_DOCS_ADMIN)
                 .anyRequest().hasRole(ROLE_DOCS);

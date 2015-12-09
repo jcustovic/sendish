@@ -35,7 +35,7 @@ public class AdminSecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .requestMatchers().antMatchers("/api/admin/**").and()
             .csrf().disable()
-            .headers().frameOptions().disable().and()
+            .headers().frameOptions().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeRequests()
                 .anyRequest().hasRole(ROLE_ADMIN);
