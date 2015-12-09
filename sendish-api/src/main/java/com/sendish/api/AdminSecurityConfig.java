@@ -35,13 +35,13 @@ public class AdminSecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .requestMatchers().antMatchers("/api/admin/**").and()
             .csrf().disable()
-            .headers().frameOptions().disable()
+            .headers().frameOptions().disable().and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeRequests()
                 .anyRequest().hasRole(ROLE_ADMIN);
 
         http
-                .exceptionHandling()
+            .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint())
             .and()
                 .addFilter(digestAuthenticationFilter(digestEntryPoint()));
@@ -52,12 +52,12 @@ public class AdminSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .withUser("pimpek").password("tijemali").roles(ROLE_ADMIN);
     }
-    
+
 	public DigestAuthenticationFilter digestAuthenticationFilter(DigestAuthenticationEntryPoint digestAuthenticationEntryPoint) throws Exception {
 		DigestAuthenticationFilter digestAuthenticationFilter = new DigestAuthenticationFilter();
 		digestAuthenticationFilter.setAuthenticationEntryPoint(digestEntryPoint());
 		digestAuthenticationFilter.setUserDetailsService(userDetailsServiceBean());
-		
+
 		return digestAuthenticationFilter;
 	}
 
@@ -76,7 +76,7 @@ public class AdminSecurityConfig extends WebSecurityConfigurerAdapter {
 		DigestAuthenticationEntryPoint digestAuthenticationEntryPoint = new DigestAuthenticationEntryPoint();
 		digestAuthenticationEntryPoint.setKey("akdas/(&%$");
 		digestAuthenticationEntryPoint.setRealmName(REALM_NAME);
-		
+
 		return digestAuthenticationEntryPoint;
 	}
 

@@ -69,7 +69,7 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
             .csrf().disable()
-            .headers().frameOptions().disable()
+            .headers().frameOptions().disable().and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .addFilterBefore(socialAuthenticationFilter, BasicAuthenticationFilter.class)
             .httpBasic().realmName(REALM_NAME).and()
