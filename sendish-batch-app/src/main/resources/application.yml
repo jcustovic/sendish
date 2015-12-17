@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:h2:file:~/sendish/db
     username: sa
-    password: cHusica
+    password: pass
   jpa:
     hibernate:
       ddl-auto: none
@@ -35,9 +35,9 @@ app:
     cert:
       dev:
         path: classpath:ios/apns/SendishAPNS_DEV.jks
-        pass: sendisH
+        pass: pass
       prod:
         path: classpath:ios/apns/SendishAPNS_PROD.jks
-        pass: sendisH
+        pass: pass
   gcm:
-    api_key: AIzaSyCUFG3_XGvTzNgUbvpUMQiGyiAjFo8b6lo
+    api_key: api_key
